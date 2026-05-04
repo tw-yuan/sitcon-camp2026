@@ -30,6 +30,8 @@
 	html {
 		min-height: 100%;
 		background-color: var(--color-background);
+		text-size-adjust: 100%;
+		-webkit-text-size-adjust: 100%;
 	}
 
 	body {
