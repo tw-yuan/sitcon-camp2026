@@ -46,6 +46,32 @@ export default defineConfig({
 					}
 				]
 			}
+		},
+		{
+			provider: fontProviders.local(),
+			name: "Fira Mono",
+			cssVariable: "--font-mono",
+			weights: [400, 500, 700],
+			styles: ["normal"],
+			options: {
+				variants: [
+					{
+						weight: 400,
+						style: "normal",
+						src: ["./src/assets/fonts/FiraMono-Regular.woff2"]
+					},
+					{
+						weight: 500,
+						style: "normal",
+						src: ["./src/assets/fonts/FiraMono-Medium.woff2"]
+					},
+					{
+						weight: 700,
+						style: "normal",
+						src: ["./src/assets/fonts/FiraMono-Bold.woff2"]
+					}
+				]
+			}
 		}
 	],
 

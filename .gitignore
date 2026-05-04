@@ -19,6 +19,9 @@ dist/
 # generated types
 .astro/
 
+# build script caches (font-subset, etc.)
+.cache/
+
 # dependencies
 node_modules/
 package-lock.json
