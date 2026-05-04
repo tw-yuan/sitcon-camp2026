@@ -876,7 +876,20 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		}
 
 		.master-carousel {
-			--carousel-slide-width: calc(100vw - 2rem);
+			--carousel-gap: 0.75rem;
+			--carousel-side-space: 0rem;
+			--carousel-slide-width: 100%;
+			width: 100%;
+			margin-inline: 0;
+		}
+
+		.master-carousel__track {
+			width: 100%;
+			padding-inline: 0;
+		}
+
+		.master-carousel__slide {
+			flex-basis: 100%;
 		}
 
 		.master-class__content {
