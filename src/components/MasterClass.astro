@@ -327,8 +327,11 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 <style>
 	.master-class {
+		--master-controls-offset: clamp(0.75rem, 2vw, 1.25rem);
+		--master-controls-reserved: 0.9rem;
 		position: relative;
 		padding-block: 0 clamp(4.5rem, 9vw, 8rem);
+		scroll-margin-block-start: calc(5.5rem + env(safe-area-inset-top, 0px));
 		background: var(--color-background);
 		color: var(--color-foreground);
 		isolation: isolate;
@@ -524,7 +527,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 	.master-carousel__viewport {
 		overflow-x: auto;
 		overflow-y: hidden;
-		padding-block: 0.2rem 0.9rem;
+		padding-block: 0.2rem var(--master-controls-reserved);
 		cursor: grab;
 		scroll-padding-inline: var(--carousel-side-space);
 		scroll-snap-type: x mandatory;
@@ -724,7 +727,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 	.master-carousel__controls {
 		position: sticky;
-		inset-block-end: clamp(0.75rem, 2vw, 1.25rem);
+		inset-block-end: calc(var(--master-controls-offset) + env(safe-area-inset-bottom, 0px));
 		z-index: 20;
 		display: flex;
 		align-items: center;
@@ -867,6 +870,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 	@media (max-width: 40rem) {
 		.master-class {
+			--master-controls-offset: 0.75rem;
+			--master-controls-reserved: calc(5.4rem + env(safe-area-inset-bottom, 0px));
 			padding-block: 0 clamp(3rem, 12vw, 5rem);
 		}
 
@@ -893,6 +898,10 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		.master-class__topics {
 			grid-template-columns: 1fr;
 			gap: 0.65rem;
+		}
+
+		.master-carousel__slide--topics {
+			padding-block-end: var(--master-controls-reserved);
 		}
 
 		.topic-card {
@@ -938,7 +947,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		}
 
 		.course-slide__content {
-			padding: 1rem;
+			padding: 1rem 1rem var(--master-controls-reserved);
 		}
 
 		.course-slide__summary {
