@@ -416,6 +416,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 	.topic-card__media {
 		position: relative;
+		box-sizing: border-box;
+		inline-size: 100%;
 		aspect-ratio: 4 / 3;
 		margin: 0;
 		overflow: hidden;
@@ -518,6 +520,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		--carousel-gap: clamp(1rem, 2.4vw, 2rem);
 		--carousel-slide-width: min(calc(100vw - var(--site-content-gutter) * 2), var(--site-content-max));
 		--carousel-side-space: max(var(--site-content-gutter), calc((100vw - var(--carousel-slide-width)) / 2));
+		--carousel-control-offset: clamp(0.75rem, 2vw, 1.25rem);
+		--carousel-control-clearance: calc(4.35rem + var(--carousel-control-offset) + env(safe-area-inset-bottom, 0px));
 		width: 100vw;
 		margin-inline: calc(50% - 50vw);
 		display: grid;
@@ -585,6 +589,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 	.course-slide__media {
 		position: relative;
+		box-sizing: border-box;
+		inline-size: 100%;
 		min-height: 100%;
 		margin: 0;
 		overflow: hidden;
@@ -727,7 +733,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 	.master-carousel__controls {
 		position: sticky;
-		inset-block-end: calc(var(--master-controls-offset) + env(safe-area-inset-bottom, 0px));
+		inset-block-end: calc(var(--carousel-control-offset) + env(safe-area-inset-bottom, 0px));
 		z-index: 20;
 		display: flex;
 		align-items: center;
@@ -959,8 +965,13 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 			line-height: 1.22;
 		}
 
+		.master-carousel__slide--topics {
+			padding-block-end: calc(0.55rem + var(--carousel-control-clearance));
+		}
+
 		.course-slide__content {
-			padding: 1rem 1rem var(--master-controls-reserved);
+			padding: 1rem;
+			padding-block-end: calc(1rem + var(--carousel-control-clearance));
 		}
 
 		.course-slide__summary {
@@ -984,7 +995,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 
 		.master-carousel__tabs {
 			flex-wrap: nowrap;
-			max-width: calc(100vw - 2rem);
+			max-width: calc(100vw - 2rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
 			overflow-x: auto;
 			scrollbar-width: none;
 		}
