@@ -232,76 +232,52 @@ const videos = studentComment.video.map(video => {
 
 <script>
 	const dialog = document.getElementById("comment-dialog") as HTMLDialogElement | null;
-
 	const iframe = document.getElementById("comment-iframe") as HTMLIFrameElement | null;
 
 	const studentCommentDialog = document.getElementById("student-comment-dialog") as HTMLDialogElement | null;
-
 	const studentCommentDialogHeader = document.getElementById("student-comment-dialog-header") as HTMLDivElement | null;
-
 	const studentCommentDialogName = document.getElementById("student-comment-dialog-name") as HTMLHeadingElement | null;
-
 	const studentCommentDialogAvatar = document.getElementById("student-comment-dialog-avatar") as HTMLImageElement | null;
-
 	const studentCommentDialogText = document.getElementById("student-comment-dialog-text") as HTMLDivElement | null;
-
 	const bgMarquee = document.querySelector("[data-student-bg-marquee]") as HTMLDivElement | null;
 
 	const videoMarqueeTrack = document.querySelector("[data-video-marquee-track]") as HTMLDivElement | null;
-
 	const videoMarqueeContainer = document.querySelector("[data-video-marquee-container]") as HTMLDivElement | null;
 
 	function renderBgMarqueeRows() {
 		if (!bgMarquee) return;
 
 		const text = bgMarquee.dataset.marqueeText ?? "";
-
 		const targetRowGap = window.innerWidth < 640 ? 96 : window.innerWidth < 1024 ? 128 : 160;
-
 		const rowCount = Math.min(24, Math.max(6, Math.ceil(bgMarquee.clientHeight / targetRowGap)));
-
 		const minimumTextRepeat = Math.max(20, Math.ceil((window.innerWidth * 2.5) / Math.max(text.length * 24, 1)));
-
 		const textRepeat = minimumTextRepeat + (minimumTextRepeat % 2);
-
 		const renderKey = `${rowCount}:${textRepeat}`;
 
 		if (bgMarquee.dataset.renderKey === renderKey) return;
 
 		bgMarquee.dataset.renderKey = renderKey;
-
 		bgMarquee.replaceChildren();
 
 		for (let i = 0; i < rowCount; i += 1) {
 			const row = document.createElement("div");
-
 			row.className = "student-comment-marquee-row";
-
 			row.style.marginLeft = `${(i % 3) * -8}rem`;
-
 			const rowText = document.createElement("span");
-
 			rowText.className = "student-comment-marquee-text";
-
 			rowText.textContent = `${text.repeat(textRepeat)}\u00A0`;
-
 			row.append(rowText);
-
 			bgMarquee.append(row);
 		}
 	}
 
 	if (bgMarquee) {
 		renderBgMarqueeRows();
-
 		const observer = new ResizeObserver(renderBgMarqueeRows);
-
 		observer.observe(bgMarquee);
-
 		window.addEventListener("beforeunload", () => {
 			observer.disconnect();
 		});
-
 		window.addEventListener("resize", renderBgMarqueeRows);
 	}
 
