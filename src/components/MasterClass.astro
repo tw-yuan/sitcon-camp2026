@@ -602,6 +602,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		--carousel-side-space: max(var(--site-content-gutter), calc((100vw - var(--carousel-slide-width)) / 2));
 		--carousel-control-offset: clamp(0.75rem, 2vw, 1.25rem);
 		--carousel-control-clearance: calc(4.35rem + var(--carousel-control-offset) + env(safe-area-inset-bottom, 0px));
+		min-width: 0;
 		width: 100vw;
 		margin-inline: calc(50% - 50vw);
 		display: grid;
@@ -609,6 +610,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 	}
 
 	.master-carousel__viewport {
+		min-width: 0;
+		max-width: 100%;
 		overflow-x: auto;
 		overflow-y: hidden;
 		padding-block: 0.2rem var(--master-controls-reserved);
@@ -633,6 +636,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		gap: var(--carousel-gap);
 		align-items: stretch;
 		box-sizing: border-box;
+		min-width: 0;
 		width: max-content;
 		padding-inline: var(--carousel-side-space);
 	}
@@ -866,6 +870,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		inset-block-end: calc(var(--carousel-control-offset) + env(safe-area-inset-bottom, 0px));
 		z-index: 20;
 		display: flex;
+		min-width: 0;
+		max-width: 100%;
 		align-items: center;
 		justify-content: center;
 		padding-inline: var(--site-content-gutter);
@@ -1025,7 +1031,8 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 			--carousel-gap: 0.75rem;
 			--carousel-side-space: 0rem;
 			--carousel-slide-width: 100%;
-			width: 100%;
+			width: min(100%, calc(100vw - var(--site-content-gutter) * 2));
+			max-width: 100%;
 			margin-inline: 0;
 		}
 
