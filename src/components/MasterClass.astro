@@ -667,10 +667,11 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 	}
 
 	.master-carousel__viewport {
+		box-sizing: content-box;
 		min-width: 0;
 		max-width: 100%;
 		overflow-x: auto;
-		overflow-y: hidden;
+		overflow-y: visible;
 		padding-block: 0.2rem var(--master-controls-reserved);
 		cursor: grab;
 		scroll-padding-inline: var(--carousel-side-space);
@@ -1119,7 +1120,7 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 		}
 
 		.master-carousel__track {
-			align-items: flex-start;
+			align-items: stretch;
 			width: 100%;
 			padding-inline: 0;
 		}
