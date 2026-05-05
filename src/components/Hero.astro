@@ -3,7 +3,6 @@ import type { ImageMetadata } from "astro";
 import homeData from "@/data/home.json";
 
 const { hero } = homeData;
-const { registration } = homeData;
 const heroIntro = hero.intro;
 const topics = heroIntro.topics;
 const heroWallImages = Object.entries(
@@ -48,8 +47,6 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 			</h1>
 		</div>
 	</div>
-	<a class="hero-page__mobile-hero-cta" href="#registration-info">{registration.cta.label}</a>
-	<a class="hero-page__mobile-sticky-cta" data-hero-mobile-sticky-cta href="#registration-info" aria-hidden="true" tabindex="-1">{registration.cta.label}</a>
 </section>
 
 <script is:inline>
@@ -106,8 +103,6 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 	const photoWallTracks = Array.from(document.querySelectorAll<HTMLElement>("[data-wall-track]"));
 	const heroSubtitle = document.querySelector<HTMLElement>("[data-hero-page-subtitle]");
 	const heroTitleLabel = document.querySelector<HTMLElement>("[data-hero-page-title-label]");
-	const heroPage = document.querySelector<HTMLElement>(".hero-page");
-	const mobileStickyCta = document.querySelector<HTMLElement>("[data-hero-mobile-sticky-cta]");
 	const question = intro?.querySelector<HTMLElement>("[data-hero-intro-question]");
 	const final = intro?.querySelector<HTMLElement>("[data-hero-intro-final]");
 	const topCurtain = intro?.querySelector<HTMLElement>("[data-hero-intro-curtain-top]");
@@ -152,28 +147,6 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 	};
 
 	startPhotoWallAnimations();
-
-	if (heroPage && mobileStickyCta) {
-		document.body.append(mobileStickyCta);
-
-		const updateMobileStickyCta = () => {
-			const revealOffset = heroPage.offsetHeight - 1;
-			const isVisible = window.scrollY > revealOffset;
-
-			mobileStickyCta.classList.toggle("is-visible", isVisible);
-			mobileStickyCta.setAttribute("aria-hidden", String(!isVisible));
-
-			if (isVisible) {
-				mobileStickyCta.removeAttribute("tabindex");
-			} else {
-				mobileStickyCta.setAttribute("tabindex", "-1");
-			}
-		};
-
-		updateMobileStickyCta();
-		window.addEventListener("scroll", updateMobileStickyCta, { passive: true });
-		window.addEventListener("resize", updateMobileStickyCta);
-	}
 
 	const setActiveTopic = (activeIndex: number) => {
 		topics.forEach((topic, index) => {
@@ -561,77 +534,6 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 		letter-spacing: 0;
 	}
 
-	.hero-page__mobile-hero-cta,
-	.hero-page__mobile-sticky-cta {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: clamp(3rem, 3.7vw, 4rem);
-		padding: 0 clamp(1.15rem, 2vw, 2rem);
-		border: 0.16rem solid var(--color-foreground);
-		border-radius: clamp(0.8rem, 1.1vw, 1rem);
-		font-size: clamp(1.1rem, 1.4vw, 1.5rem);
-		font-weight: 800;
-		line-height: 1;
-		letter-spacing: 0;
-		text-decoration: none;
-		white-space: nowrap;
-		box-shadow: 0.22rem 0.22rem 0 0 var(--color-foreground);
-		transition:
-			background 160ms ease,
-			color 160ms ease,
-			transform 160ms ease,
-			box-shadow 160ms ease;
-	}
-
-	.hero-page__mobile-hero-cta:hover,
-	.hero-page__mobile-hero-cta:focus-visible,
-	.hero-page__mobile-sticky-cta:hover,
-	.hero-page__mobile-sticky-cta:focus-visible {
-		transform: translate(-0.08rem, -0.08rem);
-		box-shadow: 0.34rem 0.34rem 0 0 var(--color-foreground);
-	}
-
-	.hero-page__mobile-hero-cta:focus-visible,
-	.hero-page__mobile-sticky-cta:focus-visible {
-		outline: 0.18rem solid var(--color-primary-blue);
-		outline-offset: 0.22rem;
-	}
-
-	.hero-page__mobile-hero-cta,
-	.hero-page__mobile-sticky-cta {
-		color: var(--color-foreground);
-		background: var(--color-green);
-	}
-
-	.hero-page__mobile-hero-cta {
-		position: absolute;
-		inset-inline: 2rem;
-		inset-block-end: 6.65rem;
-		z-index: 4;
-		display: none;
-		min-height: 3.4rem;
-		font-size: 1.25rem;
-	}
-
-	.hero-page__mobile-sticky-cta {
-		position: fixed;
-		inset-inline: 1rem;
-		inset-block-end: max(0.9rem, env(safe-area-inset-bottom));
-		z-index: 1100;
-		display: none;
-		min-height: 3.4rem;
-		border-radius: 1rem;
-		font-size: 1.25rem;
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.hero-page__mobile-sticky-cta.is-visible {
-		opacity: 1;
-		pointer-events: auto;
-	}
-
 	:global(html.hero-intro-lock),
 	:global(html.hero-intro-lock body) {
 		overflow: hidden;
@@ -764,40 +666,13 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 			padding-inline: 1rem;
 		}
 
-		.hero-page__mobile-hero-cta {
-			display: inline-flex;
-		}
-
-		.hero-page__mobile-sticky-cta {
-			display: inline-flex;
-		}
-
 		.hero-intro__stage {
 			width: calc(100vw - 1rem);
 		}
 	}
 
-	@media (max-width: 28rem) {
-		.hero-page__mobile-hero-cta {
-			inset-inline: 1rem;
-			inset-block-end: 6.2rem;
-		}
-	}
-
 	@media (prefers-reduced-motion: reduce) {
 		.hero-photo-wall__column-track {
-			transform: none;
-		}
-
-		.hero-page__mobile-hero-cta,
-		.hero-page__mobile-sticky-cta {
-			transition: none;
-		}
-
-		.hero-page__mobile-hero-cta:hover,
-		.hero-page__mobile-hero-cta:focus-visible,
-		.hero-page__mobile-sticky-cta:hover,
-		.hero-page__mobile-sticky-cta:focus-visible {
 			transform: none;
 		}
 	}

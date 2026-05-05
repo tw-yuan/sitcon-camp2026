@@ -47,7 +47,6 @@ const { header } = layoutData;
 						</a>
 					))
 				}
-				<a class="site-header__mobile-cta" data-mobile-menu-link href={header.cta.href}>{header.cta.label}</a>
 			</nav>
 		</div>
 	</details>
@@ -290,8 +289,7 @@ const { header } = layoutData;
 
 	.site-header__link,
 	.site-header__cta,
-	.site-header__mobile-link,
-	.site-header__mobile-cta {
+	.site-header__mobile-link {
 		color: inherit;
 		font-weight: 800;
 		letter-spacing: 0;
@@ -323,24 +321,24 @@ const { header } = layoutData;
 		background: var(--color-soft-blue);
 		border-radius: clamp(0.8rem, 1.1vw, 1.15rem);
 		font-size: clamp(1rem, 1.25vw, 1.45rem);
+		box-shadow: 0.22rem 0.22rem 0 0 var(--color-orange);
 		transition:
 			background 160ms ease,
-			transform 160ms ease;
+			transform 160ms ease,
+			box-shadow 160ms ease;
 	}
 
 	.site-header__cta:hover,
-	.site-header__cta:focus-visible,
-	.site-header__mobile-cta:hover,
-	.site-header__mobile-cta:focus-visible {
+	.site-header__cta:focus-visible {
 		background: var(--color-sky-blue);
-		transform: translateY(-0.08rem);
+		transform: translate(-0.08rem, -0.08rem);
+		box-shadow: 0.34rem 0.34rem 0 0 var(--color-orange);
 	}
 
 	.site-header__link:focus-visible,
 	.site-header__cta:focus-visible,
 	.site-header__mobile-trigger:focus-visible,
-	.site-header__mobile-link:focus-visible,
-	.site-header__mobile-cta:focus-visible {
+	.site-header__mobile-link:focus-visible {
 		outline: 0.16rem solid var(--color-background);
 		outline-offset: 0.2rem;
 	}
@@ -420,8 +418,7 @@ const { header } = layoutData;
 		padding: 1rem;
 	}
 
-	.site-header__mobile-link,
-	.site-header__mobile-cta {
+	.site-header__mobile-link {
 		min-height: 3rem;
 		padding: 0.9rem 1rem;
 		border-radius: 0.8rem;
@@ -431,14 +428,6 @@ const { header } = layoutData;
 	.site-header__mobile-link:hover,
 	.site-header__mobile-link:focus-visible {
 		color: var(--color-soft-blue);
-	}
-
-	.site-header__mobile-cta {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--color-foreground);
-		background: var(--color-soft-blue);
 	}
 
 	@media (max-width: 52rem) {
@@ -452,13 +441,21 @@ const { header } = layoutData;
 			width: clamp(6.6rem, 24vw, 7.8rem);
 		}
 
-		.site-header__nav,
-		.site-header__cta {
+		.site-header__nav {
 			display: none;
+		}
+
+		.site-header__cta {
+			margin-inline-start: auto;
+			min-height: 2.45rem;
+			padding: 0 0.85rem;
+			border-radius: 0.8rem;
+			font-size: 1rem;
 		}
 
 		.site-header__mobile-menu {
 			display: block;
+			margin-inline-start: 0;
 		}
 	}
 
