@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
+import IcRoundChevronRight from "~icons/ic/round-chevron-right";
 
 import imgAboutCamp1 from "@/assets/about-camp/about-sitcon-camp-1.webp";
 import imgAboutCamp2 from "@/assets/about-camp/about-sitcon-camp-2.webp";
@@ -85,7 +86,7 @@ const stats = aboutSitconCamp.stats as Stat[];
 
 		<a class="btn-green" href={aboutSitconCamp.learnMore.href} target="_blank" rel="noopener noreferrer">
 			{aboutSitconCamp.learnMore.label}
-			<span class="i-carbon-chevron-right text-xl"></span>
+			<IcRoundChevronRight class="text-xl" />
 		</a>
 	</div>
 </section>
