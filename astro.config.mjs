@@ -63,6 +63,12 @@ export default defineConfig({
 		favicons({
 			name: "SITCON Camp 2026",
 			short_name: "SITCON Camp",
+			manifest: {
+				start_url: `${base}/`,
+				display: "standalone",
+				orientation: "any",
+				display_override: ["window-controls-overlay", "minimal-ui"]
+			},
 			output: {
 				images: true,
 				files: true,
