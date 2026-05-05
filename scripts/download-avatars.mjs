@@ -1,7 +1,7 @@
-import { createWriteStream, mkdirSync } from "fs";
+import { mkdirSync } from "fs";
 import { writeFile } from "fs/promises";
 import { dirname, join } from "path";
-import { pipeline } from "stream/promises";
+import sharp from "sharp";
 import { fileURLToPath } from "url";
 import aboutData from "../src/data/about.json" with { type: "json" };
 import teams from "../src/data/teams.json" with { type: "json" };
@@ -24,23 +24,34 @@ const slugify = value => {
 	return slug || "member";
 };
 
-const getAvatarFilename = member => `team-avatar-${slugify(member.name)}-${member.id.slice(0, 8)}.jpg`;
+const getAvatarBasename = member => `team-avatar-${slugify(member.name)}-${member.id.slice(0, 8)}`;
+const getAvatarFilename = member => `${getAvatarBasename(member)}.webp`;
 const uniqueMembers = [...new Map(teams.map(member => [member.id, member])).values()];
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
 let downloaded = 0;
+const avatarFilenames = new Map();
 
-await Promise.all(
+const downloadedAvatars = await Promise.all(
 	uniqueMembers.map(async member => {
-		const dest = join(OUTPUT_DIR, getAvatarFilename(member));
 		const url = `https://www.gravatar.com/avatar/${member.id}?s=${SIZE}&d=identicon`;
 		const res = await fetch(url);
 		if (!res.ok) throw new Error(`Failed to fetch avatar for ${member.id}: ${res.status}`);
-		await pipeline(res.body, createWriteStream(dest));
+		const filename = getAvatarFilename(member);
+		const dest = join(OUTPUT_DIR, filename);
+		const source = Buffer.from(await res.arrayBuffer());
+		const avatar = await sharp(source).resize(SIZE, SIZE, { fit: "cover" }).webp({ quality: 90 }).toBuffer();
+		await writeFile(dest, avatar);
 		downloaded++;
+
+		return [member.id, filename];
 	})
 );
+
+for (const [id, filename] of downloadedAvatars) {
+	avatarFilenames.set(id, filename);
+}
 
 const teamSection = aboutData.team.groups;
 const existingMembers = new Map();
@@ -61,7 +72,7 @@ for (const team of teamSection) {
 			name: w.name,
 			description: existing?.description ?? aboutData.team.modal.descriptionPlaceholder,
 			job: w.role,
-			avatarPath: `/assets/team-avatars/${getAvatarFilename(w)}`,
+			avatarPath: `/assets/team-avatars/${avatarFilenames.get(w.id)}`,
 			avatarLink: existing?.avatarLink ?? ""
 		};
 	});
