@@ -3,57 +3,54 @@ import { Font } from "astro:assets";
 import Footer from "@/components/Footer.astro";
 import "../styles/global.css";
 import Header from "@components/Header.astro";
-import defaultOgImage from "@/assets/seo/seo-og-1200x630.jpg";
 import layoutData from "@/data/layout.json";
 
 interface Props {
 	title?: string;
 	description?: string;
 	ogImage?: string;
-	ogImageAlt?: string;
 	type?: "website" | "article";
 	noindex?: boolean;
+	additionalStructuredData?: object | object[];
 }
 
-const { title, description, ogImage, ogImageAlt, type = "website", noindex = false } = Astro.props;
+const { title, description, ogImage, type = "website", noindex = false, additionalStructuredData } = Astro.props;
 const { document: pageDocument } = layoutData;
 
 const siteURL = Astro.site ?? new URL("https://sitcon.camp");
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
 const homeURL = new URL("/2026/", siteURL);
-const defaultOgImageAlt = "SITCON 夏令營 2026 活動主視覺";
 
 const seoData = {
-	title: title ?? pageDocument.siteName,
+	title: title ?? pageDocument.defaultTitle,
 	description: description ?? pageDocument.description,
 	canonicalURL: canonicalURL.href,
-	ogImage: new URL(ogImage ?? defaultOgImage.src, siteURL).href,
-	ogImageAlt: ogImageAlt ?? defaultOgImageAlt,
+	ogImage: new URL(ogImage ?? "/2026/og.jpg", siteURL).href,
+	ogImageAlt: pageDocument.ogImageAlt,
 	ogType: type,
 	robots: noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"
 };
 
-const socialLinks = layoutData.footer.sections
-	.flatMap(section => section.links ?? [])
-	.map(link => link.href)
-	.filter(href => href.startsWith("https://"));
-
 const publisher = {
 	"@type": "Organization",
-	name: "SITCON 學生計算機年會",
-	url: "https://sitcon.org"
+	name: layoutData.organization.name,
+	url: layoutData.organization.url
 };
 
 const structuredData = [
 	{
 		...layoutData.eventLD,
 		image: [seoData.ogImage],
+		organizer: {
+			...layoutData.eventLD.organizer,
+			sameAs: layoutData.organization.sameAs
+		},
 		url: homeURL.href
 	},
 	{
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: pageDocument.siteName,
+		name: pageDocument.brandName,
 		url: homeURL.href,
 		description: pageDocument.description,
 		inLanguage: pageDocument.lang,
@@ -63,7 +60,7 @@ const structuredData = [
 		"@context": "https://schema.org",
 		...publisher,
 		logo: new URL("/2026/favicon.svg", siteURL).href,
-		sameAs: socialLinks
+		sameAs: layoutData.organization.sameAs
 	}
 ];
 ---
@@ -106,7 +103,7 @@ const structuredData = [
 		<!-- SEO: Open Graph -->
 		<meta property="og:type" content={seoData.ogType} />
 		<meta property="og:locale" content="zh_TW" />
-		<meta property="og:site_name" content={pageDocument.siteName} />
+		<meta property="og:site_name" content={pageDocument.brandName} />
 		<meta property="og:url" content={seoData.canonicalURL} />
 		<meta property="og:title" content={seoData.title} />
 		<meta property="og:description" content={seoData.description} />
@@ -125,7 +122,8 @@ const structuredData = [
 		<meta name="twitter:image:alt" content={seoData.ogImageAlt} />
 
 		<!-- JSON-LD: Event / Site / Organization -->
-		<script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />
+		{!noindex && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />}
+		{!noindex && additionalStructuredData && <script type="application/ld+json" set:html={JSON.stringify(additionalStructuredData)} is:inline />}
 	</head>
 	<body>
 		<!-- Google Tag Manager (noscript) -->

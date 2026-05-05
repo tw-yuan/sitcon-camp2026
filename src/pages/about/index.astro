@@ -6,9 +6,28 @@ import Layout from "@/layouts/Layout.astro";
 import pageData from "@/data/about.json";
 
 const { pageMeta } = pageData;
+
+const breadcrumbSchema = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: [
+		{
+			"@type": "ListItem",
+			position: 1,
+			name: "SITCON 夏令營 2026",
+			item: "https://sitcon.camp/2026/"
+		},
+		{
+			"@type": "ListItem",
+			position: 2,
+			name: "關於我們",
+			item: "https://sitcon.camp/2026/about/"
+		}
+	]
+};
 ---
 
-<Layout title={pageMeta.title} description={pageMeta.description} ogImageAlt={pageMeta.ogImageAlt}>
+<Layout title={pageMeta.title} description={pageMeta.description} additionalStructuredData={breadcrumbSchema}>
 	<EventsHeld />
 	<Team />
 	<OrganizerBrands />
