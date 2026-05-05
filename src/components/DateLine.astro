@@ -3,8 +3,14 @@ import SparklesIcon from "~icons/lucide/sparkles";
 import RocketIcon from "~icons/lucide/rocket";
 import AlarmIcon from "~icons/ic/baseline-alarm";
 import CampaignIcon from "~icons/ic/baseline-campaign";
+import CalendarPlusIcon from "~icons/lucide/calendar-plus";
+import ChevronDownIcon from "~icons/lucide/chevron-down";
 import CoffeeIcon from "~icons/lucide/coffee";
+import DownloadIcon from "~icons/lucide/download";
 import timelineData from "@/data/registration-timeline.json";
+
+const calendarUrl = "https://sitcon.camp/2026/SITCON_Camp_2026_重要時程.ics";
+const googleCalendarUrl = `https://calendar.google.com/calendar/r?cid=webcal://${calendarUrl.replace(/^https?:\/\//, "")}`;
 
 const iconMap = {
 	sparkles: SparklesIcon,
@@ -21,63 +27,225 @@ const items = timelineData.items.map(item => ({
 ---
 
 <div
-	class="relative mx-auto mt-6 w-full max-w-[80rem] [--dot:4rem] [--marker:0.875rem] [--stem:0.625rem] sm:mt-10 sm:[--dot:4.75rem] sm:[--marker:1rem] sm:[--stem:0.875rem] lg:mt-16 lg:[--dot:5.5rem] lg:[--marker:1.125rem] lg:[--stem:1.125rem]"
+	class="relative mx-auto mt-6 w-full max-w-[80rem] [--dot:4rem] [--marker:0.875rem] [--stem:0.625rem] sm:mt-10 sm:[--dot:4.75rem] sm:[--marker:1rem] sm:[--stem:0.875rem] md:mt-14 lg:mt-20 lg:[--dot:5.5rem] lg:[--marker:1.125rem] lg:[--stem:1.125rem]"
 	style="
     --line:   0.375rem;
     --arrow:  0.875rem;
     --end:    calc(var(--arrow) * 5);
   "
 >
-	<!-- 桌機：水平線 + 右箭頭 -->
-	<div class="absolute hidden md:flex md:items-center" style="top:calc(var(--dot) + var(--stem) + var(--marker)/2); transform:translateY(-50%); left:0; right:0;" aria-hidden="true">
-		<div class="bg-background flex-1" style="height:var(--line)"></div>
+	<div class="relative z-20 flex justify-center md:hidden">
 		<div
-			style="flex-shrink:0;width:0;height:0;
-             border-top:var(--arrow) solid transparent;
-             border-bottom:var(--arrow) solid transparent;
-             border-left:calc(var(--arrow)*1.5) solid var(--color-background)"
+			class="group relative inline-block md:focus-within:[&_.calendar-menu]:visible md:focus-within:[&_.calendar-menu]:opacity-100 md:hover:[&_.calendar-menu]:visible md:hover:[&_.calendar-menu]:opacity-100 [&.is-open_.calendar-menu]:visible [&.is-open_.calendar-menu]:opacity-100"
+			data-calendar-dropdown
 		>
+			<button
+				type="button"
+				class="bg-background text-foreground hover:bg-green focus-visible:outline-background flex h-12 items-center gap-2 rounded-full border-2 border-white/20 px-4 text-base leading-none font-extrabold shadow-[0_0.25rem_0_0_var(--color-orange)] transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 sm:h-14 sm:px-5 sm:text-lg"
+				aria-label="將 SITCON Camp 2026 重要時程加入行事曆"
+				aria-haspopup="true"
+				aria-expanded="false"
+				aria-controls="registration-calendar-menu-mobile"
+				data-calendar-trigger
+			>
+				<CalendarPlusIcon class="size-5 sm:size-6" aria-hidden="true" />
+				<span>加入行事曆</span>
+				<ChevronDownIcon class="calendar-chevron size-5 transition-transform group-[.is-open]:rotate-180 md:group-focus-within:rotate-180 md:group-hover:rotate-180" aria-hidden="true" />
+			</button>
+			<div id="registration-calendar-menu-mobile" class="calendar-menu invisible absolute right-1/2 z-30 min-w-60 translate-x-1/2 pt-3 opacity-0 transition-opacity md:right-0 md:translate-x-0">
+				<div class="overflow-hidden rounded-2xl border-2 border-white/20 bg-white text-black shadow-xl">
+					<a
+						href={googleCalendarUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="flex items-center gap-3 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+						data-calendar-option
+					>
+						<CalendarPlusIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
+						<span>Google Calendar</span>
+					</a>
+					<a
+						href={calendarUrl}
+						download
+						class="flex items-center gap-3 border-t border-black/10 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+						data-calendar-option
+					>
+						<DownloadIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
+						<span>Apple Calendar</span>
+					</a>
+					<a
+						href={calendarUrl}
+						download
+						class="flex items-center gap-3 border-t border-black/10 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+						data-calendar-option
+					>
+						<DownloadIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
+						<span>iCal</span>
+					</a>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<!-- 桌機：節點清單 -->
-	<ul class="hidden list-none p-0 md:flex md:flex-row md:items-start md:justify-between" style="padding-right:var(--end)">
-		{
-			items.map(({ date, label, icon: Icon }) => (
-				<li class="flex flex-col items-center text-center">
-					<div class="bg-soft-blue relative z-10 flex shrink-0 items-center justify-center rounded-full text-white" style="width:var(--dot);height:var(--dot)">
-						<Icon class="h-[55%] w-[55%]" />
-					</div>
-					<div class="bg-soft-blue/40" style="width:0.125rem;height:var(--stem)" />
-					<div class="bg-soft-blue relative z-10 rounded-full" style="width:var(--marker);height:var(--marker)" />
-					<div class="mt-4 flex max-w-[12.5rem] flex-col gap-1.5">
-						<span class="text-background text-base leading-tight font-extrabold whitespace-pre-line opacity-60 lg:text-[1.2rem]">{date}</span>
-						<span class="text-background text-lg leading-snug font-extrabold lg:text-[1.4rem]">{label}</span>
-					</div>
-				</li>
-			))
-		}
-	</ul>
+	<div class="relative mt-6 sm:mt-8 md:mt-24">
+		<!-- 桌機：水平線 + 右箭頭 -->
+		<div class="absolute hidden md:flex md:items-center" style="top:calc(var(--dot) + var(--stem) + var(--marker)/2); transform:translateY(-50%); left:0; right:0;" aria-hidden="true">
+			<div class="bg-background flex-1" style="height:var(--line)"></div>
+			<div
+				style="flex-shrink:0;width:0;height:0;
+             border-top:var(--arrow) solid transparent;
+             border-bottom:var(--arrow) solid transparent;
+             border-left:calc(var(--arrow)*1.5) solid var(--color-background)"
+			>
+			</div>
+		</div>
 
-	<!-- 手機：左導軌 + icon 壓線 + 右側文字 -->
-	<div class="relative mt-6 [--mdot:3.5rem] [--rail:5.5rem] sm:mt-10 sm:[--mdot:5rem] md:hidden">
-		<!-- 導軌線 -->
-		<div class="bg-background/50 absolute top-0 bottom-0" style="left:var(--rail); transform:translateX(-50%); width:0.1875rem" aria-hidden="true"></div>
-
-		<ul class="flex list-none flex-col gap-7 p-0 sm:gap-10" style="padding-left:var(--rail)">
+		<!-- 桌機：節點清單 -->
+		<ul class="hidden list-none p-0 md:flex md:flex-row md:items-start md:justify-between" style="padding-right:var(--end)">
 			{
-				items.map(({ date, label, icon: Icon }) => (
-					<li class="flex items-center gap-6" style="margin-left:calc(var(--mdot) / -2)">
-						<div class="bg-soft-blue relative z-10 flex shrink-0 items-center justify-center rounded-full text-white" style="width:var(--mdot);height:var(--mdot)">
+				items.map(({ date, label, icon: Icon }, index) => (
+					<li class="relative flex flex-col items-center text-center">
+						{index === items.length - 1 && (
+							<div class="absolute top-[-5.5rem] left-1/2 z-30 flex -translate-x-1/2 flex-col items-center">
+								<div
+									class="group relative inline-block md:focus-within:[&_.calendar-menu]:visible md:focus-within:[&_.calendar-menu]:opacity-100 md:hover:[&_.calendar-menu]:visible md:hover:[&_.calendar-menu]:opacity-100 [&.is-open_.calendar-menu]:visible [&.is-open_.calendar-menu]:opacity-100"
+									data-calendar-dropdown
+								>
+									<button
+										type="button"
+										class="bg-background text-foreground hover:bg-green focus-visible:outline-background flex h-12 items-center gap-2 rounded-full border-2 border-white/20 px-4 text-base leading-none font-extrabold whitespace-nowrap shadow-[0_0.25rem_0_0_var(--color-orange)] transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 lg:h-[3.25rem] lg:px-5 lg:text-lg"
+										aria-label="將 SITCON Camp 2026 重要時程加入行事曆"
+										aria-haspopup="true"
+										aria-expanded="false"
+										aria-controls="registration-calendar-menu-desktop"
+										data-calendar-trigger
+									>
+										<CalendarPlusIcon class="size-5 lg:size-6" aria-hidden="true" />
+										<span>加入行事曆</span>
+										<ChevronDownIcon class="calendar-chevron size-5 transition-transform group-[.is-open]:rotate-180 md:group-focus-within:rotate-180 md:group-hover:rotate-180" aria-hidden="true" />
+									</button>
+									<div id="registration-calendar-menu-desktop" class="calendar-menu invisible absolute right-1/2 z-30 min-w-60 translate-x-1/2 pt-3 opacity-0 transition-opacity">
+										<div class="overflow-hidden rounded-2xl border-2 border-white/20 bg-white text-black shadow-xl">
+											<a
+												href={googleCalendarUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="flex items-center gap-3 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+												data-calendar-option
+											>
+												<CalendarPlusIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
+												<span>Google Calendar</span>
+											</a>
+											<a
+												href={calendarUrl}
+												download
+												class="flex items-center gap-3 border-t border-black/10 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+												data-calendar-option
+											>
+												<DownloadIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
+												<span>Apple Calendar</span>
+											</a>
+											<a
+												href={calendarUrl}
+												download
+												class="flex items-center gap-3 border-t border-black/10 px-4 py-3 text-base font-bold transition-colors hover:bg-black/5 focus-visible:bg-black/5 focus-visible:outline-none"
+												data-calendar-option
+											>
+												<DownloadIcon class="text-soft-blue size-5 shrink-0" aria-hidden="true" />
+												<span>iCal</span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div class="bg-background/45 mt-3 h-3 w-0.5 rounded-full" aria-hidden="true" />
+							</div>
+						)}
+						<div class="bg-soft-blue relative z-10 flex shrink-0 items-center justify-center rounded-full text-white" style="width:var(--dot);height:var(--dot)">
 							<Icon class="h-[55%] w-[55%]" />
 						</div>
-						<div class="flex flex-col gap-1.5">
-							<span class="text-background text-2xl leading-tight font-extrabold whitespace-pre-line opacity-60">{date}</span>
-							<span class="text-background text-3xl leading-snug font-extrabold">{label}</span>
+						<div class="bg-soft-blue/40" style="width:0.125rem;height:var(--stem)" />
+						<div class="bg-soft-blue relative z-10 rounded-full" style="width:var(--marker);height:var(--marker)" />
+						<div class="mt-4 flex max-w-[12.5rem] flex-col gap-1.5">
+							<span class="text-background text-base leading-tight font-extrabold whitespace-pre-line opacity-60 lg:text-[1.2rem]">{date}</span>
+							<span class="text-background text-lg leading-snug font-extrabold lg:text-[1.4rem]">{label}</span>
 						</div>
 					</li>
 				))
 			}
 		</ul>
+
+		<!-- 手機：左導軌 + icon 壓線 + 右側文字 -->
+		<div class="relative [--mdot:3.5rem] [--rail:5.5rem] sm:[--mdot:5rem] md:hidden">
+			<!-- 導軌線 -->
+			<div class="bg-background/50 absolute top-0 bottom-0" style="left:var(--rail); transform:translateX(-50%); width:0.1875rem" aria-hidden="true"></div>
+
+			<ul class="flex list-none flex-col gap-7 p-0 sm:gap-10" style="padding-left:var(--rail)">
+				{
+					items.map(({ date, label, icon: Icon }) => (
+						<li class="flex items-center gap-6" style="margin-left:calc(var(--mdot) / -2)">
+							<div class="bg-soft-blue relative z-10 flex shrink-0 items-center justify-center rounded-full text-white" style="width:var(--mdot);height:var(--mdot)">
+								<Icon class="h-[55%] w-[55%]" />
+							</div>
+							<div class="flex flex-col gap-1.5">
+								<span class="text-background text-2xl leading-tight font-extrabold whitespace-pre-line opacity-60">{date}</span>
+								<span class="text-background text-3xl leading-snug font-extrabold">{label}</span>
+							</div>
+						</li>
+					))
+				}
+			</ul>
+		</div>
 	</div>
 </div>
+
+<script>
+	const calendarDropdowns = document.querySelectorAll<HTMLElement>("[data-calendar-dropdown]");
+	const mobileCalendarQuery = window.matchMedia("(max-width: 767px)");
+
+	function setCalendarDropdownOpen(dropdown: HTMLElement, isOpen: boolean) {
+		dropdown.classList.toggle("is-open", isOpen);
+		dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]")?.setAttribute("aria-expanded", String(isOpen));
+	}
+
+	for (const dropdown of calendarDropdowns) {
+		const trigger = dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]");
+		const options = dropdown.querySelectorAll<HTMLAnchorElement>("[data-calendar-option]");
+
+		trigger?.addEventListener("click", event => {
+			if (!mobileCalendarQuery.matches) return;
+
+			event.stopPropagation();
+			setCalendarDropdownOpen(dropdown, !dropdown.classList.contains("is-open"));
+		});
+
+		for (const option of options) {
+			option.addEventListener("click", () => {
+				setCalendarDropdownOpen(dropdown, false);
+			});
+		}
+	}
+
+	document.addEventListener("click", event => {
+		if (!mobileCalendarQuery.matches) return;
+
+		for (const dropdown of calendarDropdowns) {
+			if (!dropdown.contains(event.target as Node)) {
+				setCalendarDropdownOpen(dropdown, false);
+			}
+		}
+	});
+
+	document.addEventListener("keydown", event => {
+		if (event.key !== "Escape") return;
+
+		for (const dropdown of calendarDropdowns) {
+			setCalendarDropdownOpen(dropdown, false);
+		}
+	});
+
+	mobileCalendarQuery.addEventListener("change", () => {
+		for (const dropdown of calendarDropdowns) {
+			setCalendarDropdownOpen(dropdown, false);
+		}
+	});
+</script>
