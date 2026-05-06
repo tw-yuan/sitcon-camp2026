@@ -124,35 +124,38 @@ const renderedNotice = mdRenderer.render(registration.noticeMarkdown);
 </div>
 
 <script>
-	const svg = document.getElementById("reg-transition")!;
-	const ns = "http://www.w3.org/2000/svg";
-	const W = 1440,
-		H = 60;
-	const COUNT = 8;
-	const COLOR = getComputedStyle(document.documentElement).getPropertyValue("--color-foreground").trim();
+	document.addEventListener("astro:page-load", () => {
+		const svg = document.getElementById("reg-transition")!;
+		if (!svg) return;
+		const ns = "http://www.w3.org/2000/svg";
+		const W = 1440,
+			H = 60;
+		const COUNT = 8;
+		const COLOR = getComputedStyle(document.documentElement).getPropertyValue("--color-foreground").trim();
 
-	function rand(min: number, max: number) {
-		return Math.random() * (max - min) + min;
-	}
+		function rand(min: number, max: number) {
+			return Math.random() * (max - min) + min;
+		}
 
-	// 底部矩形確保無縫銜接
-	const rect = document.createElementNS(ns, "rect");
-	rect.setAttribute("x", "0");
-	rect.setAttribute("y", String(H * 0.75));
-	rect.setAttribute("width", String(W));
-	rect.setAttribute("height", String(H));
-	rect.setAttribute("fill", COLOR);
-	svg.appendChild(rect);
+		// 底部矩形確保無縫銜接
+		const rect = document.createElementNS(ns, "rect");
+		rect.setAttribute("x", "0");
+		rect.setAttribute("y", String(H * 0.75));
+		rect.setAttribute("width", String(W));
+		rect.setAttribute("height", String(H));
+		rect.setAttribute("fill", COLOR);
+		svg.appendChild(rect);
 
-	// 隨機橢圓，分 slot 確保分佈均勻
-	const slotW = W / COUNT;
-	for (let i = 0; i < COUNT; i++) {
-		const el = document.createElementNS(ns, "ellipse");
-		el.setAttribute("cx", String(slotW * i + rand(slotW * 0.1, slotW * 0.9)));
-		el.setAttribute("cy", String(H));
-		el.setAttribute("rx", String(rand(140, 230)));
-		el.setAttribute("ry", String(rand(30, 50)));
-		el.setAttribute("fill", COLOR);
-		svg.appendChild(el);
-	}
+		// 隨機橢圓，分 slot 確保分佈均勻
+		const slotW = W / COUNT;
+		for (let i = 0; i < COUNT; i++) {
+			const el = document.createElementNS(ns, "ellipse");
+			el.setAttribute("cx", String(slotW * i + rand(slotW * 0.1, slotW * 0.9)));
+			el.setAttribute("cy", String(H));
+			el.setAttribute("rx", String(rand(140, 230)));
+			el.setAttribute("ry", String(rand(30, 50)));
+			el.setAttribute("fill", COLOR);
+			svg.appendChild(el);
+		}
+	});
 </script>

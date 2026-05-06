@@ -231,156 +231,168 @@ const videos = studentComment.video.map(video => {
 </style>
 
 <script>
-	const dialog = document.getElementById("comment-dialog") as HTMLDialogElement | null;
-	const iframe = document.getElementById("comment-iframe") as HTMLIFrameElement | null;
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
-	const studentCommentDialog = document.getElementById("student-comment-dialog") as HTMLDialogElement | null;
-	const studentCommentDialogHeader = document.getElementById("student-comment-dialog-header") as HTMLDivElement | null;
-	const studentCommentDialogName = document.getElementById("student-comment-dialog-name") as HTMLHeadingElement | null;
-	const studentCommentDialogAvatar = document.getElementById("student-comment-dialog-avatar") as HTMLImageElement | null;
-	const studentCommentDialogText = document.getElementById("student-comment-dialog-text") as HTMLDivElement | null;
-	const bgMarquee = document.querySelector("[data-student-bg-marquee]") as HTMLDivElement | null;
+		const dialog = document.getElementById("comment-dialog") as HTMLDialogElement | null;
+		const iframe = document.getElementById("comment-iframe") as HTMLIFrameElement | null;
 
-	const videoMarqueeTrack = document.querySelector("[data-video-marquee-track]") as HTMLDivElement | null;
-	const videoMarqueeContainer = document.querySelector("[data-video-marquee-container]") as HTMLDivElement | null;
+		const studentCommentDialog = document.getElementById("student-comment-dialog") as HTMLDialogElement | null;
+		const studentCommentDialogHeader = document.getElementById("student-comment-dialog-header") as HTMLDivElement | null;
+		const studentCommentDialogName = document.getElementById("student-comment-dialog-name") as HTMLHeadingElement | null;
+		const studentCommentDialogAvatar = document.getElementById("student-comment-dialog-avatar") as HTMLImageElement | null;
+		const studentCommentDialogText = document.getElementById("student-comment-dialog-text") as HTMLDivElement | null;
+		const bgMarquee = document.querySelector("[data-student-bg-marquee]") as HTMLDivElement | null;
 
-	function renderBgMarqueeRows() {
-		if (!bgMarquee) return;
+		const videoMarqueeTrack = document.querySelector("[data-video-marquee-track]") as HTMLDivElement | null;
+		const videoMarqueeContainer = document.querySelector("[data-video-marquee-container]") as HTMLDivElement | null;
 
-		const text = bgMarquee.dataset.marqueeText ?? "";
-		const targetRowGap = window.innerWidth < 640 ? 96 : window.innerWidth < 1024 ? 128 : 160;
-		const rowCount = Math.min(24, Math.max(6, Math.ceil(bgMarquee.clientHeight / targetRowGap)));
-		const minimumTextRepeat = Math.max(20, Math.ceil((window.innerWidth * 2.5) / Math.max(text.length * 24, 1)));
-		const textRepeat = minimumTextRepeat + (minimumTextRepeat % 2);
-		const renderKey = `${rowCount}:${textRepeat}`;
+		function renderBgMarqueeRows() {
+			if (!bgMarquee) return;
 
-		if (bgMarquee.dataset.renderKey === renderKey) return;
+			const text = bgMarquee.dataset.marqueeText ?? "";
+			const targetRowGap = window.innerWidth < 640 ? 96 : window.innerWidth < 1024 ? 128 : 160;
+			const rowCount = Math.min(24, Math.max(6, Math.ceil(bgMarquee.clientHeight / targetRowGap)));
+			const minimumTextRepeat = Math.max(20, Math.ceil((window.innerWidth * 2.5) / Math.max(text.length * 24, 1)));
+			const textRepeat = minimumTextRepeat + (minimumTextRepeat % 2);
+			const renderKey = `${rowCount}:${textRepeat}`;
 
-		bgMarquee.dataset.renderKey = renderKey;
-		bgMarquee.replaceChildren();
+			if (bgMarquee.dataset.renderKey === renderKey) return;
 
-		for (let i = 0; i < rowCount; i += 1) {
-			const row = document.createElement("div");
-			row.className = "student-comment-marquee-row";
-			row.style.marginLeft = `${(i % 3) * -8}rem`;
-			const rowText = document.createElement("span");
-			rowText.className = "student-comment-marquee-text";
-			rowText.textContent = `${text.repeat(textRepeat)}\u00A0`;
-			row.append(rowText);
-			bgMarquee.append(row);
-		}
-	}
+			bgMarquee.dataset.renderKey = renderKey;
+			bgMarquee.replaceChildren();
 
-	if (bgMarquee) {
-		renderBgMarqueeRows();
-		const observer = new ResizeObserver(renderBgMarqueeRows);
-		observer.observe(bgMarquee);
-		window.addEventListener("beforeunload", () => {
-			observer.disconnect();
-		});
-		window.addEventListener("resize", renderBgMarqueeRows);
-	}
-
-	if (videoMarqueeTrack) {
-		const groups = Array.from(videoMarqueeTrack.querySelectorAll("[data-marquee-group]"));
-
-		const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
-
-		function fillVideoMarquee() {
-			if (!sourceItems.length) return;
-
-			// 從第一個實際卡片量真實寬度，避免硬編碼在不同螢幕尺寸下誤算數量
-			// 卡片寬度為 min(82vw, 28rem)，加上 gap-4（16px）作為間距
-			const firstItem = groups[0]?.children[0] as HTMLElement | undefined;
-			const cardWidth = firstItem ? firstItem.getBoundingClientRect().width + 16 : 464; // fallback：28rem + 16px gap
-
-			const targetWidth = window.innerWidth * 1.25;
-
-			const minCount = Math.max(sourceItems.length, Math.ceil(targetWidth / cardWidth));
-			const needCount = Math.ceil(minCount / sourceItems.length) * sourceItems.length;
-
-			for (const group of groups) {
-				group.replaceChildren();
-
-				for (let i = 0; i < needCount; i += 1) {
-					group.append(sourceItems[i % sourceItems.length].cloneNode(true));
-				}
+			for (let i = 0; i < rowCount; i += 1) {
+				const row = document.createElement("div");
+				row.className = "student-comment-marquee-row";
+				row.style.marginLeft = `${(i % 3) * -8}rem`;
+				const rowText = document.createElement("span");
+				rowText.className = "student-comment-marquee-text";
+				rowText.textContent = `${text.repeat(textRepeat)}\u00A0`;
+				row.append(rowText);
+				bgMarquee.append(row);
 			}
 		}
 
-		fillVideoMarquee();
+		if (bgMarquee) {
+			renderBgMarqueeRows();
+			const observer = new ResizeObserver(renderBgMarqueeRows);
+			observer.observe(bgMarquee);
+			signal.addEventListener("abort", () => observer.disconnect());
+			window.addEventListener("resize", renderBgMarqueeRows, { signal });
+		}
 
-		let resizeTimer: ReturnType<typeof setTimeout>;
+		if (videoMarqueeTrack) {
+			const groups = Array.from(videoMarqueeTrack.querySelectorAll("[data-marquee-group]"));
 
-		window.addEventListener("resize", () => {
-			clearTimeout(resizeTimer);
-			resizeTimer = setTimeout(fillVideoMarquee, 100);
+			const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
+
+			function fillVideoMarquee() {
+				if (!sourceItems.length) return;
+
+				// 從第一個實際卡片量真實寬度，避免硬編碼在不同螢幕尺寸下誤算數量
+				// 卡片寬度為 min(82vw, 28rem)，加上 gap-4（16px）作為間距
+				const firstItem = groups[0]?.children[0] as HTMLElement | undefined;
+				const cardWidth = firstItem ? firstItem.getBoundingClientRect().width + 16 : 464; // fallback：28rem + 16px gap
+
+				const targetWidth = window.innerWidth * 1.25;
+
+				const minCount = Math.max(sourceItems.length, Math.ceil(targetWidth / cardWidth));
+				const needCount = Math.ceil(minCount / sourceItems.length) * sourceItems.length;
+
+				for (const group of groups) {
+					group.replaceChildren();
+
+					for (let i = 0; i < needCount; i += 1) {
+						group.append(sourceItems[i % sourceItems.length].cloneNode(true));
+					}
+				}
+			}
+
+			fillVideoMarquee();
+
+			let resizeTimer: ReturnType<typeof setTimeout>;
+
+			window.addEventListener(
+				"resize",
+				() => {
+					clearTimeout(resizeTimer);
+					resizeTimer = setTimeout(fillVideoMarquee, 100);
+				},
+				{ signal }
+			);
+		}
+
+		videoMarqueeContainer?.addEventListener("click", e => {
+			if (!(e.target instanceof Element)) return;
+
+			const card = e.target.closest(".video-card") as HTMLElement | null;
+
+			if (!card || !videoMarqueeContainer.contains(card)) return;
+
+			const url = card.dataset.url;
+
+			if (!url || !iframe) return;
+
+			iframe.src = url;
+
+			dialog?.showModal();
 		});
-	}
 
-	videoMarqueeContainer?.addEventListener("click", e => {
-		if (!(e.target instanceof Element)) return;
+		document.addEventListener(
+			"click",
+			e => {
+				if (!(e.target instanceof Element)) return;
 
-		const card = e.target.closest(".video-card") as HTMLElement | null;
+				const card = e.target.closest("[data-student-comment-card]") as HTMLElement | null;
 
-		if (!card || !videoMarqueeContainer.contains(card)) return;
+				if (!card) return;
 
-		const url = card.dataset.url;
+				if (studentCommentDialogName) {
+					studentCommentDialogName.textContent = card.dataset.studentName ?? "";
+				}
 
-		if (!url || !iframe) return;
+				if (studentCommentDialogAvatar) {
+					const avatar = card.querySelector("img");
+					studentCommentDialogAvatar.src = avatar?.currentSrc || avatar?.src || "";
+					studentCommentDialogAvatar.alt = avatar?.alt ?? "";
+				}
 
-		iframe.src = url;
+				if (studentCommentDialogText) {
+					studentCommentDialogText.innerHTML = decodeURIComponent(card.dataset.commentHtml ?? "");
+				}
 
-		dialog?.showModal();
-	});
+				if (studentCommentDialogHeader) {
+					studentCommentDialogHeader.className = `flex items-center justify-between rounded-t-4xl p-5 ${card.dataset.studentColorClass ?? "bg-blue"}`;
+				}
 
-	document.addEventListener("click", e => {
-		if (!(e.target instanceof Element)) return;
+				studentCommentDialog?.showModal();
+			},
+			{ signal }
+		);
 
-		const card = e.target.closest("[data-student-comment-card]") as HTMLElement | null;
+		dialog?.addEventListener("click", e => {
+			if (e.target === dialog) {
+				dialog.close();
+			}
+		});
 
-		if (!card) return;
+		studentCommentDialog?.addEventListener("click", e => {
+			if (e.target === studentCommentDialog) {
+				studentCommentDialog.close();
+			}
+		});
 
-		if (studentCommentDialogName) {
-			studentCommentDialogName.textContent = card.dataset.studentName ?? "";
-		}
-
-		if (studentCommentDialogAvatar) {
-			const avatar = card.querySelector("img");
-			studentCommentDialogAvatar.src = avatar?.currentSrc || avatar?.src || "";
-			studentCommentDialogAvatar.alt = avatar?.alt ?? "";
-		}
-
-		if (studentCommentDialogText) {
-			studentCommentDialogText.innerHTML = decodeURIComponent(card.dataset.commentHtml ?? "");
-		}
-
-		if (studentCommentDialogHeader) {
-			studentCommentDialogHeader.className = `flex items-center justify-between rounded-t-4xl p-5 ${card.dataset.studentColorClass ?? "bg-blue"}`;
-		}
-
-		studentCommentDialog?.showModal();
-	});
-
-	dialog?.addEventListener("click", e => {
-		if (e.target === dialog) {
-			dialog.close();
-		}
-	});
-
-	studentCommentDialog?.addEventListener("click", e => {
-		if (e.target === studentCommentDialog) {
+		studentCommentDialog?.querySelector("[data-student-comment-close]")?.addEventListener("click", () => {
 			studentCommentDialog.close();
-		}
-	});
+		});
 
-	studentCommentDialog?.querySelector("[data-student-comment-close]")?.addEventListener("click", () => {
-		studentCommentDialog.close();
-	});
-
-	dialog?.addEventListener("close", () => {
-		if (iframe) {
-			iframe.src = "";
-		}
+		dialog?.addEventListener("close", () => {
+			if (iframe) {
+				iframe.src = "";
+			}
+		});
 	});
 </script>

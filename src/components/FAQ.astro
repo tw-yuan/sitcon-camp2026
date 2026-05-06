@@ -37,37 +37,39 @@ const { faq } = homeData;
 </main>
 
 <script>
-	document.querySelectorAll<HTMLDetailsElement>(".faq-item").forEach(details => {
-		const summary = details.querySelector("summary")!;
-		const body = details.querySelector<HTMLElement>(".faq-body")!;
-		const icon = details.querySelector<HTMLElement>(".faq-icon")!;
-		let animating = false;
+	document.addEventListener("astro:page-load", () => {
+		document.querySelectorAll<HTMLDetailsElement>(".faq-item").forEach(details => {
+			const summary = details.querySelector("summary")!;
+			const body = details.querySelector<HTMLElement>(".faq-body")!;
+			const icon = details.querySelector<HTMLElement>(".faq-icon")!;
+			let animating = false;
 
-		summary.addEventListener("click", e => {
-			e.preventDefault();
-			if (animating) return;
-			animating = true;
+			summary.addEventListener("click", e => {
+				e.preventDefault();
+				if (animating) return;
+				animating = true;
 
-			const isOpen = details.open;
+				const isOpen = details.open;
 
-			if (!isOpen) {
-				details.open = true;
-				body.style.height = "0";
-				const target = body.scrollHeight + "px";
-				icon.style.transform = "rotate(180deg)";
-				body.animate([{ height: "0px" }, { height: target }], { duration: 320, easing: "cubic-bezier(0.4,0,0.2,1)" }).onfinish = () => {
-					body.style.height = "auto";
-					animating = false;
-				};
-			} else {
-				body.style.height = body.scrollHeight + "px";
-				icon.style.transform = "rotate(0deg)";
-				body.animate([{ height: body.style.height }, { height: "0px" }], { duration: 280, easing: "cubic-bezier(0.4,0,0.2,1)" }).onfinish = () => {
+				if (!isOpen) {
+					details.open = true;
 					body.style.height = "0";
-					details.open = false;
-					animating = false;
-				};
-			}
+					const target = body.scrollHeight + "px";
+					icon.style.transform = "rotate(180deg)";
+					body.animate([{ height: "0px" }, { height: target }], { duration: 320, easing: "cubic-bezier(0.4,0,0.2,1)" }).onfinish = () => {
+						body.style.height = "auto";
+						animating = false;
+					};
+				} else {
+					body.style.height = body.scrollHeight + "px";
+					icon.style.transform = "rotate(0deg)";
+					body.animate([{ height: body.style.height }, { height: "0px" }], { duration: 280, easing: "cubic-bezier(0.4,0,0.2,1)" }).onfinish = () => {
+						body.style.height = "0";
+						details.open = false;
+						animating = false;
+					};
+				}
+			});
 		});
 	});
 </script>

@@ -99,317 +99,323 @@ const heroPhotoWallColumns = hero.photoWallColumns;
 <script>
 	import { animate, splitText, stagger, waapi } from "animejs";
 
-	const intro = document.querySelector<HTMLElement>("[data-hero-intro]");
-	const photoWallTracks = Array.from(document.querySelectorAll<HTMLElement>("[data-wall-track]"));
-	const heroSubtitle = document.querySelector<HTMLElement>("[data-hero-page-subtitle]");
-	const heroTitleLabel = document.querySelector<HTMLElement>("[data-hero-page-title-label]");
-	const question = intro?.querySelector<HTMLElement>("[data-hero-intro-question]");
-	const final = intro?.querySelector<HTMLElement>("[data-hero-intro-final]");
-	const topCurtain = intro?.querySelector<HTMLElement>("[data-hero-intro-curtain-top]");
-	const bottomCurtain = intro?.querySelector<HTMLElement>("[data-hero-intro-curtain-bottom]");
-	const topicViewport = intro?.querySelector<HTMLElement>(".hero-intro__topic-viewport");
-	const topicTrack = intro?.querySelector<HTMLElement>("[data-hero-intro-topic-track]");
-	const topics = intro ? Array.from(intro.querySelectorAll<HTMLElement>("[data-hero-intro-topic]")) : [];
-	const shouldSkipIntro = window.scrollY > 0 || window.location.hash.length > 1;
-	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-	let photoWallStarted = false;
-	let introFinished = false;
-	let heroTitleRevealed = false;
-	let heroSubtitleRevealed = false;
+	document.addEventListener("astro:page-load", async () => {
+		const intro = document.querySelector<HTMLElement>("[data-hero-intro]");
+		const photoWallTracks = Array.from(document.querySelectorAll<HTMLElement>("[data-wall-track]"));
+		const heroSubtitle = document.querySelector<HTMLElement>("[data-hero-page-subtitle]");
+		const heroTitleLabel = document.querySelector<HTMLElement>("[data-hero-page-title-label]");
+		const question = intro?.querySelector<HTMLElement>("[data-hero-intro-question]");
+		const final = intro?.querySelector<HTMLElement>("[data-hero-intro-final]");
+		const topCurtain = intro?.querySelector<HTMLElement>("[data-hero-intro-curtain-top]");
+		const bottomCurtain = intro?.querySelector<HTMLElement>("[data-hero-intro-curtain-bottom]");
+		const topicViewport = intro?.querySelector<HTMLElement>(".hero-intro__topic-viewport");
+		const topicTrack = intro?.querySelector<HTMLElement>("[data-hero-intro-topic-track]");
+		const topics = intro ? Array.from(intro.querySelectorAll<HTMLElement>("[data-hero-intro-topic]")) : [];
+		const introPlayedBefore = sessionStorage.getItem("hero-intro-played") === "1";
+		const shouldSkipIntro = introPlayedBefore || window.scrollY > 0 || window.location.hash.length > 1;
+		const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		let photoWallStarted = false;
+		let introFinished = false;
+		let heroTitleRevealed = false;
+		let heroSubtitleRevealed = false;
 
-	if (heroTitleLabel && !shouldSkipIntro) {
-		heroTitleLabel.style.visibility = "hidden";
-	}
-
-	const wait = (duration: number) => new Promise(resolve => window.setTimeout(resolve, duration));
-
-	const startPhotoWallAnimations = () => {
-		if (prefersReducedMotion || photoWallTracks.length === 0 || photoWallStarted) {
-			return;
+		if (heroTitleLabel && !shouldSkipIntro) {
+			heroTitleLabel.style.visibility = "hidden";
 		}
 
-		photoWallStarted = true;
+		const wait = (duration: number) => new Promise(resolve => window.setTimeout(resolve, duration));
 
-		photoWallTracks.forEach(track => {
-			const duration = Number(track.dataset.wallDuration) || 42000;
-			const offset = Number(track.dataset.wallOffset) || 0;
-			const animation = waapi.animate(track, {
-				transform: ["translate3d(0, 0, 0)", "translate3d(0, -50%, 0)"],
-				duration,
-				ease: "linear",
-				loop: true,
-				autoplay: false
+		const startPhotoWallAnimations = () => {
+			if (prefersReducedMotion || photoWallTracks.length === 0 || photoWallStarted) {
+				return;
+			}
+
+			photoWallStarted = true;
+
+			photoWallTracks.forEach(track => {
+				const duration = Number(track.dataset.wallDuration) || 42000;
+				const offset = Number(track.dataset.wallOffset) || 0;
+				const animation = waapi.animate(track, {
+					transform: ["translate3d(0, 0, 0)", "translate3d(0, -50%, 0)"],
+					duration,
+					ease: "linear",
+					loop: true,
+					autoplay: false
+				});
+
+				animation.currentTime = offset % duration;
+				animation.play();
 			});
+		};
 
-			animation.currentTime = offset % duration;
-			animation.play();
-		});
-	};
+		startPhotoWallAnimations();
 
-	startPhotoWallAnimations();
+		const setActiveTopic = (activeIndex: number) => {
+			topics.forEach((topic, index) => {
+				topic.classList.toggle("hero-intro__topic--current", index === activeIndex);
+				topic.setAttribute("aria-hidden", String(index !== activeIndex));
+			});
+		};
 
-	const setActiveTopic = (activeIndex: number) => {
-		topics.forEach((topic, index) => {
-			topic.classList.toggle("hero-intro__topic--current", index === activeIndex);
-			topic.setAttribute("aria-hidden", String(index !== activeIndex));
-		});
-	};
+		const finishIntro = () => {
+			if (introFinished) {
+				return;
+			}
 
-	const finishIntro = () => {
-		if (introFinished) {
-			return;
-		}
+			introFinished = true;
+			document.documentElement.classList.remove("hero-intro-lock");
 
-		introFinished = true;
-		document.documentElement.classList.remove("hero-intro-lock");
+			if (intro) {
+				intro.hidden = true;
+			}
 
-		if (intro) {
-			intro.hidden = true;
-		}
+			window.dispatchEvent(new CustomEvent("hero-intro:finished"));
+		};
 
-		window.dispatchEvent(new CustomEvent("hero-intro:finished"));
-	};
+		const forceRevealHeroTitle = () => {
+			if (!heroTitleLabel) {
+				return;
+			}
 
-	const forceRevealHeroTitle = () => {
-		if (!heroTitleLabel) {
-			return;
-		}
-
-		heroTitleLabel.style.visibility = "visible";
-		heroTitleLabel.style.transform = "none";
-		heroTitleLabel.querySelectorAll<HTMLElement>(".hero-page__title-word").forEach(word => {
-			word.style.transform = "none";
-		});
-	};
-
-	const forceRevealHeroSubtitle = () => {
-		if (!heroSubtitle) {
-			return;
-		}
-
-		heroSubtitle.classList.add("is-visible");
-		heroSubtitle.style.transform = "none";
-		heroSubtitle.querySelectorAll<HTMLElement>(".hero-page__subtitle-char").forEach(char => {
-			char.style.transform = "none";
-		});
-	};
-
-	const skipIntro = () => {
-		if (intro) {
-			intro.hidden = true;
-		}
-
-		forceRevealHeroTitle();
-		forceRevealHeroSubtitle();
-		finishIntro();
-	};
-
-	const revealHeroTitle = async (prefersReducedMotion: boolean) => {
-		if (!heroTitleLabel) {
-			return;
-		}
-
-		if (prefersReducedMotion) {
 			heroTitleLabel.style.visibility = "visible";
 			heroTitleLabel.style.transform = "none";
-			return;
-		}
+			heroTitleLabel.querySelectorAll<HTMLElement>(".hero-page__title-word").forEach(word => {
+				word.style.transform = "none";
+			});
+		};
 
-		const { words } = splitText(heroTitleLabel, {
-			words: { class: "hero-page__title-word", wrap: "clip" },
-			accessible: true
-		});
+		const forceRevealHeroSubtitle = () => {
+			if (!heroSubtitle) {
+				return;
+			}
 
-		words.forEach(word => {
-			word.style.transform = "translateY(115%)";
-		});
-		heroTitleLabel.style.visibility = "visible";
-
-		await animate(words, {
-			y: "0%",
-			duration: 720,
-			ease: "out(4)"
-		}).then();
-	};
-
-	const revealHeroSubtitle = async (prefersReducedMotion: boolean) => {
-		if (!heroSubtitle) {
-			return;
-		}
-
-		heroSubtitle.classList.add("is-visible");
-
-		if (prefersReducedMotion) {
+			heroSubtitle.classList.add("is-visible");
 			heroSubtitle.style.transform = "none";
-			return;
-		}
+			heroSubtitle.querySelectorAll<HTMLElement>(".hero-page__subtitle-char").forEach(char => {
+				char.style.transform = "none";
+			});
+		};
 
-		const { chars } = splitText(heroSubtitle, {
-			chars: { class: "hero-page__subtitle-char", wrap: "clip" },
-			accessible: true
-		});
+		const skipIntro = () => {
+			if (intro) {
+				intro.hidden = true;
+			}
 
-		await animate(chars, {
-			y: ["85%", "-8%", "0%"],
-			duration: 620,
-			ease: "out(3)",
-			delay: stagger(28)
-		}).then();
-	};
+			forceRevealHeroTitle();
+			forceRevealHeroSubtitle();
+			finishIntro();
+		};
 
-	const bounceQuestion = async () => {
-		if (!question) {
-			return;
-		}
+		const revealHeroTitle = async (prefersReducedMotion: boolean) => {
+			if (!heroTitleLabel) {
+				return;
+			}
 
-		await animate(question, {
-			scale: [
-				{ to: 1.025, duration: 140, ease: "outQuad" },
-				{ to: 1, duration: 260, ease: "outBounce" }
-			]
-		}).then();
-	};
+			if (prefersReducedMotion) {
+				heroTitleLabel.style.visibility = "visible";
+				heroTitleLabel.style.transform = "none";
+				return;
+			}
 
-	const slideToTopic = async (index: number) => {
-		if (!topicTrack || !topicViewport) {
-			return;
-		}
+			const { words } = splitText(heroTitleLabel, {
+				words: { class: "hero-page__title-word", wrap: "clip" },
+				accessible: true
+			});
 
-		const rowHeight = topicViewport.getBoundingClientRect().height;
-		const targetY = -index * rowHeight;
+			words.forEach(word => {
+				word.style.transform = "translateY(115%)";
+			});
+			heroTitleLabel.style.visibility = "visible";
 
-		await animate(topicTrack, {
-			keyframes: [
-				{
-					translateY: `${targetY - rowHeight * 0.1}px`,
-					duration: 320,
-					ease: "outQuint"
-				},
-				{
-					translateY: `${targetY}px`,
-					duration: 180,
-					ease: "outBack(1.9)"
-				}
-			]
-		}).then();
-	};
-
-	const showFinal = async (prefersReducedMotion: boolean) => {
-		if (!question || !final) {
-			return;
-		}
-
-		question.hidden = true;
-		final.hidden = false;
-
-		if (prefersReducedMotion) {
-			return;
-		}
-
-		final.style.transform = "scale(1.85)";
-
-		await animate(final, {
-			scale: [
-				{ to: 0.96, duration: 330, ease: "outQuint" },
-				{ to: 1, duration: 180, ease: "outBack(1.7)" }
-			]
-		}).then();
-
-		final.style.transform = "";
-	};
-
-	const openIntroCurtains = async (prefersReducedMotion: boolean) => {
-		if (final) {
-			final.hidden = true;
-		}
-
-		if (prefersReducedMotion || !topCurtain || !bottomCurtain) {
-			return;
-		}
-
-		await Promise.all([
-			animate(topCurtain, {
-				translateY: "-100%",
+			await animate(words, {
+				y: "0%",
 				duration: 720,
-				ease: "inOutCubic"
-			}).then(),
-			animate(bottomCurtain, {
-				translateY: "100%",
-				duration: 720,
-				ease: "inOutCubic"
-			}).then()
-		]);
-	};
+				ease: "out(4)"
+			}).then();
+		};
 
-	if (intro && question && final && topicViewport && topicTrack && topics.length > 0) {
-		if (shouldSkipIntro) {
-			skipIntro();
-		} else {
-			document.documentElement.classList.add("hero-intro-lock");
+		const revealHeroSubtitle = async (prefersReducedMotion: boolean) => {
+			if (!heroSubtitle) {
+				return;
+			}
 
-			try {
-				if (!prefersReducedMotion) {
-					await wait(180);
-					await bounceQuestion();
-				}
+			heroSubtitle.classList.add("is-visible");
 
-				for (let index = 1; index < topics.length; index += 1) {
-					await wait(index === 1 && !prefersReducedMotion ? 190 : 300);
+			if (prefersReducedMotion) {
+				heroSubtitle.style.transform = "none";
+				return;
+			}
 
-					if (prefersReducedMotion) {
-						const rowHeight = topicViewport.getBoundingClientRect().height;
-						topicTrack.style.transform = `translateY(${-index * rowHeight}px)`;
-					} else {
-						await slideToTopic(index);
+			const { chars } = splitText(heroSubtitle, {
+				chars: { class: "hero-page__subtitle-char", wrap: "clip" },
+				accessible: true
+			});
+
+			await animate(chars, {
+				y: ["85%", "-8%", "0%"],
+				duration: 620,
+				ease: "out(3)",
+				delay: stagger(28)
+			}).then();
+		};
+
+		const bounceQuestion = async () => {
+			if (!question) {
+				return;
+			}
+
+			await animate(question, {
+				scale: [
+					{ to: 1.025, duration: 140, ease: "outQuad" },
+					{ to: 1, duration: 260, ease: "outBounce" }
+				]
+			}).then();
+		};
+
+		const slideToTopic = async (index: number) => {
+			if (!topicTrack || !topicViewport) {
+				return;
+			}
+
+			const rowHeight = topicViewport.getBoundingClientRect().height;
+			const targetY = -index * rowHeight;
+
+			await animate(topicTrack, {
+				keyframes: [
+					{
+						translateY: `${targetY - rowHeight * 0.1}px`,
+						duration: 320,
+						ease: "outQuint"
+					},
+					{
+						translateY: `${targetY}px`,
+						duration: 180,
+						ease: "outBack(1.9)"
+					}
+				]
+			}).then();
+		};
+
+		const showFinal = async (prefersReducedMotion: boolean) => {
+			if (!question || !final) {
+				return;
+			}
+
+			question.hidden = true;
+			final.hidden = false;
+
+			if (prefersReducedMotion) {
+				return;
+			}
+
+			final.style.transform = "scale(1.85)";
+
+			await animate(final, {
+				scale: [
+					{ to: 0.96, duration: 330, ease: "outQuint" },
+					{ to: 1, duration: 180, ease: "outBack(1.7)" }
+				]
+			}).then();
+
+			final.style.transform = "";
+		};
+
+		const openIntroCurtains = async (prefersReducedMotion: boolean) => {
+			if (final) {
+				final.hidden = true;
+			}
+
+			if (prefersReducedMotion || !topCurtain || !bottomCurtain) {
+				return;
+			}
+
+			await Promise.all([
+				animate(topCurtain, {
+					translateY: "-100%",
+					duration: 720,
+					ease: "inOutCubic"
+				}).then(),
+				animate(bottomCurtain, {
+					translateY: "100%",
+					duration: 720,
+					ease: "inOutCubic"
+				}).then()
+			]);
+		};
+
+		if (intro && question && final && topicViewport && topicTrack && topics.length > 0) {
+			if (shouldSkipIntro) {
+				skipIntro();
+			} else {
+				document.documentElement.classList.add("hero-intro-lock");
+
+				try {
+					if (!prefersReducedMotion) {
+						await wait(180);
+						await bounceQuestion();
 					}
 
-					setActiveTopic(index);
-				}
+					for (let index = 1; index < topics.length; index += 1) {
+						await wait(index === 1 && !prefersReducedMotion ? 190 : 300);
 
-				await wait(360);
-				await showFinal(prefersReducedMotion);
-				await wait(190);
-				await openIntroCurtains(prefersReducedMotion);
-				finishIntro();
-				await revealHeroTitle(prefersReducedMotion);
-				heroTitleRevealed = true;
-				await revealHeroSubtitle(prefersReducedMotion);
-				heroSubtitleRevealed = true;
-			} finally {
-				document.documentElement.classList.remove("hero-intro-lock");
+						if (prefersReducedMotion) {
+							const rowHeight = topicViewport.getBoundingClientRect().height;
+							topicTrack.style.transform = `translateY(${-index * rowHeight}px)`;
+						} else {
+							await slideToTopic(index);
+						}
 
-				if (!introFinished) {
+						setActiveTopic(index);
+					}
+
+					await wait(360);
+					await showFinal(prefersReducedMotion);
+					await wait(190);
+					await openIntroCurtains(prefersReducedMotion);
 					finishIntro();
-				}
+					await revealHeroTitle(prefersReducedMotion);
+					heroTitleRevealed = true;
+					await revealHeroSubtitle(prefersReducedMotion);
+					heroSubtitleRevealed = true;
+				} finally {
+					document.documentElement.classList.remove("hero-intro-lock");
 
-				setActiveTopic(0);
-
-				if (topicViewport) {
-					const rowHeight = topicViewport.getBoundingClientRect().height;
-					const resetIndex = 0;
-					topicTrack.style.transform = `translateY(${-resetIndex * rowHeight}px)`;
-				}
-
-				if (!heroTitleRevealed) {
-					try {
-						await revealHeroTitle(prefersReducedMotion);
-						heroTitleRevealed = true;
-					} catch {
-						forceRevealHeroTitle();
+					if (!introFinished) {
+						finishIntro();
 					}
-				}
 
-				if (!heroSubtitleRevealed) {
-					try {
-						await revealHeroSubtitle(prefersReducedMotion);
-						heroSubtitleRevealed = true;
-					} catch {
-						forceRevealHeroSubtitle();
+					setActiveTopic(0);
+
+					if (topicViewport) {
+						const rowHeight = topicViewport.getBoundingClientRect().height;
+						const resetIndex = 0;
+						topicTrack.style.transform = `translateY(${-resetIndex * rowHeight}px)`;
+					}
+
+					if (!heroTitleRevealed) {
+						try {
+							await revealHeroTitle(prefersReducedMotion);
+							heroTitleRevealed = true;
+						} catch {
+							forceRevealHeroTitle();
+						}
+					}
+
+					if (!heroSubtitleRevealed) {
+						try {
+							await revealHeroSubtitle(prefersReducedMotion);
+							heroSubtitleRevealed = true;
+						} catch {
+							forceRevealHeroSubtitle();
+						}
 					}
 				}
 			}
+
+			// Mark intro as played for this session so it skips on back-navigation
+			sessionStorage.setItem("hero-intro-played", "1");
 		}
-	}
+	}); // end astro:page-load
 </script>
 
 <style>
