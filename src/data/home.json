@@ -271,122 +271,122 @@
 		"members": [
 			{
 				"id": "yda",
-				"name": "教育部青發署",
-				"role": "青志獎獲獎",
+				"name": "教育部青志獎",
+				"role": "社群經營獲得肯定",
 				"imgKey": "feature-member-yda",
-				"bio": "青志獎獲獎"
+				"bio": ""
 			},
 			{
 				"id": "harry",
 				"name": "Harry",
 				"role": "特殊選才錄取台大資工",
 				"imgKey": "feature-member-harry",
-				"bio": "特殊選才錄取台大資工"
+				"bio": "領域課程設計"
 			},
 			{
 				"id": "ak",
 				"name": "Ak",
 				"role": "特殊選才錄取陽明交大資工",
 				"imgKey": "feature-member-ak",
-				"bio": "特殊選才錄取陽明交大資工"
+				"bio": "領域課程設計"
 			},
 			{
 				"id": "wolf",
 				"name": "Wolf",
 				"role": "特殊選才錄取成大資工",
 				"imgKey": "feature-member-wolf",
-				"bio": "特殊選才錄取成大資工"
+				"bio": "小隊陪伴引導"
 			},
 			{
 				"id": "yorukot",
 				"name": "Yorukot",
 				"role": "國際知名開源專案作者",
 				"imgKey": "feature-member-yoru",
-				"bio": "國際知名開源專案作者"
+				"bio": "網站及系統開發"
 			},
 			{
 				"id": "airo",
 				"name": "艾洛",
 				"role": "清華大學資工所",
 				"imgKey": "feature-member-airo",
-				"bio": "清華大學資工所"
+				"bio": "課程活動設計"
 			},
 			{
 				"id": "seagull",
 				"name": "海鷗",
 				"role": "陽明交大資工系",
 				"imgKey": "feature-member-seagull",
-				"bio": "陽明交大資工系"
+				"bio": "小隊學習陪伴"
 			},
 			{
 				"id": "ascii-base64",
 				"name": "AsciiBase64",
 				"role": "陽明交大資工系",
 				"imgKey": "feature-member-ascii-base64",
-				"bio": "陽明交大資工系"
+				"bio": "小隊學習陪伴"
 			},
 			{
 				"id": "steak",
 				"name": "牛排",
 				"role": "陽明交大資工系",
 				"imgKey": "feature-member-steak",
-				"bio": "陽明交大資工系"
+				"bio": "小隊學習陪伴"
 			},
 			{
 				"id": "arnoldsky",
 				"name": "Arnoldsky",
 				"role": "臺科大人工智慧所",
 				"imgKey": "feature-member-arnoldsky",
-				"bio": "臺科大人工智慧所"
+				"bio": "課程活動設計"
 			},
 			{
 				"id": "kang-o",
 				"name": "康喔",
 				"role": "臺科大資工所",
 				"imgKey": "feature-member-kang-o",
-				"bio": "臺科大資工所"
+				"bio": "營隊影像紀錄"
 			},
 			{
 				"id": "lime",
 				"name": "萊姆",
 				"role": "臺科大資工",
 				"imgKey": "feature-member-lime",
-				"bio": "臺科大資工"
+				"bio": "小隊學習陪伴"
 			},
 			{
 				"id": "shrimp",
 				"name": "草蝦",
 				"role": "中央電機系",
 				"imgKey": "feature-member-shrimp",
-				"bio": "中央電機系"
+				"bio": "小隊學習陪伴"
 			},
 			{
 				"id": "77",
 				"name": "77",
 				"role": "中山跨域學程",
 				"imgKey": "feature-member-77",
-				"bio": "中山跨域學程"
+				"bio": "小隊陪伴引導"
 			},
 			{
 				"id": "fearnot",
 				"name": "Fearnot",
 				"role": "特殊選才錄取中央資工",
 				"imgKey": "feature-member-fearnot",
-				"bio": "特殊選才錄取中央資工"
+				"bio": "營隊統籌協調"
 			},
 			{
 				"id": "kaiyasi",
 				"name": "Kaiyasi",
 				"role": "特殊選才錄取中興應數",
 				"imgKey": "feature-member-kaiyasi",
-				"bio": "特殊選才錄取中興應數"
+				"bio": "網站及系統開發"
 			},
 			{
 				"id": "each",
 				"name": "Each",
 				"role": "特殊選才錄取中興應數",
 				"imgKey": "feature-member-each",
-				"bio": "特殊選才錄取中興應數"
+				"bio": "課程活動設計"
 			}
 		]
 	},
