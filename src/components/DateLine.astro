@@ -199,53 +199,71 @@ const items = timelineData.items.map(item => ({
 </div>
 
 <script>
-	const calendarDropdowns = document.querySelectorAll<HTMLElement>("[data-calendar-dropdown]");
-	const mobileCalendarQuery = window.matchMedia("(max-width: 767px)");
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
-	function setCalendarDropdownOpen(dropdown: HTMLElement, isOpen: boolean) {
-		dropdown.classList.toggle("is-open", isOpen);
-		dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]")?.setAttribute("aria-expanded", String(isOpen));
-	}
+		const calendarDropdowns = document.querySelectorAll<HTMLElement>("[data-calendar-dropdown]");
+		const mobileCalendarQuery = window.matchMedia("(max-width: 767px)");
 
-	for (const dropdown of calendarDropdowns) {
-		const trigger = dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]");
-		const options = dropdown.querySelectorAll<HTMLAnchorElement>("[data-calendar-option]");
-
-		trigger?.addEventListener("click", event => {
-			if (!mobileCalendarQuery.matches) return;
-
-			event.stopPropagation();
-			setCalendarDropdownOpen(dropdown, !dropdown.classList.contains("is-open"));
-		});
-
-		for (const option of options) {
-			option.addEventListener("click", () => {
-				setCalendarDropdownOpen(dropdown, false);
-			});
+		function setCalendarDropdownOpen(dropdown: HTMLElement, isOpen: boolean) {
+			dropdown.classList.toggle("is-open", isOpen);
+			dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]")?.setAttribute("aria-expanded", String(isOpen));
 		}
-	}
-
-	document.addEventListener("click", event => {
-		if (!mobileCalendarQuery.matches) return;
 
 		for (const dropdown of calendarDropdowns) {
-			if (!dropdown.contains(event.target as Node)) {
-				setCalendarDropdownOpen(dropdown, false);
+			const trigger = dropdown.querySelector<HTMLButtonElement>("[data-calendar-trigger]");
+			const options = dropdown.querySelectorAll<HTMLAnchorElement>("[data-calendar-option]");
+
+			trigger?.addEventListener("click", event => {
+				if (!mobileCalendarQuery.matches) return;
+
+				event.stopPropagation();
+				setCalendarDropdownOpen(dropdown, !dropdown.classList.contains("is-open"));
+			});
+
+			for (const option of options) {
+				option.addEventListener("click", () => {
+					setCalendarDropdownOpen(dropdown, false);
+				});
 			}
 		}
-	});
 
-	document.addEventListener("keydown", event => {
-		if (event.key !== "Escape") return;
+		document.addEventListener(
+			"click",
+			event => {
+				if (!mobileCalendarQuery.matches) return;
 
-		for (const dropdown of calendarDropdowns) {
-			setCalendarDropdownOpen(dropdown, false);
-		}
-	});
+				for (const dropdown of calendarDropdowns) {
+					if (!dropdown.contains(event.target as Node)) {
+						setCalendarDropdownOpen(dropdown, false);
+					}
+				}
+			},
+			{ signal }
+		);
 
-	mobileCalendarQuery.addEventListener("change", () => {
-		for (const dropdown of calendarDropdowns) {
-			setCalendarDropdownOpen(dropdown, false);
-		}
+		document.addEventListener(
+			"keydown",
+			event => {
+				if (event.key !== "Escape") return;
+
+				for (const dropdown of calendarDropdowns) {
+					setCalendarDropdownOpen(dropdown, false);
+				}
+			},
+			{ signal }
+		);
+
+		mobileCalendarQuery.addEventListener(
+			"change",
+			() => {
+				for (const dropdown of calendarDropdowns) {
+					setCalendarDropdownOpen(dropdown, false);
+				}
+			},
+			{ signal } as AddEventListenerOptions
+		);
 	});
 </script>

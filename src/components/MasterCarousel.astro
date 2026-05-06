@@ -107,101 +107,123 @@ const getMemberImage = (member: Member) => {
 </style>
 
 <script>
-	const masterMarqueeViewport = document.querySelector<HTMLElement>("[data-master-marquee-viewport]");
-	const masterMarqueeTrack = document.querySelector<HTMLElement>("[data-master-marquee-track]");
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+		let rafId = 0;
+		document.addEventListener(
+			"astro:before-swap",
+			() => {
+				ac.abort();
+				cancelAnimationFrame(rafId);
+			},
+			{ once: true }
+		);
 
-	if (masterMarqueeViewport && masterMarqueeTrack) {
-		const viewport = masterMarqueeViewport;
-		const groups = Array.from(masterMarqueeTrack.querySelectorAll<HTMLElement>("[data-marquee-group]"));
-		const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
-		const marqueeDuration = 50_000;
-		let groupWidth = 0;
-		let isFocused = false;
-		let isPointerDown = false;
-		let lastFrameTime = 0;
-		let didSetInitialScroll = false;
+		const masterMarqueeViewport = document.querySelector<HTMLElement>("[data-master-marquee-viewport]");
+		const masterMarqueeTrack = document.querySelector<HTMLElement>("[data-master-marquee-track]");
 
-		function shouldPauseMarquee() {
-			return isFocused || isPointerDown;
-		}
+		if (masterMarqueeViewport && masterMarqueeTrack) {
+			const viewport = masterMarqueeViewport;
+			const groups = Array.from(masterMarqueeTrack.querySelectorAll<HTMLElement>("[data-marquee-group]"));
+			const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
+			const marqueeDuration = 50_000;
+			let groupWidth = 0;
+			let isFocused = false;
+			let isPointerDown = false;
+			let lastFrameTime = 0;
+			let didSetInitialScroll = false;
 
-		function normalizeMasterScroll() {
-			if (!groupWidth) return;
-
-			const lowerBound = groupWidth * 0.5;
-			const upperBound = groupWidth * 1.5;
-
-			if (viewport.scrollLeft < lowerBound) {
-				viewport.scrollLeft += groupWidth;
-			} else if (viewport.scrollLeft >= upperBound) {
-				viewport.scrollLeft -= groupWidth;
+			function shouldPauseMarquee() {
+				return isFocused || isPointerDown;
 			}
-		}
 
-		function fillMasterMarquee() {
-			if (!sourceItems.length) return;
+			function normalizeMasterScroll() {
+				if (!groupWidth) return;
 
-			const targetWidth = window.innerWidth * 1.25;
-			for (const group of groups) {
-				group.replaceChildren();
+				const lowerBound = groupWidth * 0.5;
+				const upperBound = groupWidth * 1.5;
 
-				let index = 0;
-				const maxItems = sourceItems.length * 50;
-				while ((group.scrollWidth < targetWidth || index < sourceItems.length) && index < maxItems) {
-					group.append(sourceItems[index % sourceItems.length].cloneNode(true));
-					index += 1;
+				if (viewport.scrollLeft < lowerBound) {
+					viewport.scrollLeft += groupWidth;
+				} else if (viewport.scrollLeft >= upperBound) {
+					viewport.scrollLeft -= groupWidth;
 				}
 			}
 
-			groupWidth = groups[0]?.scrollWidth ?? 0;
-			if (!didSetInitialScroll && groupWidth) {
-				viewport.scrollLeft = groupWidth;
-				didSetInitialScroll = true;
-			} else {
-				normalizeMasterScroll();
-			}
-		}
+			function fillMasterMarquee() {
+				if (!sourceItems.length) return;
 
-		function animateMasterMarquee(timestamp: number) {
-			if (!lastFrameTime) {
+				const targetWidth = window.innerWidth * 1.25;
+				for (const group of groups) {
+					group.replaceChildren();
+
+					let index = 0;
+					const maxItems = sourceItems.length * 50;
+					while ((group.scrollWidth < targetWidth || index < sourceItems.length) && index < maxItems) {
+						group.append(sourceItems[index % sourceItems.length].cloneNode(true));
+						index += 1;
+					}
+				}
+
+				groupWidth = groups[0]?.scrollWidth ?? 0;
+				if (!didSetInitialScroll && groupWidth) {
+					viewport.scrollLeft = groupWidth;
+					didSetInitialScroll = true;
+				} else {
+					normalizeMasterScroll();
+				}
+			}
+
+			function animateMasterMarquee(timestamp: number) {
+				if (!lastFrameTime) {
+					lastFrameTime = timestamp;
+				}
+
+				const elapsed = timestamp - lastFrameTime;
 				lastFrameTime = timestamp;
+
+				if (!shouldPauseMarquee() && groupWidth) {
+					viewport.scrollLeft += (groupWidth / marqueeDuration) * elapsed;
+					normalizeMasterScroll();
+				}
+
+				rafId = requestAnimationFrame(animateMasterMarquee);
 			}
 
-			const elapsed = timestamp - lastFrameTime;
-			lastFrameTime = timestamp;
-
-			if (!shouldPauseMarquee() && groupWidth) {
-				viewport.scrollLeft += (groupWidth / marqueeDuration) * elapsed;
-				normalizeMasterScroll();
-			}
-
-			requestAnimationFrame(animateMasterMarquee);
+			fillMasterMarquee();
+			window.addEventListener("resize", fillMasterMarquee, { signal });
+			viewport.addEventListener("scroll", normalizeMasterScroll, { passive: true });
+			viewport.addEventListener("pointerleave", () => {
+				isPointerDown = false;
+				lastFrameTime = 0;
+			});
+			viewport.addEventListener("pointerdown", () => {
+				isPointerDown = true;
+			});
+			window.addEventListener(
+				"pointerup",
+				() => {
+					isPointerDown = false;
+					lastFrameTime = 0;
+				},
+				{ signal }
+			);
+			viewport.addEventListener("focusin", () => {
+				isFocused = true;
+			});
+			viewport.addEventListener("focusout", () => {
+				isFocused = false;
+				lastFrameTime = 0;
+			});
+			document.addEventListener(
+				"visibilitychange",
+				() => {
+					lastFrameTime = 0;
+				},
+				{ signal }
+			);
+			rafId = requestAnimationFrame(animateMasterMarquee);
 		}
-
-		fillMasterMarquee();
-		window.addEventListener("resize", fillMasterMarquee);
-		viewport.addEventListener("scroll", normalizeMasterScroll, { passive: true });
-		viewport.addEventListener("pointerleave", () => {
-			isPointerDown = false;
-			lastFrameTime = 0;
-		});
-		viewport.addEventListener("pointerdown", () => {
-			isPointerDown = true;
-		});
-		window.addEventListener("pointerup", () => {
-			isPointerDown = false;
-			lastFrameTime = 0;
-		});
-		viewport.addEventListener("focusin", () => {
-			isFocused = true;
-		});
-		viewport.addEventListener("focusout", () => {
-			isFocused = false;
-			lastFrameTime = 0;
-		});
-		document.addEventListener("visibilitychange", () => {
-			lastFrameTime = 0;
-		});
-		requestAnimationFrame(animateMasterMarquee);
-	}
+	});
 </script>

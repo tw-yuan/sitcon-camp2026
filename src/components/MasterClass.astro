@@ -245,188 +245,199 @@ const getMasterImage = (masterClass: MasterClassItem) => {
 </section>
 
 <script>
-	const carousel = document.querySelector<HTMLElement>("[data-master-carousel]");
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
-	if (carousel) {
-		const viewport = carousel.querySelector<HTMLElement>(".master-carousel__viewport");
-		const slides = Array.from(carousel.querySelectorAll<HTMLElement>("[data-master-carousel-slide]"));
-		const tabs = Array.from(carousel.querySelectorAll<HTMLButtonElement>("[data-master-carousel-tab]"));
-		const tabIndicator = carousel.querySelector<HTMLElement>("[data-master-carousel-tab-indicator]");
-		let activeIndex = 0;
-		let scrollFrame = 0;
-		let scrollEndTimeout = 0;
-		let isProgrammaticScroll = false;
-		let pointerStartX = 0;
-		let didDrag = false;
-		let viewportHeightFrame = 0;
+		const carousel = document.querySelector<HTMLElement>("[data-master-carousel]");
 
-		const updateViewportHeight = () => {
-			if (!viewport) {
-				return;
-			}
+		if (carousel) {
+			const viewport = carousel.querySelector<HTMLElement>(".master-carousel__viewport");
+			const slides = Array.from(carousel.querySelectorAll<HTMLElement>("[data-master-carousel-slide]"));
+			const tabs = Array.from(carousel.querySelectorAll<HTMLButtonElement>("[data-master-carousel-tab]"));
+			const tabIndicator = carousel.querySelector<HTMLElement>("[data-master-carousel-tab-indicator]");
+			let activeIndex = 0;
+			let scrollFrame = 0;
+			let scrollEndTimeout = 0;
+			let isProgrammaticScroll = false;
+			let pointerStartX = 0;
+			let didDrag = false;
+			let viewportHeightFrame = 0;
 
-			const activeSlide = slides[activeIndex];
+			const updateViewportHeight = () => {
+				if (!viewport) {
+					return;
+				}
 
-			if (!activeSlide) {
-				return;
-			}
+				const activeSlide = slides[activeIndex];
 
-			viewport.style.setProperty("--master-carousel-active-height", `${Math.ceil(activeSlide.getBoundingClientRect().height)}px`);
-		};
+				if (!activeSlide) {
+					return;
+				}
 
-		const queueViewportHeightUpdate = () => {
-			window.cancelAnimationFrame(viewportHeightFrame);
-			viewportHeightFrame = window.requestAnimationFrame(updateViewportHeight);
-		};
+				viewport.style.setProperty("--master-carousel-active-height", `${Math.ceil(activeSlide.getBoundingClientRect().height)}px`);
+			};
 
-		const updateTabIndicator = () => {
-			const activeTab = tabs[activeIndex];
+			const queueViewportHeightUpdate = () => {
+				window.cancelAnimationFrame(viewportHeightFrame);
+				viewportHeightFrame = window.requestAnimationFrame(updateViewportHeight);
+			};
 
-			if (!tabIndicator || !activeTab) {
-				return;
-			}
+			const updateTabIndicator = () => {
+				const activeTab = tabs[activeIndex];
 
-			tabIndicator.style.width = `${activeTab.offsetWidth}px`;
-			tabIndicator.style.transform = `translate3d(${activeTab.offsetLeft}px, 0, 0)`;
-		};
+				if (!tabIndicator || !activeTab) {
+					return;
+				}
 
-		const updateActiveState = (index: number) => {
-			if (slides.length === 0) {
-				return;
-			}
+				tabIndicator.style.width = `${activeTab.offsetWidth}px`;
+				tabIndicator.style.transform = `translate3d(${activeTab.offsetLeft}px, 0, 0)`;
+			};
 
-			activeIndex = (index + slides.length) % slides.length;
+			const updateActiveState = (index: number) => {
+				if (slides.length === 0) {
+					return;
+				}
+
+				activeIndex = (index + slides.length) % slides.length;
+
+				slides.forEach((slide, slideIndex) => {
+					slide.setAttribute("aria-hidden", String(slideIndex !== activeIndex));
+					slide.classList.toggle("master-carousel__slide--active", slideIndex === activeIndex);
+				});
+
+				tabs.forEach((tab, tabIndex) => {
+					const isActive = tabIndex === activeIndex;
+					tab.classList.toggle("master-carousel__tab--active", isActive);
+					tab.setAttribute("aria-selected", String(isActive));
+				});
+
+				updateTabIndicator();
+				queueViewportHeightUpdate();
+			};
+
+			const getSlideScrollLeft = (slide: HTMLElement) => {
+				if (!viewport) {
+					return 0;
+				}
+
+				const viewportRect = viewport.getBoundingClientRect();
+				const slideRect = slide.getBoundingClientRect();
+
+				return viewport.scrollLeft + slideRect.left + slideRect.width / 2 - (viewportRect.left + viewportRect.width / 2);
+			};
+
+			const setActiveSlide = (index: number, shouldScroll = true, behavior: ScrollBehavior = "smooth") => {
+				if (!viewport || slides.length === 0) {
+					return;
+				}
+
+				updateActiveState(index);
+
+				if (shouldScroll) {
+					isProgrammaticScroll = true;
+					viewport.scrollTo({
+						left: getSlideScrollLeft(slides[activeIndex]),
+						behavior
+					});
+					window.clearTimeout(scrollEndTimeout);
+					scrollEndTimeout = window.setTimeout(() => {
+						isProgrammaticScroll = false;
+						syncActiveFromScroll();
+					}, 620);
+				}
+			};
+
+			const syncActiveFromScroll = () => {
+				if (!viewport || slides.length === 0) {
+					return;
+				}
+
+				const viewportRect = viewport.getBoundingClientRect();
+				const viewportCenter = viewportRect.left + viewportRect.width / 2;
+				const nearestIndex = slides.reduce((nearest, slide, slideIndex) => {
+					const currentRect = slides[nearest].getBoundingClientRect();
+					const nextRect = slide.getBoundingClientRect();
+					const currentCenter = currentRect.left + currentRect.width / 2;
+					const nextCenter = nextRect.left + nextRect.width / 2;
+					const currentDistance = Math.abs(currentCenter - viewportCenter);
+					const nextDistance = Math.abs(nextCenter - viewportCenter);
+					return nextDistance < currentDistance ? slideIndex : nearest;
+				}, 0);
+
+				updateActiveState(nearestIndex);
+			};
+
+			tabs.forEach(tab => {
+				tab.addEventListener("click", () => {
+					setActiveSlide(Number(tab.dataset.masterCarouselIndex ?? 0));
+				});
+			});
 
 			slides.forEach((slide, slideIndex) => {
-				slide.setAttribute("aria-hidden", String(slideIndex !== activeIndex));
-				slide.classList.toggle("master-carousel__slide--active", slideIndex === activeIndex);
-			});
+				slide.addEventListener("click", () => {
+					if (didDrag || slideIndex === activeIndex) {
+						return;
+					}
 
-			tabs.forEach((tab, tabIndex) => {
-				const isActive = tabIndex === activeIndex;
-				tab.classList.toggle("master-carousel__tab--active", isActive);
-				tab.setAttribute("aria-selected", String(isActive));
-			});
-
-			updateTabIndicator();
-			queueViewportHeightUpdate();
-		};
-
-		const getSlideScrollLeft = (slide: HTMLElement) => {
-			if (!viewport) {
-				return 0;
-			}
-
-			const viewportRect = viewport.getBoundingClientRect();
-			const slideRect = slide.getBoundingClientRect();
-
-			return viewport.scrollLeft + slideRect.left + slideRect.width / 2 - (viewportRect.left + viewportRect.width / 2);
-		};
-
-		const setActiveSlide = (index: number, shouldScroll = true, behavior: ScrollBehavior = "smooth") => {
-			if (!viewport || slides.length === 0) {
-				return;
-			}
-
-			updateActiveState(index);
-
-			if (shouldScroll) {
-				isProgrammaticScroll = true;
-				viewport.scrollTo({
-					left: getSlideScrollLeft(slides[activeIndex]),
-					behavior
+					setActiveSlide(slideIndex);
 				});
-				window.clearTimeout(scrollEndTimeout);
-				scrollEndTimeout = window.setTimeout(() => {
-					isProgrammaticScroll = false;
-					syncActiveFromScroll();
-				}, 620);
-			}
-		};
-
-		const syncActiveFromScroll = () => {
-			if (!viewport || slides.length === 0) {
-				return;
-			}
-
-			const viewportRect = viewport.getBoundingClientRect();
-			const viewportCenter = viewportRect.left + viewportRect.width / 2;
-			const nearestIndex = slides.reduce((nearest, slide, slideIndex) => {
-				const currentRect = slides[nearest].getBoundingClientRect();
-				const nextRect = slide.getBoundingClientRect();
-				const currentCenter = currentRect.left + currentRect.width / 2;
-				const nextCenter = nextRect.left + nextRect.width / 2;
-				const currentDistance = Math.abs(currentCenter - viewportCenter);
-				const nextDistance = Math.abs(nextCenter - viewportCenter);
-				return nextDistance < currentDistance ? slideIndex : nearest;
-			}, 0);
-
-			updateActiveState(nearestIndex);
-		};
-
-		tabs.forEach(tab => {
-			tab.addEventListener("click", () => {
-				setActiveSlide(Number(tab.dataset.masterCarouselIndex ?? 0));
 			});
-		});
 
-		slides.forEach((slide, slideIndex) => {
-			slide.addEventListener("click", () => {
-				if (didDrag || slideIndex === activeIndex) {
-					return;
+			const slideResizeObserver = "ResizeObserver" in window ? new ResizeObserver(queueViewportHeightUpdate) : null;
+			slides.forEach(slide => slideResizeObserver?.observe(slide));
+			signal.addEventListener("abort", () => slideResizeObserver?.disconnect());
+			window.addEventListener("resize", queueViewportHeightUpdate, { signal });
+
+			viewport?.addEventListener(
+				"scroll",
+				() => {
+					if (isProgrammaticScroll) {
+						return;
+					}
+
+					window.cancelAnimationFrame(scrollFrame);
+					scrollFrame = window.requestAnimationFrame(syncActiveFromScroll);
+				},
+				{ passive: true }
+			);
+
+			viewport?.addEventListener("pointerdown", event => {
+				pointerStartX = event.clientX;
+				didDrag = false;
+			});
+
+			viewport?.addEventListener("pointermove", event => {
+				if (Math.abs(event.clientX - pointerStartX) > 8) {
+					didDrag = true;
+				}
+			});
+
+			window.addEventListener(
+				"resize",
+				() => {
+					setActiveSlide(activeIndex, true, "auto");
+					updateTabIndicator();
+				},
+				{ signal }
+			);
+
+			carousel.addEventListener("keydown", event => {
+				if (event.key === "ArrowLeft") {
+					event.preventDefault();
+					setActiveSlide(activeIndex - 1);
 				}
 
-				setActiveSlide(slideIndex);
-			});
-		});
-
-		const slideResizeObserver = "ResizeObserver" in window ? new ResizeObserver(queueViewportHeightUpdate) : null;
-		slides.forEach(slide => slideResizeObserver?.observe(slide));
-		window.addEventListener("resize", queueViewportHeightUpdate);
-
-		viewport?.addEventListener(
-			"scroll",
-			() => {
-				if (isProgrammaticScroll) {
-					return;
+				if (event.key === "ArrowRight") {
+					event.preventDefault();
+					setActiveSlide(activeIndex + 1);
 				}
+			});
 
-				window.cancelAnimationFrame(scrollFrame);
-				scrollFrame = window.requestAnimationFrame(syncActiveFromScroll);
-			},
-			{ passive: true }
-		);
-
-		viewport?.addEventListener("pointerdown", event => {
-			pointerStartX = event.clientX;
-			didDrag = false;
-		});
-
-		viewport?.addEventListener("pointermove", event => {
-			if (Math.abs(event.clientX - pointerStartX) > 8) {
-				didDrag = true;
-			}
-		});
-
-		window.addEventListener("resize", () => {
-			setActiveSlide(activeIndex, true, "auto");
-			updateTabIndicator();
-		});
-
-		carousel.addEventListener("keydown", event => {
-			if (event.key === "ArrowLeft") {
-				event.preventDefault();
-				setActiveSlide(activeIndex - 1);
-			}
-
-			if (event.key === "ArrowRight") {
-				event.preventDefault();
-				setActiveSlide(activeIndex + 1);
-			}
-		});
-
-		setActiveSlide(0, true, "auto");
-	}
+			setActiveSlide(0, true, "auto");
+		}
+	});
 </script>
 
 <style>

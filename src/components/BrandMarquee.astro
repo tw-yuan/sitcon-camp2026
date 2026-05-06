@@ -100,29 +100,35 @@ const marqueeItems = Array.from({ length: brandMarquee.repeatItems }, (_, index)
 </style>
 
 <script>
-	const brandMarqueeTrack = document.querySelector<HTMLElement>("[data-brand-marquee-track]");
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
-	if (brandMarqueeTrack) {
-		const groups = Array.from(brandMarqueeTrack.querySelectorAll<HTMLElement>("[data-marquee-group]"));
-		const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
+		const brandMarqueeTrack = document.querySelector<HTMLElement>("[data-brand-marquee-track]");
 
-		function fillBrandMarquee() {
-			if (!sourceItems.length) return;
+		if (brandMarqueeTrack) {
+			const groups = Array.from(brandMarqueeTrack.querySelectorAll<HTMLElement>("[data-marquee-group]"));
+			const sourceItems = groups[0] ? Array.from(groups[0].children).map(item => item.cloneNode(true)) : [];
 
-			const targetWidth = window.innerWidth * 1.25;
-			for (const group of groups) {
-				group.replaceChildren();
+			function fillBrandMarquee() {
+				if (!sourceItems.length) return;
 
-				let index = 0;
-				const maxItems = sourceItems.length * 50;
-				while ((group.scrollWidth < targetWidth || index < sourceItems.length) && index < maxItems) {
-					group.append(sourceItems[index % sourceItems.length].cloneNode(true));
-					index += 1;
+				const targetWidth = window.innerWidth * 1.25;
+				for (const group of groups) {
+					group.replaceChildren();
+
+					let index = 0;
+					const maxItems = sourceItems.length * 50;
+					while ((group.scrollWidth < targetWidth || index < sourceItems.length) && index < maxItems) {
+						group.append(sourceItems[index % sourceItems.length].cloneNode(true));
+						index += 1;
+					}
 				}
 			}
-		}
 
-		fillBrandMarquee();
-		window.addEventListener("resize", fillBrandMarquee);
-	}
+			fillBrandMarquee();
+			window.addEventListener("resize", fillBrandMarquee, { signal });
+		}
+	});
 </script>
