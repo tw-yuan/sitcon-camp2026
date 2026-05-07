@@ -4,8 +4,32 @@ import Team from "@/components/Team.astro";
 import OrganizerBrands from "@/components/OrganizerBrands.astro";
 import Layout from "@/layouts/Layout.astro";
 import pageData from "@/data/about.json";
+import layoutData from "@/data/layout.json";
 
 const { pageMeta } = pageData;
+const siteURL = Astro.site ?? new URL("https://sitcon.camp");
+const homeURL = new URL("/2026/", siteURL);
+const aboutURL = new URL("/2026/about/", siteURL);
+
+const aboutPageSchema = {
+	"@context": "https://schema.org",
+	"@type": "AboutPage",
+	name: pageMeta.title,
+	description: pageMeta.description,
+	url: aboutURL.href,
+	inLanguage: layoutData.document.lang,
+	isPartOf: {
+		"@type": "WebSite",
+		name: layoutData.document.brandName,
+		url: homeURL.href
+	},
+	mainEntity: {
+		"@type": "Organization",
+		name: layoutData.organization.name,
+		url: layoutData.organization.url,
+		sameAs: layoutData.organization.sameAs
+	}
+};
 
 const breadcrumbSchema = {
 	"@context": "https://schema.org",
@@ -15,19 +39,21 @@ const breadcrumbSchema = {
 			"@type": "ListItem",
 			position: 1,
 			name: "SITCON 夏令營 2026",
-			item: "https://sitcon.camp/2026/"
+			item: homeURL.href
 		},
 		{
 			"@type": "ListItem",
 			position: 2,
 			name: "關於我們",
-			item: "https://sitcon.camp/2026/about/"
+			item: aboutURL.href
 		}
 	]
 };
+
+const structuredData = [aboutPageSchema, breadcrumbSchema];
 ---
 
-<Layout title={pageMeta.title} description={pageMeta.description} additionalStructuredData={breadcrumbSchema}>
+<Layout title={pageMeta.title} description={pageMeta.description} additionalStructuredData={structuredData}>
 	<EventsHeld />
 	<Team />
 	<OrganizerBrands />

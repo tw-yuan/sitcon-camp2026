@@ -20,7 +20,6 @@ const { document: pageDocument } = layoutData;
 
 const siteURL = Astro.site ?? new URL("https://sitcon.camp");
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
-const homeURL = new URL("/2026/", siteURL);
 
 const seoData = {
 	title: title ?? pageDocument.defaultTitle,
@@ -31,39 +30,6 @@ const seoData = {
 	ogType: type,
 	robots: noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"
 };
-
-const publisher = {
-	"@type": "Organization",
-	name: layoutData.organization.name,
-	url: layoutData.organization.url
-};
-
-const structuredData = [
-	{
-		...layoutData.eventLD,
-		image: [seoData.ogImage],
-		organizer: {
-			...layoutData.eventLD.organizer,
-			sameAs: layoutData.organization.sameAs
-		},
-		url: homeURL.href
-	},
-	{
-		"@context": "https://schema.org",
-		"@type": "WebSite",
-		name: pageDocument.brandName,
-		url: homeURL.href,
-		description: pageDocument.description,
-		inLanguage: pageDocument.lang,
-		publisher
-	},
-	{
-		"@context": "https://schema.org",
-		...publisher,
-		logo: new URL("/2026/favicon.svg", siteURL).href,
-		sameAs: layoutData.organization.sameAs
-	}
-];
 ---
 
 <!doctype html>
@@ -123,8 +89,7 @@ const structuredData = [
 		<meta name="twitter:image" content={seoData.ogImage} />
 		<meta name="twitter:image:alt" content={seoData.ogImageAlt} />
 
-		<!-- JSON-LD: Event / Site / Organization -->
-		{!noindex && <script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline />}
+		<!-- JSON-LD: page-specific structured data -->
 		{!noindex && additionalStructuredData && <script type="application/ld+json" set:html={JSON.stringify(additionalStructuredData)} is:inline />}
 		<ClientRouter />
 	</head>

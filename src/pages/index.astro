@@ -10,7 +10,44 @@ import RegistrationInfo from "@/components/RegistrationInfo.astro";
 import FAQ from "@/components/FAQ.astro";
 import OrganizersBrands from "@/components/OrganizerBrands.astro";
 import homeData from "@/data/home.json";
+import layoutData from "@/data/layout.json";
 import { markdownToPlainText } from "@/utils/markdown";
+
+const siteURL = Astro.site ?? new URL("https://sitcon.camp");
+const homeURL = new URL("/2026/", siteURL);
+const ogImage = new URL("/2026/og.jpg", siteURL);
+const publisher = {
+	"@type": "Organization",
+	name: layoutData.organization.name,
+	url: layoutData.organization.url
+};
+
+const eventSchema = {
+	...layoutData.eventLD,
+	image: [ogImage.href],
+	organizer: {
+		...layoutData.eventLD.organizer,
+		sameAs: layoutData.organization.sameAs
+	},
+	url: homeURL.href
+};
+
+const websiteSchema = {
+	"@context": "https://schema.org",
+	"@type": "WebSite",
+	name: layoutData.document.brandName,
+	url: homeURL.href,
+	description: layoutData.document.description,
+	inLanguage: layoutData.document.lang,
+	publisher
+};
+
+const organizationSchema = {
+	"@context": "https://schema.org",
+	...publisher,
+	logo: new URL("/2026/favicon.svg", siteURL).href,
+	sameAs: layoutData.organization.sameAs
+};
 
 const faqSchema = {
 	"@context": "https://schema.org",
@@ -24,9 +61,11 @@ const faqSchema = {
 		}
 	}))
 };
+
+const structuredData = [eventSchema, websiteSchema, organizationSchema, faqSchema];
 ---
 
-<Layout additionalStructuredData={faqSchema}>
+<Layout additionalStructuredData={structuredData}>
 	<Hero />
 	<BrandMarquee />
 	<MasterClass />
