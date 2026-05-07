@@ -9,6 +9,52 @@ import sitemap from "@astrojs/sitemap";
 import favicons from "astro-favicons";
 
 const base = "/2026";
+const basePath = base.replace(/^\/+|\/+$/g, "");
+const pwaAssetNames = new Set([
+	"android-chrome-192x192.png",
+	"android-chrome-512x512.png",
+	"apple-touch-icon-precomposed.png",
+	"apple-touch-icon.png",
+	"browserconfig.xml",
+	"favicon-16x16.png",
+	"favicon-32x32.png",
+	"favicon-48x48.png",
+	"favicon.ico",
+	"favicon.svg",
+	"manifest.webmanifest",
+	"mstile-144x144.png",
+	"mstile-150x150.png",
+	"mstile-310x150.png",
+	"mstile-310x310.png",
+	"mstile-70x70.png",
+	"safari-pinned-tab.svg",
+	"yandex-browser-50x50.png",
+	"yandex-browser-manifest.json"
+]);
+
+function emitPwaAssetsAtArtifactRoot() {
+	return {
+		name: "camp:pwa-assets-at-artifact-root",
+		enforce: /** @type {"post"} */ ("post"),
+		/**
+		 * @param {unknown} _
+		 * @param {Record<string, { fileName: string }>} bundle
+		 */
+		generateBundle(_, bundle) {
+			for (const [fileName, asset] of Object.entries(bundle)) {
+				const pwaAssetName = fileName.startsWith(`${basePath}/`) ? fileName.slice(basePath.length + 1) : "";
+
+				if (!pwaAssetNames.has(pwaAssetName)) {
+					continue;
+				}
+
+				asset.fileName = pwaAssetName;
+				bundle[pwaAssetName] = asset;
+				delete bundle[fileName];
+			}
+		}
+	};
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -80,7 +126,8 @@ export default defineConfig({
 			tailwindcss(),
 			Icons({
 				compiler: "astro"
-			})
+			}),
+			emitPwaAssetsAtArtifactRoot()
 		]
 	},
 
