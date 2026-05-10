@@ -1,5 +1,4 @@
 ---
-import GripVertical from "~icons/lucide/grip-vertical";
 import X from "~icons/lucide/x";
 import type { ScheduleBlock, ScheduleDay, ScheduleDayType, ScheduleEvent, ScheduleEventCategory } from "@/data/schedule";
 import { scheduleDays, scheduleEvents, scheduleMeta, schedulePeriods } from "@/data/schedule";
@@ -126,23 +125,12 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			<div class="schedule-days-track" data-schedule-days-track>
 				{
 					scheduleDays.map(day => (
-						<article
-							class:list={["schedule-day", dayAccentClassMap[day.type], { "schedule-day--movable": day.canMove }]}
-							data-schedule-day
-							data-schedule-day-id={day.id}
-							data-schedule-can-move={String(day.canMove)}
-							draggable={day.canMove ? "true" : "false"}
-						>
+						<article class:list={["schedule-day", dayAccentClassMap[day.type]]}>
 							<header class="schedule-day__header">
 								<div class="schedule-day__header-copy">
 									<h2 class="schedule-day__title">{day.title}</h2>
 									<p class="schedule-day__subtitle">{day.subtitle}</p>
 								</div>
-								{day.canMove && (
-									<span class="schedule-day__move-handle" aria-label={`${day.title}可拖曳調整順序`} title="拖曳調整主題日順序">
-										<GripVertical width={22} height={22} stroke-width={3} />
-									</span>
-								)}
 							</header>
 
 							<div class="schedule-day__blocks">
@@ -175,7 +163,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 																data-schedule-event-trigger={event.id}
 																aria-label={`查看${event.name}介紹`}
 															>
-																{block.hasDesign === true && <div class="schedule-event__backdrop" aria-hidden="true" />}
 																<div class="schedule-event__body">
 																	<div class="schedule-event__content">
 																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
@@ -231,63 +218,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
 		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLDialogElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
-		const daysTrack = document.querySelector<HTMLElement>("[data-schedule-days-track]");
-		const desktopDragQuery = window.matchMedia("(min-width: 42.001rem)");
-		let draggedDay: HTMLElement | null = null;
-		let lastInsertKey = "";
-
-		const flipAnimate = (moveFn: () => void) => {
-			if (!daysTrack) return;
-			const days = Array.from(daysTrack.querySelectorAll<HTMLElement>("[data-schedule-day]"));
-			const firsts = new Map(days.map(d => [d, d.getBoundingClientRect()]));
-
-			moveFn();
-
-			days.forEach(day => {
-				if (day === draggedDay) return;
-				const first = firsts.get(day)!;
-				const last = day.getBoundingClientRect();
-				const dx = first.left - last.left;
-				if (Math.abs(dx) < 1) return;
-
-				day.style.transition = "none";
-				day.style.transform = `translateX(${dx}px)`;
-				day.offsetHeight;
-				day.style.transition = "transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1)";
-				day.style.transform = "";
-
-				const cleanup = () => {
-					day.style.transform = "";
-					day.style.transition = "";
-				};
-				day.addEventListener("transitionend", cleanup, { once: true });
-				day.addEventListener("transitioncancel", cleanup, { once: true });
-			});
-		};
-
-		const isMovableDay = (day: HTMLElement | null): day is HTMLElement => day?.dataset.scheduleCanMove === "true";
-		const setDragEnabled = () => {
-			const shouldEnable = desktopDragQuery.matches;
-
-			daysTrack?.querySelectorAll<HTMLElement>("[data-schedule-day]").forEach(day => {
-				day.draggable = shouldEnable && day.dataset.scheduleCanMove === "true";
-			});
-		};
-
-		const getMovableInsertTarget = (target: EventTarget | null) => {
-			if (!(target instanceof Element) || !daysTrack) return null;
-
-			const day = target.closest<HTMLElement>("[data-schedule-day]");
-
-			if (!isMovableDay(day) || !daysTrack.contains(day)) {
-				return null;
-			}
-
-			return day;
-		};
-
-		setDragEnabled();
-		desktopDragQuery.addEventListener("change", setDragEnabled, { signal });
 
 		document.addEventListener(
 			"click",
@@ -310,75 +240,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			{ signal }
 		);
 
-		daysTrack?.addEventListener(
-			"dragstart",
-			event => {
-				const day = getMovableInsertTarget(event.target);
-
-				if (!desktopDragQuery.matches || !day) {
-					event.preventDefault();
-					return;
-				}
-
-				draggedDay = day;
-				day.classList.add("is-dragging");
-				event.dataTransfer?.setData("text/plain", day.dataset.scheduleDayId ?? "");
-				event.dataTransfer?.setDragImage(day, day.clientWidth / 2, 40);
-				if (event.dataTransfer) {
-					event.dataTransfer.effectAllowed = "move";
-				}
-			},
-			{ signal }
-		);
-
-		daysTrack?.addEventListener(
-			"dragover",
-			event => {
-				if (!desktopDragQuery.matches || !draggedDay) return;
-
-				const targetDay = getMovableInsertTarget(event.target);
-
-				if (!targetDay) return;
-
-				event.preventDefault();
-				if (event.dataTransfer) {
-					event.dataTransfer.dropEffect = "move";
-				}
-
-				if (targetDay === draggedDay) return;
-
-				const targetRect = targetDay.getBoundingClientRect();
-				const shouldPlaceAfter = event.clientX > targetRect.left + targetRect.width / 2;
-				const insertKey = `${targetDay.dataset.scheduleDayId}-${shouldPlaceAfter}`;
-				if (insertKey === lastInsertKey) return;
-				lastInsertKey = insertKey;
-
-				flipAnimate(() => {
-					daysTrack!.insertBefore(draggedDay!, shouldPlaceAfter ? targetDay.nextSibling : targetDay);
-				});
-			},
-			{ signal }
-		);
-
-		daysTrack?.addEventListener(
-			"drop",
-			event => {
-				if (!draggedDay) return;
-				event.preventDefault();
-			},
-			{ signal }
-		);
-
-		daysTrack?.addEventListener(
-			"dragend",
-			() => {
-				draggedDay?.classList.remove("is-dragging");
-				draggedDay = null;
-				lastInsertKey = "";
-			},
-			{ signal }
-		);
-
 		dialogs.forEach(dialog => {
 			dialog.addEventListener(
 				"click",
@@ -397,7 +258,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	.schedule-page {
 		overflow: hidden;
 		padding-block: clamp(8.25rem, 12vw, 12rem) clamp(3.5rem, 7vw, 6rem);
-		background: linear-gradient(135deg, color-mix(in srgb, var(--color-soft-blue) 18%, transparent) 0 28%, transparent 28% 100%), var(--color-background);
+		background: var(--color-background);
 		color: var(--color-foreground);
 	}
 
@@ -477,6 +338,25 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		min-width: 0;
 	}
 
+	.schedule-days-track {
+		scrollbar-color: var(--color-foreground) color-mix(in srgb, var(--color-foreground) 14%, transparent);
+		scrollbar-width: thin;
+	}
+
+	.schedule-days-track::-webkit-scrollbar {
+		height: 0.55rem;
+	}
+
+	.schedule-days-track::-webkit-scrollbar-track {
+		background: color-mix(in srgb, var(--color-foreground) 14%, transparent);
+		border-radius: 999rem;
+	}
+
+	.schedule-days-track::-webkit-scrollbar-thumb {
+		background: var(--color-foreground);
+		border-radius: 999rem;
+	}
+
 	.schedule-day {
 		display: grid;
 		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-midday-row) var(--schedule-evening-row);
@@ -489,26 +369,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
 		transition:
 			box-shadow 180ms ease,
-			opacity 180ms ease,
 			transform 180ms ease;
-	}
-
-	.schedule-day--movable {
-		cursor: grab;
-	}
-
-	.schedule-day--movable:hover {
-		transform: translateY(-0.18rem) rotate(-0.35deg);
-		box-shadow: 0.42rem 0.42rem 0 0 var(--day-accent);
-	}
-
-	.schedule-day--movable:active {
-		cursor: grabbing;
-	}
-
-	.schedule-day.is-dragging {
-		opacity: 0.62;
-		transform: scale(0.985) rotate(1deg);
 	}
 
 	.schedule-day--green {
@@ -545,27 +406,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		display: grid;
 		min-width: 0;
 		gap: 0.45rem;
-	}
-
-	.schedule-day__move-handle {
-		display: inline-grid;
-		place-items: center;
-		flex: 0 0 auto;
-		width: clamp(1.45rem, 2vw, 2rem);
-		aspect-ratio: 1;
-		margin-block-start: -0.2rem;
-		border-radius: 999rem;
-		opacity: 0.72;
-		transition:
-			background 160ms ease,
-			opacity 160ms ease,
-			transform 160ms ease;
-	}
-
-	.schedule-day--movable:hover .schedule-day__move-handle {
-		background: rgb(255 255 255 / 22%);
-		opacity: 1;
-		transform: rotate(4deg);
 	}
 
 	.schedule-day--blue .schedule-day__header,
@@ -691,34 +531,10 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
 	}
 
-	.schedule-event__backdrop {
-		position: absolute;
-		inset: 0;
-		overflow: hidden;
-		border-radius: inherit;
-		background:
-			radial-gradient(circle at 50% 18%, color-mix(in srgb, white 72%, var(--day-accent)) 0%, rgb(255 255 255 / 0%) 38%),
-			radial-gradient(circle at 18% 100%, color-mix(in srgb, var(--day-accent) 76%, transparent) 0%, rgb(255 255 255 / 0%) 44%),
-			radial-gradient(circle at 100% 86%, color-mix(in srgb, var(--day-accent) 58%, transparent) 0%, rgb(255 255 255 / 0%) 34%),
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, white 28%, var(--day-accent)) 0%,
-				color-mix(in srgb, var(--color-background) 88%, var(--day-accent)) 52%,
-				color-mix(in srgb, var(--day-accent) 44%, var(--color-foreground)) 100%
-			);
-	}
-
-	.schedule-event__backdrop::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(180deg, rgb(36 39 46 / 12%) 0%, rgb(36 39 46 / 28%) 100%);
-	}
-
 	.schedule-event--featured {
 		overflow: hidden;
 		isolation: isolate;
-		background: color-mix(in srgb, var(--day-accent) 10%, var(--color-background));
+		background: var(--color-background);
 	}
 
 	.schedule-event--featured .schedule-event__body {
@@ -737,15 +553,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		padding: clamp(1rem, 1.4vw, 1.35rem) clamp(0.7rem, 0.9vw, 0.9rem);
 		text-align: center;
 		border-radius: inherit;
-		background: linear-gradient(
-			180deg,
-			rgb(249 245 239 / 0%) 0%,
-			rgb(249 245 239 / 78%) 20%,
-			rgb(249 245 239 / 94%) 36%,
-			rgb(249 245 239 / 94%) 64%,
-			rgb(249 245 239 / 78%) 80%,
-			rgb(249 245 239 / 0%) 100%
-		);
+		background: var(--color-background);
 	}
 
 	.schedule-event--featured .schedule-event__badge {
@@ -966,10 +774,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			box-shadow: 0.18rem 0.18rem 0 0 var(--day-accent);
 		}
 
-		.schedule-day--movable:hover {
-			box-shadow: 0.26rem 0.26rem 0 0 var(--day-accent);
-		}
-
 		.schedule-day__header {
 			gap: 0.3rem;
 			padding: 0.62rem;
@@ -977,10 +781,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 		.schedule-day__header-copy {
 			gap: 0.28rem;
-		}
-
-		.schedule-day__move-handle {
-			margin-inline-end: -0.18rem;
 		}
 
 		.schedule-block {
@@ -1024,10 +824,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			padding: 0.5rem;
 		}
 
-		.schedule-day__move-handle {
-			display: none;
-		}
-
 		.schedule-day__subtitle {
 			font-size: 0.62rem;
 		}
@@ -1063,132 +859,106 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 
 		.schedule-board {
-			grid-template-columns: 1fr;
-			gap: 1rem;
-			overflow-x: visible;
+			grid-template-columns: 3rem minmax(0, 1fr);
+			gap: 0.5rem;
+			overflow: visible;
 			padding-block-end: 0;
-		}
-
-		.schedule-time-rail {
-			display: none;
+			--schedule-header-row: 5.4rem;
+			--schedule-morning-row: 12rem;
+			--schedule-midday-row: 14rem;
+			--schedule-evening-row: 10.5rem;
 		}
 
 		.schedule-days-track {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(5, minmax(11.5rem, 12.5rem));
 			min-width: 0;
+			overflow-x: auto;
+			overflow-y: hidden;
+			overscroll-behavior-x: contain;
+			padding: 0 0.2rem 0.85rem 0;
+			scroll-padding-inline: 0.2rem;
+			scroll-snap-type: x proximity;
+			scrollbar-gutter: stable;
 		}
 
 		.schedule-day {
-			grid-template-rows: auto;
-			border-radius: 1.2rem 0;
+			grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-midday-row) var(--schedule-evening-row);
+			border-radius: 1rem 0;
+			scroll-snap-align: start;
 		}
 
 		.schedule-day__header {
-			justify-content: center;
-			padding: 0.85rem 1rem;
-			text-align: center;
+			justify-content: flex-start;
+			padding: 0.62rem;
+			text-align: left;
 		}
 
 		.schedule-day__header-copy {
-			justify-items: center;
-			gap: 0.36rem;
+			justify-items: start;
+			gap: 0.28rem;
 		}
 
 		.schedule-day__subtitle {
-			font-size: 0.8rem;
+			font-size: 0.68rem;
 		}
 
 		.schedule-day__title {
-			font-size: 1.55rem;
-		}
-
-		.schedule-day--movable,
-		.schedule-day--movable:active {
-			cursor: default;
-		}
-
-		.schedule-day--movable:hover {
-			transform: none;
-			box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
-		}
-
-		.schedule-day__move-handle {
-			display: none;
+			font-size: 1.08rem;
 		}
 
 		.schedule-day__blocks {
-			display: grid;
-			gap: 1rem;
-			padding: 1rem;
+			display: contents;
 		}
 
 		.schedule-block {
-			gap: 0.55rem;
-			grid-row: auto;
+			grid-row: var(--schedule-block-row) / span var(--schedule-block-span);
 			min-height: 0;
-			padding: 0;
-			border-block-start: 0;
+			padding: 0.42rem;
 		}
 
 		.schedule-block__events {
-			grid-auto-rows: max-content;
-			height: auto;
-		}
-
-		.schedule-block__period {
-			position: static;
-			justify-self: start;
-			align-self: start;
-			width: auto;
-			height: auto;
-			overflow: visible;
-			clip: auto;
-			clip-path: none;
-			color: var(--color-background);
-			font-size: 0.95rem;
-			font-weight: 800;
-			line-height: 1;
-			white-space: normal;
+			grid-auto-rows: minmax(0, 1fr);
+			height: 100%;
 		}
 
 		.schedule-event {
-			height: auto;
-			min-height: 9rem;
-			border-radius: 1rem 0;
+			height: 100%;
+			min-height: 0;
+			border-radius: 0.75rem 0;
 		}
 
 		.schedule-block--spanning .schedule-event {
-			min-height: calc(9rem * var(--schedule-block-span));
+			min-height: 0;
 		}
 
 		.schedule-event__body {
-			padding: 1rem;
+			padding: 0.7rem;
 		}
 
 		.schedule-event--featured .schedule-event__name {
-			font-size: clamp(1.3rem, 5.8vw, 1.5rem);
-			-webkit-line-clamp: 4;
+			font-size: 1.12rem;
+			-webkit-line-clamp: 3;
 		}
 
 		.schedule-event--featured .schedule-event__summary {
-			max-width: 18ch;
-			-webkit-line-clamp: 4;
+			max-width: 16ch;
+			-webkit-line-clamp: 3;
 		}
 
 		.schedule-event__badge {
-			padding: 0.42rem 0.82rem;
-			font-size: 0.84rem;
+			padding: 0.34rem 0.7rem;
+			font-size: 0.74rem;
 		}
 
 		.schedule-event__name {
-			font-size: 1.25rem;
-			line-height: 1.25;
-			-webkit-line-clamp: 2;
+			font-size: 1rem;
+			line-height: 1.28;
+			-webkit-line-clamp: 3;
 		}
 
 		.schedule-event__summary {
-			font-size: 1rem;
-			line-height: 1.5;
+			font-size: 0.86rem;
+			line-height: 1.45;
 			-webkit-line-clamp: 2;
 		}
 
@@ -1214,37 +984,45 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	}
 
 	@media (max-width: 30rem) {
-		.schedule-day__blocks {
-			padding: 0.9rem;
+		.schedule-board {
+			grid-template-columns: 2.75rem minmax(0, 1fr);
+			--schedule-header-row: 5.2rem;
+			--schedule-morning-row: 11.5rem;
+			--schedule-midday-row: 13.2rem;
+			--schedule-evening-row: 9.8rem;
 		}
 
-		.schedule-block {
-			min-height: 0;
+		.schedule-days-track {
+			grid-template-columns: repeat(5, minmax(10.75rem, 11.5rem));
 		}
 
-		.schedule-event {
-			min-height: 8.5rem;
-		}
-
-		.schedule-event__body {
-			padding: 0.95rem;
-		}
-
-		.schedule-block--spanning .schedule-event {
-			min-height: calc(8.5rem * var(--schedule-block-span));
-		}
-
-		.schedule-event__badge {
+		.schedule-time-rail__period {
 			font-size: 0.8rem;
 		}
 
+		.schedule-block {
+			padding: 0.36rem;
+		}
+
+		.schedule-event--featured .schedule-event__content {
+			padding: 0.75rem 0.55rem;
+		}
+
+		.schedule-event__body {
+			padding: 0.62rem;
+		}
+
+		.schedule-event__badge {
+			padding: 0.3rem 0.62rem;
+			font-size: 0.72rem;
+		}
+
 		.schedule-event__name {
-			font-size: 1.12rem;
-			-webkit-line-clamp: 2;
+			font-size: 0.98rem;
 		}
 
 		.schedule-event__summary {
-			font-size: 0.94rem;
+			font-size: 0.82rem;
 			-webkit-line-clamp: 2;
 		}
 	}

@@ -14,6 +14,10 @@ const isNavItemActive = (href: string) => {
 
 	const navPath = getNavPath(href);
 
+	if (navPath === "/2026/schedule") {
+		return false;
+	}
+
 	if (navPath === "/2026") {
 		return currentPath === navPath;
 	}

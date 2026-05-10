@@ -24,7 +24,6 @@ export interface ScheduleDay {
 	title: string;
 	subtitle: string;
 	type: ScheduleDayType;
-	canMove: boolean;
 	blocks: ScheduleBlock[];
 }
 
@@ -158,7 +157,6 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "營隊啟程",
 		subtitle: "第一天",
 		type: "opening",
-		canMove: false,
 		blocks: [
 			{ startPeriod: "上午", eventIds: ["start-and-opening"] },
 			{ startPeriod: "下午", eventIds: ["icebreaking"] },
@@ -170,7 +168,6 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "軟體工程主題日",
 		subtitle: "講師：Denny 黃一晉",
 		type: "software",
-		canMove: true,
 		blocks: [
 			{
 				startPeriod: "上午",
@@ -181,26 +178,10 @@ export const scheduleDays: ScheduleDay[] = [
 		]
 	},
 	{
-		id: "ai-day",
-		title: "人工智慧主題日",
-		subtitle: "講師：Ak 郭慕天、Harry 張祺煒",
-		type: "artificial-intelligence",
-		canMove: true,
-		blocks: [
-			{
-				startPeriod: "上午",
-				span: 3,
-				hasDesign: true,
-				eventIds: ["ai-main"]
-			}
-		]
-	},
-	{
 		id: "security-day",
 		title: "資訊安全主題日",
 		subtitle: "講師：Jasper 尤理衡",
 		type: "security",
-		canMove: true,
 		blocks: [
 			{
 				startPeriod: "上午",
@@ -211,11 +192,24 @@ export const scheduleDays: ScheduleDay[] = [
 		]
 	},
 	{
+		id: "ai-day",
+		title: "人工智慧主題日",
+		subtitle: "講師：Ak 郭慕天、Harry 張祺煒",
+		type: "artificial-intelligence",
+		blocks: [
+			{
+				startPeriod: "上午",
+				span: 3,
+				hasDesign: true,
+				eventIds: ["ai-main"]
+			}
+		]
+	},
+	{
 		id: "camp-close",
 		title: "營隊收束",
 		subtitle: "第五天",
 		type: "closing",
-		canMove: false,
 		blocks: [
 			{ startPeriod: "上午", eventIds: ["learning-wrap"] },
 			{ startPeriod: "下午", eventIds: ["closing"] },
