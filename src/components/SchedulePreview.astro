@@ -215,9 +215,15 @@ const getEvent = (eventId: string): ScheduleEvent => {
 
 				const targetDay = getMovableInsertTarget(event.target);
 
-				if (!targetDay || targetDay === draggedDay) return;
+				if (!targetDay) return;
 
 				event.preventDefault();
+				if (event.dataTransfer) {
+					event.dataTransfer.dropEffect = "move";
+				}
+
+				if (targetDay === draggedDay) return;
+
 				const targetRect = targetDay.getBoundingClientRect();
 				const shouldPlaceAfter = event.clientX > targetRect.left + targetRect.width / 2;
 				targetDay.classList.toggle("is-drop-before", !shouldPlaceAfter);
@@ -232,6 +238,15 @@ const getEvent = (eventId: string): ScheduleEvent => {
 			event => {
 				const day = getMovableInsertTarget(event.target);
 				day?.classList.remove("is-drop-before", "is-drop-after");
+			},
+			{ signal }
+		);
+
+		daysTrack?.addEventListener(
+			"drop",
+			event => {
+				if (!draggedDay) return;
+				event.preventDefault();
 			},
 			{ signal }
 		);
