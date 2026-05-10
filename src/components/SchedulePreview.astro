@@ -113,6 +113,10 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			<p class="schedule-hero__lead">{scheduleMeta.description}</p>
 		</header>
 
+		<div class="schedule-notes" aria-label="課表公告">
+			<p class="schedule-note">更多資訊將於本週發佈，三個主題日的實際順序與完整時段將於正式課表公開時一併更新</p>
+		</div>
+
 		<div class="schedule-board" aria-label="五天活動日程輪廓">
 			<div class="schedule-time-rail" aria-hidden="true">
 				<div class="schedule-time-rail__spacer"></div>
@@ -171,7 +175,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 																data-schedule-event-trigger={event.id}
 																aria-label={`查看${event.name}介紹`}
 															>
-																{block.hasDesign === true && <div class="schedule-event__backdrop" aria-hidden="true"></div>}
+																{block.hasDesign === true && <div class="schedule-event__backdrop" aria-hidden="true" />}
 																<div class="schedule-event__body">
 																	<div class="schedule-event__content">
 																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
@@ -195,8 +199,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 				}
 			</div>
 		</div>
-
-		<p class="schedule-note">{scheduleMeta.note}</p>
 	</div>
 
 	{
@@ -254,7 +256,10 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 				day.style.transition = "transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1)";
 				day.style.transform = "";
 
-				const cleanup = () => { day.style.transform = ""; day.style.transition = ""; };
+				const cleanup = () => {
+					day.style.transform = "";
+					day.style.transition = "";
+				};
 				day.addEventListener("transitionend", cleanup, { once: true });
 				day.addEventListener("transitioncancel", cleanup, { once: true });
 			});
@@ -695,7 +700,12 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			radial-gradient(circle at 50% 18%, color-mix(in srgb, white 72%, var(--day-accent)) 0%, rgb(255 255 255 / 0%) 38%),
 			radial-gradient(circle at 18% 100%, color-mix(in srgb, var(--day-accent) 76%, transparent) 0%, rgb(255 255 255 / 0%) 44%),
 			radial-gradient(circle at 100% 86%, color-mix(in srgb, var(--day-accent) 58%, transparent) 0%, rgb(255 255 255 / 0%) 34%),
-			linear-gradient(180deg, color-mix(in srgb, white 28%, var(--day-accent)) 0%, color-mix(in srgb, var(--color-background) 88%, var(--day-accent)) 52%, color-mix(in srgb, var(--day-accent) 44%, var(--color-foreground)) 100%);
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, white 28%, var(--day-accent)) 0%,
+				color-mix(in srgb, var(--color-background) 88%, var(--day-accent)) 52%,
+				color-mix(in srgb, var(--day-accent) 44%, var(--color-foreground)) 100%
+			);
 	}
 
 	.schedule-event__backdrop::after {
@@ -822,10 +832,17 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		background: var(--color-dark-green);
 	}
 
+	.schedule-notes {
+		display: grid;
+		gap: 0.75rem;
+		justify-items: center;
+		margin-block-start: clamp(2rem, 4vw, 3rem);
+	}
+
 	.schedule-note {
 		width: fit-content;
 		max-width: 52rem;
-		margin: clamp(2rem, 4vw, 3rem) auto 0;
+		margin: 0;
 		padding: 1rem 1.2rem;
 		color: color-mix(in srgb, var(--color-foreground) 78%, transparent);
 		background: color-mix(in srgb, var(--color-green) 32%, var(--color-background));
