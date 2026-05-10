@@ -212,8 +212,7 @@ export const scheduleDays: ScheduleDay[] = [
 		type: "closing",
 		blocks: [
 			{ startPeriod: "上午", eventIds: ["learning-wrap"] },
-			{ startPeriod: "下午", eventIds: ["closing"] },
-			{ startPeriod: "晚上", eventIds: ["departure"] }
+			{ startPeriod: "下午", eventIds: ["closing"] }
 		]
 	}
 ];
