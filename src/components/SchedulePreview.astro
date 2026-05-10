@@ -1,0 +1,533 @@
+---
+import X from "~icons/lucide/x";
+import type { ScheduleDayType, ScheduleEvent, ScheduleEventCategory } from "@/data/schedule";
+import { scheduleDays, scheduleEvents, scheduleMeta } from "@/data/schedule";
+
+const eventsById = new Map(scheduleEvents.map(event => [event.id, event]));
+
+const dayAccentClassMap: Record<ScheduleDayType, string> = {
+	opening: "schedule-day--green",
+	software: "schedule-day--blue",
+	"machine-learning": "schedule-day--sky",
+	security: "schedule-day--orange",
+	closing: "schedule-day--dark"
+};
+
+const categoryClassMap: Record<ScheduleEventCategory, string> = {
+	啟程: "schedule-badge--green",
+	主線課程: "schedule-badge--blue",
+	實作交流: "schedule-badge--sky",
+	社群活動: "schedule-badge--orange",
+	收束: "schedule-badge--dark"
+};
+
+const getEvent = (eventId: string): ScheduleEvent => {
+	const event = eventsById.get(eventId);
+
+	if (!event) {
+		throw new Error(`Missing schedule event: ${eventId}`);
+	}
+
+	return event;
+};
+---
+
+<section class="schedule-page" aria-labelledby="schedule-title">
+	<div class="site-container">
+		<header class="schedule-hero">
+			<p class="schedule-hero__eyebrow">SITCON Camp 2026</p>
+			<h1 id="schedule-title" class="schedule-hero__title">{scheduleMeta.title}</h1>
+			<p class="schedule-hero__lead">{scheduleMeta.description}</p>
+		</header>
+
+		<div class="schedule-board" aria-label="五天活動日程輪廓">
+			{
+				scheduleDays.map(day => (
+					<article class:list={["schedule-day", dayAccentClassMap[day.type]]}>
+						<header class="schedule-day__header">
+							<p class="schedule-day__subtitle">{day.subtitle}</p>
+							<h2 class="schedule-day__title">{day.title}</h2>
+						</header>
+
+						<div class="schedule-day__blocks">
+							{day.blocks
+								.filter(block => block.eventIds.length > 0)
+								.map(block => (
+									<section class="schedule-block" aria-label={`${day.title}${block.period}活動`}>
+										<h3 class="schedule-block__period">{block.period}</h3>
+										<div class="schedule-block__events">
+											{block.eventIds.map(eventId => {
+												const event = getEvent(eventId);
+
+												return (
+													<button type="button" class="schedule-event" data-schedule-event-trigger={event.id} aria-label={`查看${event.name}介紹`}>
+														<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
+														<span class="schedule-event__name">{event.name}</span>
+														<span class="schedule-event__summary">{event.summary}</span>
+													</button>
+												);
+											})}
+										</div>
+									</section>
+								))}
+						</div>
+					</article>
+				))
+			}
+		</div>
+
+		<p class="schedule-note">{scheduleMeta.note}</p>
+	</div>
+
+	{
+		scheduleEvents.map(event => (
+			<dialog class="schedule-dialog" data-schedule-dialog={event.id} aria-labelledby={`schedule-dialog-title-${event.id}`}>
+				<div class="schedule-dialog__panel">
+					<div class="schedule-dialog__image-wrap">
+						<img class="schedule-dialog__image" src={event.image.src} alt={event.image.alt} loading="lazy" decoding="async" />
+					</div>
+					<div class="schedule-dialog__content">
+						<span class:list={["schedule-dialog__badge", categoryClassMap[event.category]]}>{event.category}</span>
+						<h2 id={`schedule-dialog-title-${event.id}`} class="schedule-dialog__title">
+							{event.name}
+						</h2>
+						<p class="schedule-dialog__description">{event.description}</p>
+					</div>
+					<button type="button" class="schedule-dialog__close" data-schedule-dialog-close aria-label={`關閉${event.name}介紹`}>
+						<X width={24} height={24} stroke-width={3} />
+					</button>
+				</div>
+			</dialog>
+		))
+	}
+</section>
+
+<script>
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
+
+		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLDialogElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
+
+		document.addEventListener(
+			"click",
+			event => {
+				if (!(event.target instanceof Element)) return;
+
+				const trigger = event.target.closest<HTMLElement>("[data-schedule-event-trigger]");
+				const closeButton = event.target.closest<HTMLElement>("[data-schedule-dialog-close]");
+
+				if (trigger) {
+					const dialog = dialogs.get(trigger.dataset.scheduleEventTrigger ?? "");
+					dialog?.showModal();
+					return;
+				}
+
+				if (closeButton) {
+					closeButton.closest<HTMLDialogElement>("dialog")?.close();
+				}
+			},
+			{ signal }
+		);
+
+		dialogs.forEach(dialog => {
+			dialog.addEventListener(
+				"click",
+				event => {
+					if (event.target === dialog) {
+						dialog.close();
+					}
+				},
+				{ signal }
+			);
+		});
+	});
+</script>
+
+<style>
+	.schedule-page {
+		overflow: hidden;
+		padding-block: clamp(8.25rem, 12vw, 12rem) clamp(3.5rem, 7vw, 6rem);
+		background: linear-gradient(135deg, color-mix(in srgb, var(--color-soft-blue) 18%, transparent) 0 28%, transparent 28% 100%), var(--color-background);
+		color: var(--color-foreground);
+	}
+
+	.schedule-hero {
+		display: grid;
+		gap: clamp(1rem, 2vw, 1.5rem);
+		max-width: 54rem;
+	}
+
+	.schedule-hero__eyebrow {
+		width: fit-content;
+		margin: 0;
+		padding: 0.55rem 0.85rem;
+		background: var(--color-green);
+		font-size: clamp(1rem, 1.4vw, 1.25rem);
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.schedule-hero__title {
+		margin: 0;
+		font-size: clamp(3rem, 8vw, 6.8rem);
+		font-weight: 800;
+		letter-spacing: 0;
+		line-height: 1.02;
+		text-wrap: balance;
+	}
+
+	.schedule-hero__lead {
+		max-width: 46rem;
+		margin: 0;
+		color: color-mix(in srgb, var(--color-foreground) 76%, transparent);
+		font-size: clamp(1.1rem, 2vw, 1.45rem);
+		font-weight: 700;
+		line-height: 1.65;
+	}
+
+	.schedule-board {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.2vw, 1rem);
+		margin-block-start: clamp(2.5rem, 5vw, 4.5rem);
+	}
+
+	.schedule-day {
+		display: grid;
+		grid-template-rows: auto 1fr;
+		min-width: 0;
+		overflow: hidden;
+		background: var(--color-foreground);
+		border: 3px solid var(--color-foreground);
+		border-radius: 1.4rem 0;
+		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
+	}
+
+	.schedule-day--green {
+		--day-accent: var(--color-green);
+	}
+
+	.schedule-day--blue {
+		--day-accent: var(--color-primary-blue);
+	}
+
+	.schedule-day--sky {
+		--day-accent: var(--color-soft-blue);
+	}
+
+	.schedule-day--orange {
+		--day-accent: var(--color-orange);
+	}
+
+	.schedule-day--dark {
+		--day-accent: var(--color-dark-green);
+	}
+
+	.schedule-day__header {
+		display: grid;
+		gap: 0.45rem;
+		padding: 1rem;
+		color: var(--color-background);
+		background: var(--day-accent);
+	}
+
+	.schedule-day--blue .schedule-day__header,
+	.schedule-day--dark .schedule-day__header {
+		color: var(--color-background);
+	}
+
+	.schedule-day--green .schedule-day__header,
+	.schedule-day--orange .schedule-day__header,
+	.schedule-day--sky .schedule-day__header {
+		color: var(--color-foreground);
+	}
+
+	.schedule-day__subtitle,
+	.schedule-day__title {
+		margin: 0;
+	}
+
+	.schedule-day__subtitle {
+		font-size: 0.82rem;
+		font-weight: 800;
+		line-height: 1.2;
+		opacity: 0.82;
+	}
+
+	.schedule-day__title {
+		min-height: 3.2rem;
+		font-size: clamp(1.3rem, 2vw, 1.65rem);
+		font-weight: 800;
+		line-height: 1.15;
+	}
+
+	.schedule-day__blocks {
+		display: grid;
+		align-content: start;
+		gap: 0.75rem;
+		padding: 0.75rem;
+	}
+
+	.schedule-block {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.schedule-block__period {
+		margin: 0;
+		color: var(--color-background);
+		font-size: 0.9rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.schedule-block__events {
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.schedule-event {
+		display: grid;
+		gap: 0.35rem;
+		width: 100%;
+		min-height: 6.25rem;
+		padding: 0.75rem;
+		color: var(--color-foreground);
+		text-align: left;
+		cursor: pointer;
+		background: var(--color-background);
+		border: 0;
+		border-radius: 0.9rem 0;
+		box-shadow: 0.16rem 0.16rem 0 0 var(--day-accent);
+		transition:
+			transform 160ms ease,
+			box-shadow 160ms ease,
+			background 160ms ease;
+	}
+
+	.schedule-event:hover,
+	.schedule-event:focus-visible {
+		background: color-mix(in srgb, var(--color-background) 86%, white);
+		transform: translate(-0.08rem, -0.08rem);
+		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
+	}
+
+	.schedule-event:focus-visible,
+	.schedule-dialog__close:focus-visible {
+		outline: 0.2rem solid var(--color-soft-blue);
+		outline-offset: 0.18rem;
+	}
+
+	.schedule-event__badge,
+	.schedule-dialog__badge {
+		width: fit-content;
+		padding: 0.28rem 0.5rem;
+		border-radius: 999rem;
+		font-size: 0.72rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.schedule-event__name {
+		font-size: 1.02rem;
+		font-weight: 800;
+		line-height: 1.28;
+	}
+
+	.schedule-event__summary {
+		color: color-mix(in srgb, var(--color-foreground) 64%, transparent);
+		font-size: 0.82rem;
+		font-weight: 700;
+		line-height: 1.45;
+	}
+
+	.schedule-badge--green {
+		color: var(--color-foreground);
+		background: color-mix(in srgb, var(--color-green) 70%, white);
+	}
+
+	.schedule-badge--blue {
+		color: var(--color-background);
+		background: var(--color-primary-blue);
+	}
+
+	.schedule-badge--sky {
+		color: var(--color-foreground);
+		background: color-mix(in srgb, var(--color-soft-blue) 70%, white);
+	}
+
+	.schedule-badge--orange {
+		color: var(--color-foreground);
+		background: color-mix(in srgb, var(--color-orange) 78%, white);
+	}
+
+	.schedule-badge--dark {
+		color: var(--color-background);
+		background: var(--color-dark-green);
+	}
+
+	.schedule-note {
+		width: fit-content;
+		max-width: 52rem;
+		margin: clamp(2rem, 4vw, 3rem) auto 0;
+		padding: 1rem 1.2rem;
+		color: color-mix(in srgb, var(--color-foreground) 78%, transparent);
+		background: color-mix(in srgb, var(--color-green) 32%, var(--color-background));
+		border-radius: 1rem 0;
+		font-size: clamp(0.98rem, 1.6vw, 1.12rem);
+		font-weight: 800;
+		line-height: 1.55;
+		text-align: center;
+	}
+
+	.schedule-dialog {
+		width: min(calc(100% - 2rem), 58rem);
+		margin: auto;
+		padding: 0;
+		color: var(--color-background);
+		background: transparent;
+		border: 0;
+		border-radius: 1.5rem;
+	}
+
+	.schedule-dialog::backdrop {
+		background: rgb(0 0 0 / 55%);
+	}
+
+	.schedule-dialog__panel {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 0.95fr) minmax(18rem, 0.82fr);
+		overflow: hidden;
+		background: var(--color-foreground);
+		border: 3px solid var(--color-background);
+		border-radius: 1.5rem;
+		box-shadow: 0.4rem 0.4rem 0 0 var(--color-orange);
+	}
+
+	.schedule-dialog__image-wrap {
+		order: 2;
+		min-height: 25rem;
+		background: var(--color-soft-blue);
+	}
+
+	.schedule-dialog__image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.schedule-dialog__content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 1rem;
+		min-width: 0;
+		padding: clamp(1.5rem, 4vw, 3rem);
+	}
+
+	.schedule-dialog__title {
+		margin: 0;
+		font-size: clamp(2rem, 4vw, 3.6rem);
+		font-weight: 800;
+		letter-spacing: 0;
+		line-height: 1.08;
+		text-wrap: balance;
+	}
+
+	.schedule-dialog__description {
+		margin: 0;
+		color: color-mix(in srgb, var(--color-background) 82%, transparent);
+		font-size: clamp(1rem, 1.6vw, 1.18rem);
+		font-weight: 700;
+		line-height: 1.75;
+	}
+
+	.schedule-dialog__close {
+		position: absolute;
+		inset-block-start: 0.8rem;
+		inset-inline-end: 0.8rem;
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		aspect-ratio: 1;
+		color: var(--color-background);
+		cursor: pointer;
+		background: rgb(36 39 46 / 72%);
+		border: 2px solid rgb(249 245 239 / 25%);
+		border-radius: 999rem;
+		transition:
+			background 160ms ease,
+			transform 160ms ease;
+	}
+
+	.schedule-dialog__close:hover {
+		background: var(--color-foreground);
+		transform: rotate(6deg);
+	}
+
+	@media (max-width: 72rem) {
+		.schedule-board {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.schedule-day__title {
+			min-height: auto;
+		}
+	}
+
+	@media (max-width: 42rem) {
+		.schedule-page {
+			padding-block-start: 7.25rem;
+		}
+
+		.schedule-board {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.schedule-day {
+			border-radius: 1.2rem 0;
+		}
+
+		.schedule-day__blocks {
+			gap: 1rem;
+			padding: 1rem;
+		}
+
+		.schedule-event {
+			min-height: auto;
+			padding: 0.9rem;
+		}
+
+		.schedule-dialog {
+			width: min(calc(100% - 1rem), 36rem);
+		}
+
+		.schedule-dialog__panel {
+			grid-template-columns: 1fr;
+			max-height: calc(100dvh - 1.5rem);
+			overflow-y: auto;
+		}
+
+		.schedule-dialog__image-wrap {
+			order: 0;
+			min-height: auto;
+			aspect-ratio: 16 / 10;
+		}
+
+		.schedule-dialog__content {
+			padding: 1.25rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.schedule-event,
+		.schedule-dialog__close {
+			transition: none;
+		}
+	}
+</style>

@@ -5,9 +5,24 @@ import SitconCampLogo from "@/assets/brand/sitcon-camp-logo.svg";
 import layoutData from "@/data/layout.json";
 
 const { header } = layoutData;
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const getNavPath = (href: string) => new URL(href, Astro.site ?? "https://sitcon.camp").pathname.replace(/\/$/, "") || "/";
+const isNavItemActive = (href: string) => {
+	if (href.includes("#")) {
+		return false;
+	}
+
+	const navPath = getNavPath(href);
+
+	if (navPath === "/2026") {
+		return currentPath === navPath;
+	}
+
+	return currentPath === navPath || currentPath.startsWith(`${navPath}/`);
+};
 ---
 
-<header class="site-header" data-site-header data-astro-transition-persist="site-header" aria-label={header.ariaLabel}>
+<header class:list={["site-header", { "is-visible": currentPath !== "/2026" }]} data-site-header data-astro-transition-persist="site-header" aria-label={header.ariaLabel}>
 	<a class="site-header__brand" href={header.brand.href} aria-label={header.brand.ariaLabel}>
 		<img class="site-header__logo" src={SitconCampLogo.src} width={SitconCampLogo.width} height={SitconCampLogo.height} alt={header.brand.logoAlt} />
 	</a>
@@ -15,7 +30,7 @@ const { header } = layoutData;
 	<nav class="site-header__nav" aria-label={header.navAriaLabel}>
 		{
 			header.navItems.map(item => (
-				<a class="site-header__link" href={item.href}>
+				<a class:list={["site-header__link", { "site-header__link--active": isNavItemActive(item.href) }]} href={item.href} aria-current={isNavItemActive(item.href) ? "page" : undefined}>
 					{item.label}
 				</a>
 			))
@@ -42,7 +57,12 @@ const { header } = layoutData;
 			<nav class="site-header__mobile-nav" aria-label={header.navAriaLabel}>
 				{
 					header.navItems.map(item => (
-						<a class="site-header__mobile-link" data-mobile-menu-link href={item.href}>
+						<a
+							class:list={["site-header__mobile-link", { "site-header__mobile-link--active": isNavItemActive(item.href) }]}
+							data-mobile-menu-link
+							href={item.href}
+							aria-current={isNavItemActive(item.href) ? "page" : undefined}
+						>
 							{item.label}
 						</a>
 					))
@@ -311,7 +331,8 @@ const { header } = layoutData;
 	}
 
 	.site-header__link:hover,
-	.site-header__link:focus-visible {
+	.site-header__link:focus-visible,
+	.site-header__link--active {
 		color: var(--color-soft-blue);
 		transform: translateY(-0.08rem);
 	}
@@ -431,7 +452,8 @@ const { header } = layoutData;
 	}
 
 	.site-header__mobile-link:hover,
-	.site-header__mobile-link:focus-visible {
+	.site-header__mobile-link:focus-visible,
+	.site-header__mobile-link--active {
 		color: var(--color-soft-blue);
 	}
 
