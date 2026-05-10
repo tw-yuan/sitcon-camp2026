@@ -15,6 +15,7 @@ export interface ScheduleMeta {
 export interface ScheduleBlock {
 	startPeriod: ScheduleBlockPeriod;
 	span?: number;
+	hasDesign?: boolean;
 	eventIds: string[];
 }
 
@@ -107,9 +108,9 @@ export const scheduleEvents: ScheduleEvent[] = [
 	{
 		id: "security-main",
 		name: "資安國手帶你進入攻防思維",
-		summary: "由資安國手尤里衡帶領，看見系統安全的思考方式。",
+		summary: "由資安國手尤理衡帶領，看見系統安全的思考方式。",
 		description:
-			"資訊安全主題日將由資安國手尤里衡帶領，從真正站上競技場的經驗出發，帶學員靠近資安領域的思考方式。資安不只是找到漏洞或解出題目，更是在理解系統如何運作、哪裡可能失守，以及攻擊者與防禦者會如何看待同一個問題。這一天的重點，是讓學員看見安全思維為什麼是理解系統不可或缺的一部分，也讓對資安好奇的人有一個更具體、更有方向感的入口。透過國手的經驗與視角，學員能更直接感受到資安領域的深度、挑戰與吸引力。",
+			"資訊安全主題日將由資安國手尤理衡帶領，從真正站上競技場的經驗出發，帶學員靠近資安領域的思考方式。資安不只是找到漏洞或解出題目，更是在理解系統如何運作、哪裡可能失守，以及攻擊者與防禦者會如何看待同一個問題。這一天的重點，是讓學員看見安全思維為什麼是理解系統不可或缺的一部分，也讓對資安好奇的人有一個更具體、更有方向感的入口。透過國手的經驗與視角，學員能更直接感受到資安領域的深度、挑戰與吸引力。",
 		category: "主線課程",
 		image: {
 			src: "/2026/images/schedule/security-main.svg",
@@ -167,13 +168,14 @@ export const scheduleDays: ScheduleDay[] = [
 	{
 		id: "software-day",
 		title: "軟體工程主題日",
-		subtitle: "用軟體工程師的方法思考與協作",
+		subtitle: "講師：Denny 黃一晉",
 		type: "software",
 		canMove: true,
 		blocks: [
 			{
 				startPeriod: "上午",
 				span: 3,
+				hasDesign: true,
 				eventIds: ["software-main"]
 			}
 		]
@@ -181,13 +183,14 @@ export const scheduleDays: ScheduleDay[] = [
 	{
 		id: "ai-day",
 		title: "人工智慧主題日",
-		subtitle: "AI 不是魔法，是垃圾進垃圾出",
+		subtitle: "講師：Ak 郭慕天、Harry 張祺煒",
 		type: "artificial-intelligence",
 		canMove: true,
 		blocks: [
 			{
 				startPeriod: "上午",
 				span: 3,
+				hasDesign: true,
 				eventIds: ["ai-main"]
 			}
 		]
@@ -195,13 +198,14 @@ export const scheduleDays: ScheduleDay[] = [
 	{
 		id: "security-day",
 		title: "資訊安全主題日",
-		subtitle: "資安國手尤里衡帶你進入攻防思維",
+		subtitle: "講師：Jasper 尤理衡",
 		type: "security",
 		canMove: true,
 		blocks: [
 			{
 				startPeriod: "上午",
 				span: 3,
+				hasDesign: true,
 				eventIds: ["security-main"]
 			}
 		]

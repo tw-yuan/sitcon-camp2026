@@ -10,7 +10,7 @@ const schedulePeriodIndexMap = new Map(schedulePeriods.map((period, index) => [p
 const dayAccentClassMap: Record<ScheduleDayType, string> = {
 	opening: "schedule-day--sky",
 	software: "schedule-day--green",
-	"machine-learning": "schedule-day--orange",
+	"artificial-intelligence": "schedule-day--orange",
 	security: "schedule-day--blue",
 	closing: "schedule-day--dark"
 };
@@ -18,7 +18,6 @@ const dayAccentClassMap: Record<ScheduleDayType, string> = {
 const categoryClassMap: Record<ScheduleEventCategory, string> = {
 	啟程: "schedule-badge--green",
 	主線課程: "schedule-badge--blue",
-	實作交流: "schedule-badge--sky",
 	社群活動: "schedule-badge--orange",
 	收束: "schedule-badge--dark"
 };
@@ -80,6 +79,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 		return {
 			...block,
+			hasDesign: block.hasDesign === true,
 			label: getBlockRangeLabel(block),
 			rowStart: startIndex + 2,
 			span
@@ -93,6 +93,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 					{
 						startPeriod: period,
 						span: 1,
+						hasDesign: false,
 						eventIds: [],
 						label: period,
 						rowStart: index + 2
@@ -146,7 +147,14 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 									return (
 										<section
-											class:list={["schedule-block", { "schedule-block--empty": eventIds.length === 0 }]}
+											class:list={[
+												"schedule-block",
+												{
+													"schedule-block--empty": eventIds.length === 0,
+													"schedule-block--spanning": block.span > 1,
+													"schedule-block--featured": block.hasDesign === true
+												}
+											]}
 											style={`--schedule-block-row:${block.rowStart}; --schedule-block-span:${block.span};`}
 											aria-label={`${day.title}${block.label}活動`}
 										>
@@ -157,10 +165,20 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 														const event = getEvent(eventId);
 
 														return (
-															<button type="button" class="schedule-event" data-schedule-event-trigger={event.id} aria-label={`查看${event.name}介紹`}>
-																<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
-																<span class="schedule-event__name">{event.name}</span>
-																<span class="schedule-event__summary">{event.summary}</span>
+															<button
+																type="button"
+																class:list={["schedule-event", { "schedule-event--featured": block.hasDesign === true }]}
+																data-schedule-event-trigger={event.id}
+																aria-label={`查看${event.name}介紹`}
+															>
+																{block.hasDesign === true && <div class="schedule-event__backdrop" aria-hidden="true"></div>}
+																<div class="schedule-event__body">
+																	<div class="schedule-event__content">
+																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
+																		<span class="schedule-event__name">{event.name}</span>
+																		<span class="schedule-event__summary">{event.summary}</span>
+																	</div>
+																</div>
 															</button>
 														);
 													})}
@@ -605,6 +623,10 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		min-height: 0;
 	}
 
+	.schedule-block--featured .schedule-block__events {
+		gap: 0;
+	}
+
 	.schedule-block__empty-text {
 		display: flex;
 		align-items: center;
@@ -622,14 +644,13 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	}
 
 	.schedule-event {
+		position: relative;
 		display: grid;
-		grid-template-rows: auto auto minmax(0, 1fr);
-		align-content: start;
-		gap: clamp(0.35rem, 0.55vw, 0.5rem);
+		grid-template-rows: minmax(0, 1fr);
 		width: 100%;
 		height: 100%;
 		min-height: 0;
-		padding: clamp(0.75rem, 1vw, 0.95rem);
+		padding: 0;
 		color: var(--color-foreground);
 		text-align: left;
 		cursor: pointer;
@@ -643,11 +664,98 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			background 160ms ease;
 	}
 
+	.schedule-event__body {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		height: 100%;
+		min-height: 0;
+		padding: clamp(0.75rem, 1vw, 0.95rem);
+	}
+
+	.schedule-event__content {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(0.35rem, 0.55vw, 0.5rem);
+	}
+
 	.schedule-event:hover,
 	.schedule-event:focus-visible {
 		background: color-mix(in srgb, var(--color-background) 86%, white);
 		transform: translate(-0.08rem, -0.08rem);
 		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
+	}
+
+	.schedule-event__backdrop {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		border-radius: inherit;
+		background:
+			radial-gradient(circle at 50% 18%, color-mix(in srgb, white 72%, var(--day-accent)) 0%, rgb(255 255 255 / 0%) 38%),
+			radial-gradient(circle at 18% 100%, color-mix(in srgb, var(--day-accent) 76%, transparent) 0%, rgb(255 255 255 / 0%) 44%),
+			radial-gradient(circle at 100% 86%, color-mix(in srgb, var(--day-accent) 58%, transparent) 0%, rgb(255 255 255 / 0%) 34%),
+			linear-gradient(180deg, color-mix(in srgb, white 28%, var(--day-accent)) 0%, color-mix(in srgb, var(--color-background) 88%, var(--day-accent)) 52%, color-mix(in srgb, var(--day-accent) 44%, var(--color-foreground)) 100%);
+	}
+
+	.schedule-event__backdrop::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgb(36 39 46 / 12%) 0%, rgb(36 39 46 / 28%) 100%);
+	}
+
+	.schedule-event--featured {
+		overflow: hidden;
+		isolation: isolate;
+		background: color-mix(in srgb, var(--day-accent) 10%, var(--color-background));
+	}
+
+	.schedule-event--featured .schedule-event__body {
+		position: relative;
+		justify-content: center;
+		padding: clamp(1rem, 1.4vw, 1.3rem) 0;
+	}
+
+	.schedule-event--featured .schedule-event__content {
+		position: relative;
+		z-index: 1;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 100%;
+		padding: clamp(1rem, 1.4vw, 1.35rem) clamp(0.7rem, 0.9vw, 0.9rem);
+		text-align: center;
+		border-radius: inherit;
+		background: linear-gradient(
+			180deg,
+			rgb(249 245 239 / 0%) 0%,
+			rgb(249 245 239 / 78%) 20%,
+			rgb(249 245 239 / 94%) 36%,
+			rgb(249 245 239 / 94%) 64%,
+			rgb(249 245 239 / 78%) 80%,
+			rgb(249 245 239 / 0%) 100%
+		);
+	}
+
+	.schedule-event--featured .schedule-event__badge {
+		align-self: center;
+	}
+
+	.schedule-event--featured .schedule-event__name {
+		font-size: clamp(1.45rem, 1.55vw, 1.8rem);
+		line-height: 1.14;
+		-webkit-line-clamp: 3;
+		text-wrap: balance;
+	}
+
+	.schedule-event--featured .schedule-event__summary {
+		font-size: clamp(0.96rem, 0.95vw, 1.08rem);
+		line-height: 1.6;
+		-webkit-line-clamp: 3;
+		max-width: 16ch;
+		margin-inline: auto;
+		text-wrap: pretty;
 	}
 
 	.schedule-event:focus-visible,
@@ -872,6 +980,10 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			box-shadow: 0.1rem 0.1rem 0 0 var(--day-accent);
 		}
 
+		.schedule-event__body {
+			padding: 0.72rem;
+		}
+
 		.schedule-event:hover,
 		.schedule-event:focus-visible {
 			box-shadow: 0.16rem 0.16rem 0 0 var(--day-accent);
@@ -912,8 +1024,19 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 
 		.schedule-event {
-			gap: 0.42rem;
+			min-height: 0;
+		}
+
+		.schedule-event__body {
 			padding: 0.65rem;
+		}
+
+		.schedule-event--featured .schedule-event__content {
+			padding: 0.95rem 0.7rem;
+		}
+
+		.schedule-event--featured .schedule-event__name {
+			font-size: 1.16rem;
 		}
 	}
 
@@ -1012,11 +1135,27 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 
 		.schedule-event {
-			gap: 0.55rem;
 			height: auto;
 			min-height: 9rem;
-			padding: 1rem;
 			border-radius: 1rem 0;
+		}
+
+		.schedule-block--spanning .schedule-event {
+			min-height: calc(9rem * var(--schedule-block-span));
+		}
+
+		.schedule-event__body {
+			padding: 1rem;
+		}
+
+		.schedule-event--featured .schedule-event__name {
+			font-size: clamp(1.3rem, 5.8vw, 1.5rem);
+			-webkit-line-clamp: 4;
+		}
+
+		.schedule-event--featured .schedule-event__summary {
+			max-width: 18ch;
+			-webkit-line-clamp: 4;
 		}
 
 		.schedule-event__badge {
@@ -1068,7 +1207,14 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 		.schedule-event {
 			min-height: 8.5rem;
+		}
+
+		.schedule-event__body {
 			padding: 0.95rem;
+		}
+
+		.schedule-block--spanning .schedule-event {
+			min-height: calc(8.5rem * var(--schedule-block-span));
 		}
 
 		.schedule-event__badge {
