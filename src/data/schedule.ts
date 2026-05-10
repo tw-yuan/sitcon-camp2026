@@ -1,5 +1,6 @@
 export type ScheduleDayType = "opening" | "software" | "machine-learning" | "security" | "closing";
-export type ScheduleBlockPeriod = "上午" | "下午" | "晚上";
+export const schedulePeriods = ["上午", "中午", "晚上"] as const;
+export type ScheduleBlockPeriod = (typeof schedulePeriods)[number];
 export type ScheduleEventCategory = "啟程" | "主線課程" | "實作交流" | "社群活動" | "收束";
 
 export interface ScheduleMeta {
@@ -9,7 +10,8 @@ export interface ScheduleMeta {
 }
 
 export interface ScheduleBlock {
-	period: ScheduleBlockPeriod;
+	startPeriod: ScheduleBlockPeriod;
+	span?: number;
 	eventIds: string[];
 }
 
@@ -211,9 +213,9 @@ export const scheduleDays: ScheduleDay[] = [
 		type: "opening",
 		canMove: false,
 		blocks: [
-			{ period: "上午", eventIds: ["check-in", "opening"] },
-			{ period: "下午", eventIds: ["icebreaking", "camp-guide"] },
-			{ period: "晚上", eventIds: ["night-special"] }
+			{ startPeriod: "上午", eventIds: ["check-in", "opening"] },
+			{ startPeriod: "中午", eventIds: ["icebreaking", "camp-guide"] },
+			{ startPeriod: "晚上", eventIds: ["night-special"] }
 		]
 	},
 	{
@@ -223,9 +225,7 @@ export const scheduleDays: ScheduleDay[] = [
 		type: "software",
 		canMove: true,
 		blocks: [
-			{ period: "上午", eventIds: ["software-main"] },
-			{ period: "下午", eventIds: ["project-real", "open-source"] },
-			{ period: "晚上", eventIds: ["talk-with-tech-people"] }
+			{ startPeriod: "上午", span: 3, eventIds: ["software-main"] }
 		]
 	},
 	{
@@ -235,9 +235,7 @@ export const scheduleDays: ScheduleDay[] = [
 		type: "machine-learning",
 		canMove: true,
 		blocks: [
-			{ period: "上午", eventIds: ["ml-main"] },
-			{ period: "下午", eventIds: ["data-model-experiment", "ai-limits"] },
-			{ period: "晚上", eventIds: ["night-special"] }
+			{ startPeriod: "上午", span: 3, eventIds: ["ml-main"] }
 		]
 	},
 	{
@@ -247,9 +245,7 @@ export const scheduleDays: ScheduleDay[] = [
 		type: "security",
 		canMove: true,
 		blocks: [
-			{ period: "上午", eventIds: ["security-main"] },
-			{ period: "下午", eventIds: ["attack-defense", "security-field"] },
-			{ period: "晚上", eventIds: ["meet-sitcon-staff"] }
+			{ startPeriod: "上午", span: 3, eventIds: ["security-main"] }
 		]
 	},
 	{
@@ -259,9 +255,8 @@ export const scheduleDays: ScheduleDay[] = [
 		type: "closing",
 		canMove: false,
 		blocks: [
-			{ period: "上午", eventIds: ["learning-wrap", "community-exchange"] },
-			{ period: "下午", eventIds: ["group-photo", "closing"] },
-			{ period: "晚上", eventIds: [] }
+			{ startPeriod: "上午", eventIds: ["learning-wrap", "community-exchange"] },
+			{ startPeriod: "中午", span: 2, eventIds: ["group-photo", "closing"] }
 		]
 	}
 ];

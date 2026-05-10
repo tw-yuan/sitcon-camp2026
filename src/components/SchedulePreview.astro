@@ -1,17 +1,17 @@
 ---
 import GripVertical from "~icons/lucide/grip-vertical";
 import X from "~icons/lucide/x";
-import type { ScheduleDayType, ScheduleEvent, ScheduleEventCategory } from "@/data/schedule";
-import { scheduleDays, scheduleEvents, scheduleMeta } from "@/data/schedule";
+import type { ScheduleBlock, ScheduleDay, ScheduleDayType, ScheduleEvent, ScheduleEventCategory } from "@/data/schedule";
+import { scheduleDays, scheduleEvents, scheduleMeta, schedulePeriods } from "@/data/schedule";
 
 const eventsById = new Map(scheduleEvents.map(event => [event.id, event]));
-const schedulePeriods = ["上午", "下午", "晚上"] as const;
+const schedulePeriodIndexMap = new Map(schedulePeriods.map((period, index) => [period, index]));
 
 const dayAccentClassMap: Record<ScheduleDayType, string> = {
-	opening: "schedule-day--green",
-	software: "schedule-day--blue",
-	"machine-learning": "schedule-day--sky",
-	security: "schedule-day--orange",
+	opening: "schedule-day--sky",
+	software: "schedule-day--green",
+	"machine-learning": "schedule-day--orange",
+	security: "schedule-day--blue",
 	closing: "schedule-day--dark"
 };
 
@@ -31,6 +31,76 @@ const getEvent = (eventId: string): ScheduleEvent => {
 	}
 
 	return event;
+};
+
+const getBlockSpan = (block: ScheduleBlock): number => {
+	const startIndex = schedulePeriodIndexMap.get(block.startPeriod);
+
+	if (startIndex === undefined) {
+		throw new Error(`Invalid schedule period: ${block.startPeriod}`);
+	}
+
+	const remainingPeriods = schedulePeriods.length - startIndex;
+	return Math.max(1, Math.min(block.span ?? 1, remainingPeriods));
+};
+
+const getBlockRangeLabel = (block: ScheduleBlock): string => {
+	const startIndex = schedulePeriodIndexMap.get(block.startPeriod);
+
+	if (startIndex === undefined) {
+		throw new Error(`Invalid schedule period: ${block.startPeriod}`);
+	}
+
+	const span = getBlockSpan(block);
+	const endPeriod = schedulePeriods[startIndex + span - 1];
+
+	return block.startPeriod === endPeriod ? block.startPeriod : `${block.startPeriod}至${endPeriod}`;
+};
+
+const getRenderableBlocks = (day: ScheduleDay) => {
+	const occupiedPeriods = Array.from({ length: schedulePeriods.length }, () => false);
+	const blocks = day.blocks.map(block => {
+		const startIndex = schedulePeriodIndexMap.get(block.startPeriod);
+
+		if (startIndex === undefined) {
+			throw new Error(`Invalid schedule period: ${block.startPeriod}`);
+		}
+
+		const span = getBlockSpan(block);
+
+		for (let offset = 0; offset < span; offset += 1) {
+			const periodIndex = startIndex + offset;
+
+			if (occupiedPeriods[periodIndex]) {
+				throw new Error(`Overlapping schedule blocks in day: ${day.id}`);
+			}
+
+			occupiedPeriods[periodIndex] = true;
+		}
+
+		return {
+			...block,
+			label: getBlockRangeLabel(block),
+			rowStart: startIndex + 2,
+			span
+		};
+	});
+
+	const emptyBlocks = schedulePeriods.flatMap((period, index) =>
+		occupiedPeriods[index]
+			? []
+			: [
+					{
+						startPeriod: period,
+						span: 1,
+						eventIds: [],
+						label: period,
+						rowStart: index + 2
+					}
+				]
+	);
+
+	return [...blocks, ...emptyBlocks].sort((left, right) => left.rowStart - right.rowStart);
 };
 ---
 
@@ -60,8 +130,8 @@ const getEvent = (eventId: string): ScheduleEvent => {
 						>
 							<header class="schedule-day__header">
 								<div class="schedule-day__header-copy">
-									<p class="schedule-day__subtitle">{day.subtitle}</p>
 									<h2 class="schedule-day__title">{day.title}</h2>
+									<p class="schedule-day__subtitle">{day.subtitle}</p>
 								</div>
 								{day.canMove && (
 									<span class="schedule-day__move-handle" aria-label={`${day.title}可拖曳調整順序`} title="拖曳調整主題日順序">
@@ -71,13 +141,16 @@ const getEvent = (eventId: string): ScheduleEvent => {
 							</header>
 
 							<div class="schedule-day__blocks">
-								{schedulePeriods.map(period => {
-									const block = day.blocks.find(item => item.period === period);
-									const eventIds = block?.eventIds ?? [];
+								{getRenderableBlocks(day).map(block => {
+									const eventIds = block.eventIds;
 
 									return (
-										<section class:list={["schedule-block", { "schedule-block--empty": eventIds.length === 0 }]} aria-label={`${day.title}${period}活動`}>
-											<h3 class="schedule-block__period">{period}</h3>
+										<section
+											class:list={["schedule-block", { "schedule-block--empty": eventIds.length === 0 }]}
+											style={`--schedule-block-row:${block.rowStart}; --schedule-block-span:${block.span};`}
+											aria-label={`${day.title}${block.label}活動`}
+										>
+											<h3 class="schedule-block__period">{block.label}</h3>
 											{eventIds.length > 0 ? (
 												<div class="schedule-block__events">
 													{eventIds.map(eventId => {
@@ -347,13 +420,13 @@ const getEvent = (eventId: string): ScheduleEvent => {
 		--schedule-row-gap: clamp(0.5rem, 0.9vw, 0.75rem);
 		--schedule-header-row: clamp(6.7rem, 9vw, 8.25rem);
 		--schedule-morning-row: clamp(14rem, 19vw, 18rem);
-		--schedule-afternoon-row: clamp(17rem, 24vw, 23rem);
+		--schedule-midday-row: clamp(17rem, 24vw, 23rem);
 		--schedule-evening-row: clamp(11rem, 16vw, 15rem);
 	}
 
 	.schedule-time-rail {
 		display: grid;
-		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-afternoon-row) var(--schedule-evening-row);
+		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-midday-row) var(--schedule-evening-row);
 		gap: var(--schedule-row-gap);
 	}
 
@@ -383,7 +456,7 @@ const getEvent = (eventId: string): ScheduleEvent => {
 
 	.schedule-day {
 		display: grid;
-		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-afternoon-row) var(--schedule-evening-row);
+		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-midday-row) var(--schedule-evening-row);
 		gap: var(--schedule-row-gap);
 		min-width: 0;
 		overflow: hidden;
@@ -496,7 +569,7 @@ const getEvent = (eventId: string): ScheduleEvent => {
 	}
 
 	.schedule-day__title {
-		font-size: clamp(1rem, 1.45vw, 1.5rem);
+		font-size: clamp(1.35rem, 1.95vw, 2rem);
 		font-weight: 800;
 		line-height: 1.15;
 	}
@@ -507,6 +580,7 @@ const getEvent = (eventId: string): ScheduleEvent => {
 
 	.schedule-block {
 		display: grid;
+		grid-row: var(--schedule-block-row) / span var(--schedule-block-span);
 		min-height: 0;
 		padding: clamp(0.5rem, 0.85vw, 0.75rem);
 		box-shadow: inset 0 3px 0 0 var(--color-foreground);
@@ -747,7 +821,7 @@ const getEvent = (eventId: string): ScheduleEvent => {
 			gap: 0.55rem;
 			--schedule-header-row: 6.4rem;
 			--schedule-morning-row: 14.5rem;
-			--schedule-afternoon-row: 18rem;
+			--schedule-midday-row: 18rem;
 			--schedule-evening-row: 13rem;
 		}
 
@@ -809,7 +883,7 @@ const getEvent = (eventId: string): ScheduleEvent => {
 			grid-template-columns: 3.2rem minmax(0, 1fr);
 			--schedule-header-row: 5.8rem;
 			--schedule-morning-row: 13.5rem;
-			--schedule-afternoon-row: 17rem;
+			--schedule-midday-row: 17rem;
 			--schedule-evening-row: 12rem;
 		}
 
@@ -869,6 +943,25 @@ const getEvent = (eventId: string): ScheduleEvent => {
 			border-radius: 1.2rem 0;
 		}
 
+		.schedule-day__header {
+			justify-content: center;
+			padding: 0.85rem 1rem;
+			text-align: center;
+		}
+
+		.schedule-day__header-copy {
+			justify-items: center;
+			gap: 0.36rem;
+		}
+
+		.schedule-day__subtitle {
+			font-size: 0.8rem;
+		}
+
+		.schedule-day__title {
+			font-size: 1.55rem;
+		}
+
 		.schedule-day--movable,
 		.schedule-day--movable:active {
 			cursor: default;
@@ -891,6 +984,7 @@ const getEvent = (eventId: string): ScheduleEvent => {
 
 		.schedule-block {
 			gap: 0.55rem;
+			grid-row: auto;
 			min-height: 0;
 			padding: 0;
 			border-block-start: 0;
