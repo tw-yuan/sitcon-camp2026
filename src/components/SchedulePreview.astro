@@ -1,9 +1,11 @@
 ---
+import GripVertical from "~icons/lucide/grip-vertical";
 import X from "~icons/lucide/x";
 import type { ScheduleDayType, ScheduleEvent, ScheduleEventCategory } from "@/data/schedule";
 import { scheduleDays, scheduleEvents, scheduleMeta } from "@/data/schedule";
 
 const eventsById = new Map(scheduleEvents.map(event => [event.id, event]));
+const schedulePeriods = ["上午", "下午", "晚上"] as const;
 
 const dayAccentClassMap: Record<ScheduleDayType, string> = {
 	opening: "schedule-day--green",
@@ -41,39 +43,66 @@ const getEvent = (eventId: string): ScheduleEvent => {
 		</header>
 
 		<div class="schedule-board" aria-label="五天活動日程輪廓">
-			{
-				scheduleDays.map(day => (
-					<article class:list={["schedule-day", dayAccentClassMap[day.type]]}>
-						<header class="schedule-day__header">
-							<p class="schedule-day__subtitle">{day.subtitle}</p>
-							<h2 class="schedule-day__title">{day.title}</h2>
-						</header>
+			<div class="schedule-time-rail" aria-hidden="true">
+				<div class="schedule-time-rail__spacer"></div>
+				{schedulePeriods.map(period => <div class="schedule-time-rail__period">{period}</div>)}
+			</div>
 
-						<div class="schedule-day__blocks">
-							{day.blocks
-								.filter(block => block.eventIds.length > 0)
-								.map(block => (
-									<section class="schedule-block" aria-label={`${day.title}${block.period}活動`}>
-										<h3 class="schedule-block__period">{block.period}</h3>
-										<div class="schedule-block__events">
-											{block.eventIds.map(eventId => {
-												const event = getEvent(eventId);
+			<div class="schedule-days-track" data-schedule-days-track>
+				{
+					scheduleDays.map(day => (
+						<article
+							class:list={["schedule-day", dayAccentClassMap[day.type], { "schedule-day--movable": day.canMove }]}
+							data-schedule-day
+							data-schedule-day-id={day.id}
+							data-schedule-can-move={String(day.canMove)}
+							draggable={day.canMove ? "true" : "false"}
+						>
+							<header class="schedule-day__header">
+								<div class="schedule-day__header-copy">
+									<p class="schedule-day__subtitle">{day.subtitle}</p>
+									<h2 class="schedule-day__title">{day.title}</h2>
+								</div>
+								{day.canMove && (
+									<span class="schedule-day__move-handle" aria-label={`${day.title}可拖曳調整順序`} title="拖曳調整主題日順序">
+										<GripVertical width={22} height={22} stroke-width={3} />
+									</span>
+								)}
+							</header>
 
-												return (
-													<button type="button" class="schedule-event" data-schedule-event-trigger={event.id} aria-label={`查看${event.name}介紹`}>
-														<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
-														<span class="schedule-event__name">{event.name}</span>
-														<span class="schedule-event__summary">{event.summary}</span>
-													</button>
-												);
-											})}
-										</div>
-									</section>
-								))}
-						</div>
-					</article>
-				))
-			}
+							<div class="schedule-day__blocks">
+								{schedulePeriods.map(period => {
+									const block = day.blocks.find(item => item.period === period);
+									const eventIds = block?.eventIds ?? [];
+
+									return (
+										<section class:list={["schedule-block", { "schedule-block--empty": eventIds.length === 0 }]} aria-label={`${day.title}${period}活動`}>
+											<h3 class="schedule-block__period">{period}</h3>
+											{eventIds.length > 0 ? (
+												<div class="schedule-block__events">
+													{eventIds.map(eventId => {
+														const event = getEvent(eventId);
+
+														return (
+															<button type="button" class="schedule-event" data-schedule-event-trigger={event.id} aria-label={`查看${event.name}介紹`}>
+																<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
+																<span class="schedule-event__name">{event.name}</span>
+																<span class="schedule-event__summary">{event.summary}</span>
+															</button>
+														);
+													})}
+												</div>
+											) : (
+												<p class="schedule-block__empty-text">更多活動即將公布</p>
+											)}
+										</section>
+									);
+								})}
+							</div>
+						</article>
+					))
+				}
+			</div>
 		</div>
 
 		<p class="schedule-note">{scheduleMeta.note}</p>
@@ -109,6 +138,33 @@ const getEvent = (eventId: string): ScheduleEvent => {
 		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
 		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLDialogElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
+		const daysTrack = document.querySelector<HTMLElement>("[data-schedule-days-track]");
+		const desktopDragQuery = window.matchMedia("(min-width: 42.001rem)");
+		let draggedDay: HTMLElement | null = null;
+
+		const isMovableDay = (day: HTMLElement | null): day is HTMLElement => day?.dataset.scheduleCanMove === "true";
+		const setDragEnabled = () => {
+			const shouldEnable = desktopDragQuery.matches;
+
+			daysTrack?.querySelectorAll<HTMLElement>("[data-schedule-day]").forEach(day => {
+				day.draggable = shouldEnable && day.dataset.scheduleCanMove === "true";
+			});
+		};
+
+		const getMovableInsertTarget = (target: EventTarget | null) => {
+			if (!(target instanceof Element) || !daysTrack) return null;
+
+			const day = target.closest<HTMLElement>("[data-schedule-day]");
+
+			if (!isMovableDay(day) || !daysTrack.contains(day)) {
+				return null;
+			}
+
+			return day;
+		};
+
+		setDragEnabled();
+		desktopDragQuery.addEventListener("change", setDragEnabled, { signal });
 
 		document.addEventListener(
 			"click",
@@ -127,6 +183,67 @@ const getEvent = (eventId: string): ScheduleEvent => {
 				if (closeButton) {
 					closeButton.closest<HTMLDialogElement>("dialog")?.close();
 				}
+			},
+			{ signal }
+		);
+
+		daysTrack?.addEventListener(
+			"dragstart",
+			event => {
+				const day = getMovableInsertTarget(event.target);
+
+				if (!desktopDragQuery.matches || !day) {
+					event.preventDefault();
+					return;
+				}
+
+				draggedDay = day;
+				day.classList.add("is-dragging");
+				event.dataTransfer?.setData("text/plain", day.dataset.scheduleDayId ?? "");
+				event.dataTransfer?.setDragImage(day, day.clientWidth / 2, 40);
+				if (event.dataTransfer) {
+					event.dataTransfer.effectAllowed = "move";
+				}
+			},
+			{ signal }
+		);
+
+		daysTrack?.addEventListener(
+			"dragover",
+			event => {
+				if (!desktopDragQuery.matches || !draggedDay) return;
+
+				const targetDay = getMovableInsertTarget(event.target);
+
+				if (!targetDay || targetDay === draggedDay) return;
+
+				event.preventDefault();
+				const targetRect = targetDay.getBoundingClientRect();
+				const shouldPlaceAfter = event.clientX > targetRect.left + targetRect.width / 2;
+				targetDay.classList.toggle("is-drop-before", !shouldPlaceAfter);
+				targetDay.classList.toggle("is-drop-after", shouldPlaceAfter);
+				daysTrack.insertBefore(draggedDay, shouldPlaceAfter ? targetDay.nextSibling : targetDay);
+			},
+			{ signal }
+		);
+
+		daysTrack?.addEventListener(
+			"dragleave",
+			event => {
+				const day = getMovableInsertTarget(event.target);
+				day?.classList.remove("is-drop-before", "is-drop-after");
+			},
+			{ signal }
+		);
+
+		daysTrack?.addEventListener(
+			"dragend",
+			() => {
+				draggedDay?.classList.remove("is-dragging");
+				draggedDay = null;
+				daysTrack.querySelectorAll<HTMLElement>("[data-schedule-day]").forEach(day => {
+					day.classList.remove("is-drop-before", "is-drop-after");
+				});
 			},
 			{ signal }
 		);
@@ -189,20 +306,93 @@ const getEvent = (eventId: string): ScheduleEvent => {
 
 	.schedule-board {
 		display: grid;
-		grid-template-columns: repeat(5, minmax(0, 1fr));
+		grid-template-columns: minmax(4.25rem, 0.22fr) minmax(0, 1fr);
 		gap: clamp(0.75rem, 1.2vw, 1rem);
 		margin-block-start: clamp(2.5rem, 5vw, 4.5rem);
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		padding-block-end: 0.4rem;
+		--schedule-header-row: clamp(6.7rem, 9vw, 8.25rem);
+		--schedule-morning-row: clamp(14rem, 19vw, 18rem);
+		--schedule-afternoon-row: clamp(17rem, 24vw, 23rem);
+		--schedule-evening-row: clamp(11rem, 16vw, 15rem);
+	}
+
+	.schedule-time-rail {
+		display: grid;
+		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-afternoon-row) var(--schedule-evening-row);
+		gap: 0.75rem;
+	}
+
+	.schedule-time-rail__spacer {
+		border: 3px solid transparent;
+	}
+
+	.schedule-time-rail__period {
+		display: grid;
+		place-items: center;
+		padding: 0.8rem 0.4rem;
+		color: var(--color-background);
+		background: var(--color-foreground);
+		border-radius: 1.1rem 0;
+		font-size: clamp(1rem, 1.4vw, 1.25rem);
+		font-weight: 800;
+		line-height: 1;
+		box-shadow: 0.2rem 0.2rem 0 0 var(--color-orange);
+	}
+
+	.schedule-days-track {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.2vw, 1rem);
+		min-width: 0;
 	}
 
 	.schedule-day {
 		display: grid;
-		grid-template-rows: auto 1fr;
+		grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-afternoon-row) var(--schedule-evening-row);
 		min-width: 0;
 		overflow: hidden;
 		background: var(--color-foreground);
 		border: 3px solid var(--color-foreground);
 		border-radius: 1.4rem 0;
 		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
+		transition:
+			box-shadow 180ms ease,
+			opacity 180ms ease,
+			transform 180ms ease;
+	}
+
+	.schedule-day--movable {
+		cursor: grab;
+	}
+
+	.schedule-day--movable:hover {
+		transform: translateY(-0.18rem) rotate(-0.35deg);
+		box-shadow: 0.42rem 0.42rem 0 0 var(--day-accent);
+	}
+
+	.schedule-day--movable:active {
+		cursor: grabbing;
+	}
+
+	.schedule-day.is-dragging {
+		opacity: 0.62;
+		transform: scale(0.985) rotate(1deg);
+	}
+
+	.schedule-day.is-drop-before {
+		box-shadow:
+			-0.35rem 0 0 0 var(--color-background),
+			-0.6rem 0 0 0 var(--day-accent),
+			0.28rem 0.28rem 0 0 var(--day-accent);
+	}
+
+	.schedule-day.is-drop-after {
+		box-shadow:
+			0.35rem 0 0 0 var(--color-background),
+			0.6rem 0 0 0 var(--day-accent),
+			0.28rem 0.28rem 0 0 var(--day-accent);
 	}
 
 	.schedule-day--green {
@@ -226,11 +416,40 @@ const getEvent = (eventId: string): ScheduleEvent => {
 	}
 
 	.schedule-day__header {
-		display: grid;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
 		gap: 0.45rem;
 		padding: 1rem;
 		color: var(--color-background);
 		background: var(--day-accent);
+	}
+
+	.schedule-day__header-copy {
+		display: grid;
+		min-width: 0;
+		gap: 0.45rem;
+	}
+
+	.schedule-day__move-handle {
+		display: inline-grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 2rem;
+		aspect-ratio: 1;
+		margin-block-start: -0.2rem;
+		border-radius: 999rem;
+		opacity: 0.72;
+		transition:
+			background 160ms ease,
+			opacity 160ms ease,
+			transform 160ms ease;
+	}
+
+	.schedule-day--movable:hover .schedule-day__move-handle {
+		background: rgb(255 255 255 / 22%);
+		opacity: 1;
+		transform: rotate(4deg);
 	}
 
 	.schedule-day--blue .schedule-day__header,
@@ -257,42 +476,62 @@ const getEvent = (eventId: string): ScheduleEvent => {
 	}
 
 	.schedule-day__title {
-		min-height: 3.2rem;
-		font-size: clamp(1.3rem, 2vw, 1.65rem);
+		font-size: clamp(1.15rem, 1.65vw, 1.5rem);
 		font-weight: 800;
 		line-height: 1.15;
 	}
 
 	.schedule-day__blocks {
-		display: grid;
-		align-content: start;
-		gap: 0.75rem;
-		padding: 0.75rem;
+		display: contents;
 	}
 
 	.schedule-block {
 		display: grid;
-		gap: 0.5rem;
+		min-height: 0;
+		padding: 0.75rem;
+		border-block-start: 3px solid var(--color-foreground);
 	}
 
 	.schedule-block__period {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		white-space: nowrap;
 		margin: 0;
-		color: var(--color-background);
-		font-size: 0.9rem;
-		font-weight: 800;
-		line-height: 1;
 	}
 
 	.schedule-block__events {
 		display: grid;
+		grid-auto-rows: minmax(0, 1fr);
 		gap: 0.55rem;
+		height: 100%;
+		min-height: 0;
+	}
+
+	.schedule-block__empty-text {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		margin: 0;
+		padding: 0.8rem;
+		color: color-mix(in srgb, var(--color-background) 72%, transparent);
+		border: 2px dashed color-mix(in srgb, var(--color-background) 34%, transparent);
+		border-radius: 0.9rem 0;
+		font-size: 0.95rem;
+		font-weight: 800;
+		line-height: 1.45;
+		text-align: center;
 	}
 
 	.schedule-event {
 		display: grid;
 		gap: 0.35rem;
 		width: 100%;
-		min-height: 6.25rem;
+		min-height: 0;
 		padding: 0.75rem;
 		color: var(--color-foreground);
 		text-align: left;
@@ -331,14 +570,14 @@ const getEvent = (eventId: string): ScheduleEvent => {
 	}
 
 	.schedule-event__name {
-		font-size: 1.02rem;
+		font-size: clamp(0.96rem, 1vw, 1.06rem);
 		font-weight: 800;
 		line-height: 1.28;
 	}
 
 	.schedule-event__summary {
 		color: color-mix(in srgb, var(--color-foreground) 64%, transparent);
-		font-size: 0.82rem;
+		font-size: clamp(0.78rem, 0.8vw, 0.86rem);
 		font-weight: 700;
 		line-height: 1.45;
 	}
@@ -471,11 +710,11 @@ const getEvent = (eventId: string): ScheduleEvent => {
 
 	@media (max-width: 72rem) {
 		.schedule-board {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: 4.25rem minmax(62rem, 1fr);
 		}
 
-		.schedule-day__title {
-			min-height: auto;
+		.schedule-days-track {
+			min-width: 62rem;
 		}
 	}
 
@@ -487,19 +726,66 @@ const getEvent = (eventId: string): ScheduleEvent => {
 		.schedule-board {
 			grid-template-columns: 1fr;
 			gap: 1rem;
+			overflow-x: visible;
+			padding-block-end: 0;
+		}
+
+		.schedule-time-rail {
+			display: none;
+		}
+
+		.schedule-days-track {
+			grid-template-columns: 1fr;
+			min-width: 0;
 		}
 
 		.schedule-day {
+			grid-template-rows: auto;
 			border-radius: 1.2rem 0;
 		}
 
+		.schedule-day--movable,
+		.schedule-day--movable:active {
+			cursor: default;
+		}
+
+		.schedule-day--movable:hover {
+			transform: none;
+			box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
+		}
+
+		.schedule-day__move-handle {
+			display: none;
+		}
+
 		.schedule-day__blocks {
+			display: grid;
 			gap: 1rem;
 			padding: 1rem;
 		}
 
+		.schedule-block {
+			gap: 0.55rem;
+			min-height: 9rem;
+			padding: 0;
+			border-block-start: 0;
+		}
+
+		.schedule-block__period {
+			position: static;
+			width: auto;
+			height: auto;
+			overflow: visible;
+			clip: auto;
+			clip-path: none;
+			color: var(--color-background);
+			font-size: 0.95rem;
+			font-weight: 800;
+			line-height: 1;
+			white-space: normal;
+		}
+
 		.schedule-event {
-			min-height: auto;
 			padding: 0.9rem;
 		}
 

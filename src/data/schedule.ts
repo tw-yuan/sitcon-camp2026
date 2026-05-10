@@ -18,6 +18,7 @@ export interface ScheduleDay {
 	title: string;
 	subtitle: string;
 	type: ScheduleDayType;
+	canMove: boolean;
 	blocks: ScheduleBlock[];
 }
 
@@ -208,6 +209,7 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "營隊啟程",
 		subtitle: "第一天",
 		type: "opening",
+		canMove: false,
 		blocks: [
 			{ period: "上午", eventIds: ["check-in", "opening"] },
 			{ period: "下午", eventIds: ["icebreaking", "camp-guide"] },
@@ -219,6 +221,7 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "軟體工程主題日",
 		subtitle: "講師：待公布",
 		type: "software",
+		canMove: true,
 		blocks: [
 			{ period: "上午", eventIds: ["software-main"] },
 			{ period: "下午", eventIds: ["project-real", "open-source"] },
@@ -230,6 +233,7 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "機器學習主題日",
 		subtitle: "講師：待公布",
 		type: "machine-learning",
+		canMove: true,
 		blocks: [
 			{ period: "上午", eventIds: ["ml-main"] },
 			{ period: "下午", eventIds: ["data-model-experiment", "ai-limits"] },
@@ -241,6 +245,7 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "資安主題日",
 		subtitle: "講師：待公布",
 		type: "security",
+		canMove: true,
 		blocks: [
 			{ period: "上午", eventIds: ["security-main"] },
 			{ period: "下午", eventIds: ["attack-defense", "security-field"] },
@@ -252,6 +257,7 @@ export const scheduleDays: ScheduleDay[] = [
 		title: "營隊收束",
 		subtitle: "第五天",
 		type: "closing",
+		canMove: false,
 		blocks: [
 			{ period: "上午", eventIds: ["learning-wrap", "community-exchange"] },
 			{ period: "下午", eventIds: ["group-photo", "closing"] },
