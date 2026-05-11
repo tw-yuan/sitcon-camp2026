@@ -116,6 +116,11 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			<p class="schedule-note">{scheduleMeta.note}</p>
 		</div>
 
+		<div class="schedule-view-switch" data-schedule-view-switch role="group" aria-label="手機課表檢視切換">
+			<button type="button" class="schedule-view-switch__option" data-schedule-view-option="scroll" aria-pressed="false">橫向</button>
+			<button type="button" class="schedule-view-switch__option is-active" data-schedule-view-option="stacked" aria-pressed="true">直向</button>
+		</div>
+
 		<div class="schedule-board" aria-label="五天活動日程輪廓">
 			<div class="schedule-time-rail" aria-hidden="true">
 				<div class="schedule-time-rail__spacer"></div>
@@ -190,7 +195,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 	{
 		scheduleEvents.map(event => (
-			<dialog class="schedule-dialog" data-schedule-dialog={event.id} aria-labelledby={`schedule-dialog-title-${event.id}`}>
+			<div class="schedule-dialog" data-schedule-dialog={event.id} role="dialog" aria-modal="true" aria-labelledby={`schedule-dialog-title-${event.id}`} hidden>
 				<div class="schedule-dialog__panel">
 					<div class="schedule-dialog__image-wrap">
 						<img class="schedule-dialog__image" src={event.image.src} alt={event.image.alt} loading="lazy" decoding="async" />
@@ -206,7 +211,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 						<X width={24} height={24} stroke-width={3} />
 					</button>
 				</div>
-			</dialog>
+			</div>
 		))
 	}
 </section>
@@ -217,7 +222,61 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		const { signal } = ac;
 		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
 
-		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLDialogElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
+		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
+		const scheduleBoard = document.querySelector<HTMLElement>(".schedule-board");
+		const viewSwitch = document.querySelector<HTMLElement>("[data-schedule-view-switch]");
+		const viewOptions = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-schedule-view-option]"));
+		let activeDialog: HTMLElement | null = null;
+		let lastFocusedElement: HTMLElement | null = null;
+		let scrollPosition = 0;
+
+		const setScheduleView = (view: "scroll" | "stacked") => {
+			scheduleBoard?.classList.toggle("schedule-board--scroll", view === "scroll");
+			viewOptions.forEach(option => {
+				const isActive = option.dataset.scheduleViewOption === view;
+				option.classList.toggle("is-active", isActive);
+				option.setAttribute("aria-pressed", String(isActive));
+			});
+		};
+
+		viewSwitch?.addEventListener(
+			"click",
+			event => {
+				if (!(event.target instanceof Element)) return;
+
+				const option = event.target.closest<HTMLButtonElement>("[data-schedule-view-option]");
+				const view = option?.dataset.scheduleViewOption;
+
+				if (view === "scroll" || view === "stacked") {
+					setScheduleView(view);
+				}
+			},
+			{ signal }
+		);
+
+		const closeDialog = (dialog = activeDialog) => {
+			if (!dialog) return;
+
+			dialog.hidden = true;
+			activeDialog = null;
+			document.documentElement.classList.remove("schedule-dialog-is-open");
+			window.scrollTo({ top: scrollPosition, left: 0, behavior: "instant" });
+			lastFocusedElement?.focus({ preventScroll: true });
+			lastFocusedElement = null;
+		};
+
+		const openDialog = (dialog: HTMLElement) => {
+			if (activeDialog && activeDialog !== dialog) {
+				closeDialog(activeDialog);
+			}
+
+			lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+			scrollPosition = window.scrollY;
+			document.documentElement.classList.add("schedule-dialog-is-open");
+			dialog.hidden = false;
+			activeDialog = dialog;
+			dialog.querySelector<HTMLElement>("[data-schedule-dialog-close]")?.focus({ preventScroll: true });
+		};
 
 		document.addEventListener(
 			"click",
@@ -229,12 +288,24 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 				if (trigger) {
 					const dialog = dialogs.get(trigger.dataset.scheduleEventTrigger ?? "");
-					dialog?.showModal();
+					if (dialog) {
+						openDialog(dialog);
+					}
 					return;
 				}
 
 				if (closeButton) {
-					closeButton.closest<HTMLDialogElement>("dialog")?.close();
+					closeDialog(closeButton.closest<HTMLElement>("[data-schedule-dialog]"));
+				}
+			},
+			{ signal }
+		);
+
+		document.addEventListener(
+			"keydown",
+			event => {
+				if (event.key === "Escape" && activeDialog) {
+					closeDialog();
 				}
 			},
 			{ signal }
@@ -245,7 +316,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 				"click",
 				event => {
 					if (event.target === dialog) {
-						dialog.close();
+						closeDialog(dialog);
 					}
 				},
 				{ signal }
@@ -260,6 +331,28 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		padding-block: clamp(8.25rem, 12vw, 12rem) clamp(3.5rem, 7vw, 6rem);
 		background: var(--color-background);
 		color: var(--color-foreground);
+	}
+
+	:global(html),
+	:global(body) {
+		overflow-x: hidden;
+	}
+
+	@supports (overflow-x: clip) {
+		:global(html),
+		:global(body) {
+			overflow-x: clip;
+		}
+	}
+
+	:global(html.schedule-dialog-is-open) {
+		overflow: hidden;
+		overscroll-behavior: none;
+	}
+
+	:global(html.schedule-dialog-is-open body) {
+		overflow: hidden;
+		overscroll-behavior: none;
 	}
 
 	.schedule-hero {
@@ -300,6 +393,9 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		display: grid;
 		grid-template-columns: clamp(3.25rem, 5vw, 4.25rem) minmax(0, 1fr);
 		gap: clamp(0.75rem, 1.2vw, 1rem);
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
 		margin-block-start: clamp(2.5rem, 5vw, 4.5rem);
 		--schedule-row-gap: clamp(0.5rem, 0.9vw, 0.75rem);
 		--schedule-header-row: clamp(6.7rem, 9vw, 8.25rem);
@@ -335,6 +431,8 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		display: grid;
 		grid-template-columns: repeat(5, minmax(0, 1fr));
 		gap: clamp(0.75rem, 1.2vw, 1rem);
+		width: 100%;
+		max-width: 100%;
 		min-width: 0;
 	}
 
@@ -661,25 +759,69 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		text-align: center;
 	}
 
-	.schedule-dialog {
-		width: min(calc(100% - 2rem), 58rem);
-		margin: auto;
-		padding: 0;
-		color: var(--color-background);
-		background: transparent;
-		border: 0;
-		border-radius: 1.5rem;
+	.schedule-view-switch {
+		display: none;
 	}
 
-	.schedule-dialog::backdrop {
+	.schedule-view-switch__option {
+		min-width: 6rem;
+		padding: 0.62rem 0.9rem;
+		color: var(--color-foreground);
+		font: inherit;
+		font-size: 0.95rem;
+		font-weight: 800;
+		line-height: 1;
+		cursor: pointer;
+		background: transparent;
+		border: 0;
+		border-radius: 0.75rem 0;
+		transition:
+			background 160ms ease,
+			color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.schedule-view-switch__option.is-active {
+		color: var(--color-background);
+		background: var(--color-foreground);
+		box-shadow: 0.14rem 0.14rem 0 0 var(--color-orange);
+	}
+
+	.schedule-dialog {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		display: grid;
+		place-items: center;
+		inline-size: auto;
+		max-width: none;
+		block-size: auto;
+		max-height: none;
+		margin: 0;
+		padding: min(4vw, 2rem);
+		box-sizing: border-box;
+		color: var(--color-background);
 		background: rgb(0 0 0 / 55%);
+		border: 0;
+		overflow: hidden;
+	}
+
+	.schedule-dialog[hidden] {
+		display: none;
 	}
 
 	.schedule-dialog__panel {
 		position: relative;
+		align-self: center;
+		justify-self: center;
 		display: grid;
 		grid-template-columns: minmax(0, 0.95fr) minmax(18rem, 0.82fr);
+		box-sizing: border-box;
+		width: min(100%, 58rem);
+		max-width: 100%;
+		max-height: calc(100dvh - 2rem);
 		overflow: hidden;
+		overflow-y: auto;
 		background: var(--color-foreground);
 		border: 3px solid var(--color-background);
 		border-radius: 1.5rem;
@@ -858,53 +1000,73 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			padding-block-start: 7.25rem;
 		}
 
+		.schedule-view-switch {
+			display: flex;
+			justify-content: center;
+			width: fit-content;
+			margin: clamp(1.5rem, 6vw, 2.25rem) auto 0;
+			padding: 0.28rem;
+			background: color-mix(in srgb, var(--color-foreground) 10%, transparent);
+			border: 2px solid color-mix(in srgb, var(--color-foreground) 18%, transparent);
+			border-radius: 1rem 0;
+		}
+
+		.schedule-view-switch__option:focus-visible {
+			outline: 0.18rem solid var(--color-soft-blue);
+			outline-offset: 0.12rem;
+		}
+
 		.schedule-board {
+			margin-block-start: 1rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) {
 			grid-template-columns: 1fr;
 			gap: 1rem;
 			overflow-x: visible;
 			padding-block-end: 0;
 		}
 
-		.schedule-time-rail {
+		.schedule-board:not(.schedule-board--scroll) .schedule-time-rail {
 			display: none;
 		}
 
-		.schedule-days-track {
+		.schedule-board:not(.schedule-board--scroll) .schedule-days-track {
 			grid-template-columns: 1fr;
 			min-width: 0;
 		}
 
-		.schedule-day {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day {
 			grid-template-rows: auto;
 			border-radius: 1.2rem 0;
 		}
 
-		.schedule-day__header {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__header {
 			justify-content: center;
 			padding: 0.85rem 1rem;
 			text-align: center;
 		}
 
-		.schedule-day__header-copy {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__header-copy {
 			justify-items: center;
 			gap: 0.36rem;
 		}
 
-		.schedule-day__subtitle {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__subtitle {
 			font-size: 0.8rem;
 		}
 
-		.schedule-day__title {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__title {
 			font-size: 1.55rem;
 		}
 
-		.schedule-day__blocks {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__blocks {
 			display: grid;
 			gap: 1rem;
 			padding: 1rem;
 		}
 
-		.schedule-block {
+		.schedule-board:not(.schedule-board--scroll) .schedule-block {
 			gap: 0.55rem;
 			grid-row: auto;
 			min-height: 0;
@@ -912,12 +1074,12 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			border-block-start: 0;
 		}
 
-		.schedule-block__events {
+		.schedule-board:not(.schedule-board--scroll) .schedule-block__events {
 			grid-auto-rows: max-content;
 			height: auto;
 		}
 
-		.schedule-block__period {
+		.schedule-board:not(.schedule-board--scroll) .schedule-block__period {
 			position: static;
 			justify-self: start;
 			align-self: start;
@@ -933,54 +1095,101 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			white-space: normal;
 		}
 
-		.schedule-event {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event {
 			height: auto;
 			min-height: 9rem;
 			border-radius: 1rem 0;
 		}
 
-		.schedule-block--spanning .schedule-event {
+		.schedule-board:not(.schedule-board--scroll) .schedule-block--spanning .schedule-event {
 			min-height: calc(9rem * var(--schedule-block-span));
 		}
 
-		.schedule-event__body {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__body {
 			padding: 1rem;
 		}
 
-		.schedule-event--featured .schedule-event__name {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event--featured .schedule-event__name {
 			font-size: clamp(1.3rem, 5.8vw, 1.5rem);
 			-webkit-line-clamp: 4;
 		}
 
-		.schedule-event--featured .schedule-event__summary {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event--featured .schedule-event__summary {
 			max-width: 18ch;
 			-webkit-line-clamp: 4;
 		}
 
-		.schedule-event__badge {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__badge {
 			padding: 0.42rem 0.82rem;
 			font-size: 0.84rem;
 		}
 
-		.schedule-event__name {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__name {
 			font-size: 1.25rem;
 			line-height: 1.25;
 			-webkit-line-clamp: 2;
 		}
 
-		.schedule-event__summary {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__summary {
 			font-size: 1rem;
 			line-height: 1.5;
 			-webkit-line-clamp: 2;
 		}
 
-		.schedule-dialog {
-			width: min(calc(100% - 1rem), 36rem);
+		.schedule-board--scroll {
+			grid-template-columns: 3.2rem minmax(0, 1fr);
+			gap: 0.55rem;
+			overflow: hidden;
+			contain: inline-size layout paint;
+			--schedule-header-row: 7.6rem;
+		}
+
+		.schedule-board--scroll .schedule-days-track {
+			display: flex;
+			align-items: stretch;
+			width: 100%;
+			max-width: 100%;
+			min-width: 0;
+			overflow-x: auto;
+			overflow-y: hidden;
+			overscroll-behavior-x: contain;
+			padding-block-end: 0.8rem;
+			scroll-padding-inline: 0.2rem;
+			scroll-snap-type: x proximity;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.schedule-board--scroll .schedule-day {
+			flex: 0 0 clamp(12.5rem, 72vw, 18rem);
+			min-width: 0;
+			scroll-snap-align: start;
+		}
+
+		.schedule-board--scroll .schedule-day__header {
+			padding: 0.85rem 1rem;
+		}
+
+		.schedule-board--scroll .schedule-day__header-copy {
+			gap: 0.36rem;
+		}
+
+		.schedule-board--scroll .schedule-day__subtitle {
+			font-size: 0.8rem;
+			line-height: 1.2;
+		}
+
+		.schedule-board--scroll .schedule-day__title {
+			font-size: 1.55rem;
+			line-height: 1.15;
+			overflow-wrap: anywhere;
+			text-wrap: balance;
 		}
 
 		.schedule-dialog__panel {
+			width: 100%;
+			max-width: 32rem;
 			grid-template-columns: 1fr;
-			max-height: calc(100dvh - 1.5rem);
+			max-height: calc(100dvh - 2rem);
 			overflow-y: auto;
 		}
 
@@ -996,36 +1205,36 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	}
 
 	@media (max-width: 30rem) {
-		.schedule-day__blocks {
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__blocks {
 			padding: 0.9rem;
 		}
 
-		.schedule-block {
+		.schedule-board:not(.schedule-board--scroll) .schedule-block {
 			min-height: 0;
 		}
 
-		.schedule-event {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event {
 			min-height: 8.5rem;
 		}
 
-		.schedule-event__body {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__body {
 			padding: 0.95rem;
 		}
 
-		.schedule-block--spanning .schedule-event {
+		.schedule-board:not(.schedule-board--scroll) .schedule-block--spanning .schedule-event {
 			min-height: calc(8.5rem * var(--schedule-block-span));
 		}
 
-		.schedule-event__badge {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__badge {
 			font-size: 0.8rem;
 		}
 
-		.schedule-event__name {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__name {
 			font-size: 1.12rem;
 			-webkit-line-clamp: 2;
 		}
 
-		.schedule-event__summary {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__summary {
 			font-size: 0.94rem;
 			-webkit-line-clamp: 2;
 		}
