@@ -105,99 +105,101 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 ---
 
 <section class="schedule-page" aria-labelledby="schedule-title">
-	<div class="site-container">
-		<header class="schedule-hero">
-			<p class="schedule-hero__eyebrow">SITCON Camp 2026</p>
-			<h1 id="schedule-title" class="schedule-hero__title">{scheduleMeta.title}</h1>
-			<p class="schedule-hero__lead">{scheduleMeta.description}</p>
-		</header>
+	<div class="schedule-page__content" data-schedule-page-content>
+		<div class="site-container">
+			<header class="schedule-hero">
+				<p class="schedule-hero__eyebrow">SITCON Camp 2026</p>
+				<h1 id="schedule-title" class="schedule-hero__title">{scheduleMeta.title}</h1>
+				<p class="schedule-hero__lead">{scheduleMeta.description}</p>
+			</header>
 
-		<div class="schedule-notes" aria-label="課表公告">
-			<p class="schedule-note">{scheduleMeta.note}</p>
-		</div>
-
-		<div class="schedule-board" aria-label="五天活動日程輪廓">
-			<div class="schedule-time-rail" aria-hidden="true">
-				<div class="schedule-time-rail__spacer"></div>
-				{schedulePeriods.map(period => <div class="schedule-time-rail__period">{period}</div>)}
+			<div class="schedule-notes" aria-label="課表公告">
+				<p class="schedule-note">{scheduleMeta.note}</p>
 			</div>
 
-			<div class="schedule-days-track" data-schedule-days-track>
-				{
-					scheduleDays.map(day => (
-						<article class:list={["schedule-day", dayAccentClassMap[day.type]]}>
-							<header class="schedule-day__header">
-								<div class="schedule-day__header-copy">
-									<h2 class="schedule-day__title">{day.title}</h2>
-									<p class="schedule-day__subtitle">{day.subtitle}</p>
-								</div>
-							</header>
+			<div class="schedule-board schedule-board--scroll" aria-label="五天活動日程輪廓">
+				<div class="schedule-time-rail" aria-hidden="true">
+					<div class="schedule-time-rail__spacer"></div>
+					{schedulePeriods.map(period => <div class="schedule-time-rail__period">{period}</div>)}
+				</div>
 
-							<div class="schedule-day__blocks">
-								{getRenderableBlocks(day).map(block => {
-									const eventIds = block.eventIds;
+				<div class="schedule-days-track" data-schedule-days-track>
+					{
+						scheduleDays.map(day => (
+							<article class:list={["schedule-day", dayAccentClassMap[day.type]]}>
+								<header class="schedule-day__header">
+									<div class="schedule-day__header-copy">
+										<h2 class="schedule-day__title">{day.title}</h2>
+										<p class="schedule-day__subtitle">{day.subtitle}</p>
+									</div>
+								</header>
 
-									return (
-										<section
-											class:list={[
-												"schedule-block",
-												{
-													"schedule-block--empty": eventIds.length === 0,
-													"schedule-block--spanning": block.span > 1,
-													"schedule-block--featured": block.hasDesign === true
-												}
-											]}
-											style={`--schedule-block-row:${block.rowStart}; --schedule-block-span:${block.span};`}
-											aria-label={`${day.title}${block.label}活動`}
-										>
-											<h3 class="schedule-block__period">{block.label}</h3>
-											{eventIds.length > 0 ? (
-												<div class="schedule-block__events">
-													{eventIds.map(eventId => {
-														const event = getEvent(eventId);
+								<div class="schedule-day__blocks">
+									{getRenderableBlocks(day).map(block => {
+										const eventIds = block.eventIds;
 
-														return (
-															<button
-																type="button"
-																class:list={["schedule-event", { "schedule-event--featured": block.hasDesign === true }]}
-																data-schedule-event-trigger={event.id}
-																aria-label={`查看${event.name}介紹`}
-															>
-																<div class="schedule-event__body">
-																	<div class="schedule-event__content">
-																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
-																		<span class="schedule-event__name">{event.name}</span>
-																		<span class="schedule-event__summary">{event.summary}</span>
+										return (
+											<section
+												class:list={[
+													"schedule-block",
+													{
+														"schedule-block--empty": eventIds.length === 0,
+														"schedule-block--spanning": block.span > 1,
+														"schedule-block--featured": block.hasDesign === true
+													}
+												]}
+												style={`--schedule-block-row:${block.rowStart}; --schedule-block-span:${block.span};`}
+												aria-label={`${day.title}${block.label}活動`}
+											>
+												<h3 class="schedule-block__period">{block.label}</h3>
+												{eventIds.length > 0 ? (
+													<div class="schedule-block__events">
+														{eventIds.map(eventId => {
+															const event = getEvent(eventId);
+
+															return (
+																<button
+																	type="button"
+																	class:list={["schedule-event", { "schedule-event--featured": block.hasDesign === true }]}
+																	data-schedule-event-trigger={event.id}
+																	aria-label={`查看${event.name}介紹`}
+																>
+																	<div class="schedule-event__body">
+																		<div class="schedule-event__content">
+																			<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
+																			<span class="schedule-event__name">{event.name}</span>
+																			<span class="schedule-event__summary">{event.summary}</span>
+																		</div>
 																	</div>
-																</div>
-															</button>
-														);
-													})}
-												</div>
-											) : (
-												<p class="schedule-block__empty-text">...</p>
-											)}
-										</section>
-									);
-								})}
-							</div>
-						</article>
-					))
-				}
+																</button>
+															);
+														})}
+													</div>
+												) : (
+													<p class="schedule-block__empty-text">...</p>
+												)}
+											</section>
+										);
+									})}
+								</div>
+							</article>
+						))
+					}
+				</div>
 			</div>
 		</div>
 	</div>
 
 	{
 		scheduleEvents.map(event => (
-			<dialog class="schedule-dialog" data-schedule-dialog={event.id} aria-labelledby={`schedule-dialog-title-${event.id}`}>
+			<div class="schedule-dialog" data-schedule-dialog={event.id} role="dialog" aria-modal="true" aria-labelledby={`schedule-dialog-title-${event.id}`} hidden>
 				<div class="schedule-dialog__panel">
 					<div class="schedule-dialog__image-wrap">
 						<img class="schedule-dialog__image" src={event.image.src} alt={event.image.alt} loading="lazy" decoding="async" />
 					</div>
 					<div class="schedule-dialog__content">
 						<span class:list={["schedule-dialog__badge", categoryClassMap[event.category]]}>{event.category}</span>
-						<h2 id={`schedule-dialog-title-${event.id}`} class="schedule-dialog__title">
+						<h2 id={`schedule-dialog-title-${event.id}`} class="schedule-dialog__title" tabindex="-1">
 							{event.name}
 						</h2>
 						<p class="schedule-dialog__description">{event.description}</p>
@@ -206,7 +208,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 						<X width={24} height={24} stroke-width={3} />
 					</button>
 				</div>
-			</dialog>
+			</div>
 		))
 	}
 </section>
@@ -215,9 +217,86 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	document.addEventListener("astro:page-load", () => {
 		const ac = new AbortController();
 		const { signal } = ac;
-		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
+		document.addEventListener(
+			"astro:before-swap",
+			() => {
+				closeDialog();
+				ac.abort();
+			},
+			{ once: true }
+		);
 
-		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLDialogElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
+		const dialogs = new Map(Array.from(document.querySelectorAll<HTMLElement>("[data-schedule-dialog]")).map(dialog => [dialog.dataset.scheduleDialog ?? "", dialog]));
+		const pageContent = document.querySelector<HTMLElement>("[data-schedule-page-content]");
+		const scheduleBoard = document.querySelector<HTMLElement>(".schedule-board");
+		let activeDialog: HTMLElement | null = null;
+		let lastFocusedElement: HTMLElement | null = null;
+		let scrollPosition = 0;
+		const focusableSelector = [
+			"a[href]",
+			"button:not([disabled])",
+			'input:not([disabled]):not([type="hidden"])',
+			"select:not([disabled])",
+			"textarea:not([disabled])",
+			'[tabindex]:not([tabindex="-1"])'
+		].join(",");
+
+		const getFocusableElements = (dialog: HTMLElement) => Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector)).filter(element => !element.closest("[hidden]"));
+
+		const setPageContentInert = (isInert: boolean) => {
+			if (!pageContent) return;
+
+			const pageContentWithInert = pageContent as HTMLElement & { inert?: boolean };
+			if ("inert" in pageContentWithInert) {
+				pageContentWithInert.inert = isInert;
+			}
+			pageContent.toggleAttribute("inert", isInert);
+			if (isInert) {
+				pageContent.setAttribute("aria-hidden", "true");
+			} else {
+				pageContent.removeAttribute("aria-hidden");
+			}
+		};
+
+		const focusDialogTitle = (dialog: HTMLElement) => {
+			dialog.querySelector<HTMLElement>(`[id="schedule-dialog-title-${dialog.dataset.scheduleDialog ?? ""}"]`)?.focus({ preventScroll: true });
+		};
+
+		const restoreFocus = (dialog: HTMLElement | null) => {
+			const fallbackTrigger = dialog?.dataset.scheduleDialog ? document.querySelector<HTMLElement>(`[data-schedule-event-trigger="${dialog.dataset.scheduleDialog}"]`) : null;
+			const target = lastFocusedElement && lastFocusedElement.isConnected && (!dialog || !dialog.contains(lastFocusedElement)) ? lastFocusedElement : fallbackTrigger;
+
+			target?.focus({ preventScroll: true });
+			lastFocusedElement = null;
+		};
+
+		const closeDialog = (dialog = activeDialog) => {
+			if (!dialog) return;
+
+			dialog.hidden = true;
+			setPageContentInert(false);
+			activeDialog = null;
+			document.documentElement.classList.remove("schedule-dialog-is-open");
+			window.scrollTo({ top: scrollPosition, left: 0, behavior: "instant" });
+			restoreFocus(dialog);
+		};
+
+		const openDialog = (dialog: HTMLElement) => {
+			if (activeDialog && activeDialog !== dialog) {
+				closeDialog(activeDialog);
+			}
+
+			lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+			scrollPosition = window.scrollY;
+			setPageContentInert(true);
+			document.documentElement.classList.add("schedule-dialog-is-open");
+			dialog.hidden = false;
+			activeDialog = dialog;
+			focusDialogTitle(dialog);
+			if (document.activeElement === lastFocusedElement) {
+				dialog.querySelector<HTMLElement>("[data-schedule-dialog-close]")?.focus({ preventScroll: true });
+			}
+		};
 
 		document.addEventListener(
 			"click",
@@ -229,13 +308,54 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 				if (trigger) {
 					const dialog = dialogs.get(trigger.dataset.scheduleEventTrigger ?? "");
-					dialog?.showModal();
+					if (dialog) {
+						openDialog(dialog);
+					}
 					return;
 				}
 
 				if (closeButton) {
-					closeButton.closest<HTMLDialogElement>("dialog")?.close();
+					closeDialog(closeButton.closest<HTMLElement>("[data-schedule-dialog]"));
 				}
+			},
+			{ signal }
+		);
+
+		document.addEventListener(
+			"keydown",
+			event => {
+				if (event.key === "Escape" && activeDialog) {
+					closeDialog();
+					return;
+				}
+
+				if (event.key !== "Tab" || !activeDialog) {
+					return;
+				}
+
+				const focusables = getFocusableElements(activeDialog);
+
+				if (focusables.length === 0) {
+					event.preventDefault();
+					return;
+				}
+
+				const currentIndex = focusables.indexOf(document.activeElement as HTMLElement);
+				const nextIndex = event.shiftKey ? (currentIndex <= 0 ? focusables.length - 1 : currentIndex - 1) : currentIndex === -1 || currentIndex === focusables.length - 1 ? 0 : currentIndex + 1;
+
+				event.preventDefault();
+				focusables[nextIndex]?.focus({ preventScroll: true });
+			},
+			{ signal }
+		);
+
+		document.addEventListener(
+			"focusin",
+			event => {
+				if (!activeDialog || !(event.target instanceof Node) || activeDialog.contains(event.target)) return;
+
+				const focusables = getFocusableElements(activeDialog);
+				(focusables[0] ?? activeDialog.querySelector<HTMLElement>("[data-schedule-dialog-close]"))?.focus({ preventScroll: true });
 			},
 			{ signal }
 		);
@@ -245,7 +365,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 				"click",
 				event => {
 					if (event.target === dialog) {
-						dialog.close();
+						closeDialog(dialog);
 					}
 				},
 				{ signal }
@@ -260,6 +380,28 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		padding-block: clamp(8.25rem, 12vw, 12rem) clamp(3.5rem, 7vw, 6rem);
 		background: var(--color-background);
 		color: var(--color-foreground);
+	}
+
+	:global(html),
+	:global(body) {
+		overflow-x: hidden;
+	}
+
+	@supports (overflow-x: clip) {
+		:global(html),
+		:global(body) {
+			overflow-x: clip;
+		}
+	}
+
+	:global(html.schedule-dialog-is-open) {
+		overflow: hidden;
+		overscroll-behavior: none;
+	}
+
+	:global(html.schedule-dialog-is-open body) {
+		overflow: hidden;
+		overscroll-behavior: none;
 	}
 
 	.schedule-hero {
@@ -300,6 +442,9 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		display: grid;
 		grid-template-columns: clamp(3.25rem, 5vw, 4.25rem) minmax(0, 1fr);
 		gap: clamp(0.75rem, 1.2vw, 1rem);
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
 		margin-block-start: clamp(2.5rem, 5vw, 4.5rem);
 		--schedule-row-gap: clamp(0.5rem, 0.9vw, 0.75rem);
 		--schedule-header-row: clamp(6.7rem, 9vw, 8.25rem);
@@ -335,6 +480,8 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		display: grid;
 		grid-template-columns: repeat(5, minmax(0, 1fr));
 		gap: clamp(0.75rem, 1.2vw, 1rem);
+		width: 100%;
+		max-width: 100%;
 		min-width: 0;
 	}
 
@@ -662,24 +809,43 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	}
 
 	.schedule-dialog {
-		width: min(calc(100% - 2rem), 58rem);
-		margin: auto;
-		padding: 0;
+		position: fixed;
+		inset: 0;
+		z-index: 1100;
+		display: grid;
+		place-items: center;
+		inline-size: auto;
+		max-width: none;
+		block-size: auto;
+		max-height: none;
+		margin: 0;
+		padding: min(4vw, 2rem);
+		box-sizing: border-box;
 		color: var(--color-background);
-		background: transparent;
+		background: rgb(0 0 0 / 55%);
 		border: 0;
-		border-radius: 1.5rem;
+		overflow-x: hidden;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		-webkit-overflow-scrolling: touch;
 	}
 
-	.schedule-dialog::backdrop {
-		background: rgb(0 0 0 / 55%);
+	.schedule-dialog[hidden] {
+		display: none;
 	}
 
 	.schedule-dialog__panel {
 		position: relative;
+		align-self: center;
+		justify-self: center;
 		display: grid;
 		grid-template-columns: minmax(0, 0.95fr) minmax(18rem, 0.82fr);
+		box-sizing: border-box;
+		width: min(100%, 58rem);
+		max-width: 100%;
+		max-height: calc(100dvh - 2rem);
 		overflow: hidden;
+		overflow-y: auto;
 		background: var(--color-foreground);
 		border: 3px solid var(--color-background);
 		border-radius: 1.5rem;
@@ -859,116 +1025,179 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 
 		.schedule-board {
-			grid-template-columns: 3rem minmax(0, 1fr);
-			gap: 0.5rem;
-			overflow: visible;
-			padding-block-end: 0;
-			--schedule-header-row: 5.4rem;
-			--schedule-morning-row: 12rem;
-			--schedule-midday-row: 14rem;
-			--schedule-evening-row: 10.5rem;
+			margin-block-start: 1rem;
 		}
 
-		.schedule-days-track {
-			grid-template-columns: repeat(5, minmax(11.5rem, 12.5rem));
+		.schedule-board:not(.schedule-board--scroll) {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+			overflow-x: visible;
+			padding-block-end: 0;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-time-rail {
+			display: none;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-days-track {
+			grid-template-columns: 1fr;
+			min-width: 0;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-day {
+			grid-template-rows: auto;
+			border-radius: 1.2rem 0;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__header {
+			justify-content: center;
+			padding: 0.85rem 1rem;
+			text-align: center;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__header-copy {
+			justify-items: center;
+			gap: 0.36rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__subtitle {
+			font-size: 0.8rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__title {
+			font-size: 1.55rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__blocks {
+			display: grid;
+			gap: 1rem;
+			padding: 1rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-block {
+			gap: 0.55rem;
+			grid-row: auto;
+			min-height: 0;
+			padding: 0;
+			border-block-start: 0;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-block__events {
+			grid-auto-rows: max-content;
+			height: auto;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-block__period {
+			position: static;
+			justify-self: start;
+			align-self: start;
+			width: auto;
+			height: auto;
+			overflow: visible;
+			clip: auto;
+			clip-path: none;
+			color: var(--color-background);
+			font-size: 0.95rem;
+			font-weight: 800;
+			line-height: 1;
+			white-space: normal;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event {
+			height: auto;
+			min-height: 9rem;
+			border-radius: 1rem 0;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-block--spanning .schedule-event {
+			min-height: calc(9rem * var(--schedule-block-span));
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__body {
+			padding: 1rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event--featured .schedule-event__name {
+			font-size: clamp(1.3rem, 5.8vw, 1.5rem);
+			-webkit-line-clamp: 4;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event--featured .schedule-event__summary {
+			max-width: 18ch;
+			-webkit-line-clamp: 4;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__badge {
+			padding: 0.42rem 0.82rem;
+			font-size: 0.84rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__name {
+			font-size: 1.25rem;
+			line-height: 1.25;
+			-webkit-line-clamp: 2;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__summary {
+			font-size: 1rem;
+			line-height: 1.5;
+			-webkit-line-clamp: 2;
+		}
+
+		.schedule-board--scroll {
+			grid-template-columns: 3.2rem minmax(0, 1fr);
+			gap: 0.55rem;
+			overflow: hidden;
+			contain: inline-size layout paint;
+			--schedule-header-row: 7.6rem;
+		}
+
+		.schedule-board--scroll .schedule-days-track {
+			display: flex;
+			align-items: stretch;
+			width: 100%;
+			max-width: 100%;
 			min-width: 0;
 			overflow-x: auto;
 			overflow-y: hidden;
 			overscroll-behavior-x: contain;
-			padding: 0 0.2rem 0.85rem 0;
+			padding-block-end: 0.8rem;
 			scroll-padding-inline: 0.2rem;
 			scroll-snap-type: x proximity;
-			scrollbar-gutter: stable;
+			-webkit-overflow-scrolling: touch;
 		}
 
-		.schedule-day {
-			grid-template-rows: var(--schedule-header-row) var(--schedule-morning-row) var(--schedule-midday-row) var(--schedule-evening-row);
-			border-radius: 1rem 0;
+		.schedule-board--scroll .schedule-day {
+			flex: 0 0 clamp(12.5rem, 72vw, 18rem);
+			min-width: 0;
 			scroll-snap-align: start;
 		}
 
-		.schedule-day__header {
-			justify-content: flex-start;
-			padding: 0.62rem;
-			text-align: left;
+		.schedule-board--scroll .schedule-day__header {
+			padding: 0.85rem 1rem;
 		}
 
-		.schedule-day__header-copy {
-			justify-items: start;
-			gap: 0.28rem;
+		.schedule-board--scroll .schedule-day__header-copy {
+			gap: 0.36rem;
 		}
 
-		.schedule-day__subtitle {
-			font-size: 0.68rem;
+		.schedule-board--scroll .schedule-day__subtitle {
+			font-size: 0.8rem;
+			line-height: 1.2;
 		}
 
-		.schedule-day__title {
-			font-size: 1.08rem;
-		}
-
-		.schedule-day__blocks {
-			display: contents;
-		}
-
-		.schedule-block {
-			grid-row: var(--schedule-block-row) / span var(--schedule-block-span);
-			min-height: 0;
-			padding: 0.42rem;
-		}
-
-		.schedule-block__events {
-			grid-auto-rows: minmax(0, 1fr);
-			height: 100%;
-		}
-
-		.schedule-event {
-			height: 100%;
-			min-height: 0;
-			border-radius: 0.75rem 0;
-		}
-
-		.schedule-block--spanning .schedule-event {
-			min-height: 0;
-		}
-
-		.schedule-event__body {
-			padding: 0.7rem;
-		}
-
-		.schedule-event--featured .schedule-event__name {
-			font-size: 1.12rem;
-			-webkit-line-clamp: 3;
-		}
-
-		.schedule-event--featured .schedule-event__summary {
-			max-width: 16ch;
-			-webkit-line-clamp: 3;
-		}
-
-		.schedule-event__badge {
-			padding: 0.34rem 0.7rem;
-			font-size: 0.74rem;
-		}
-
-		.schedule-event__name {
-			font-size: 1rem;
-			line-height: 1.28;
-			-webkit-line-clamp: 3;
-		}
-
-		.schedule-event__summary {
-			font-size: 0.86rem;
-			line-height: 1.45;
-			-webkit-line-clamp: 2;
-		}
-
-		.schedule-dialog {
-			width: min(calc(100% - 1rem), 36rem);
+		.schedule-board--scroll .schedule-day__title {
+			font-size: 1.55rem;
+			line-height: 1.15;
+			overflow-wrap: anywhere;
+			text-wrap: balance;
 		}
 
 		.schedule-dialog__panel {
+			width: 100%;
+			max-width: 32rem;
 			grid-template-columns: 1fr;
-			max-height: calc(100dvh - 1.5rem);
+			max-height: calc(100dvh - 2rem);
 			overflow-y: auto;
 		}
 
@@ -983,46 +1212,49 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 	}
 
+	@media (max-width: 48rem) {
+		.schedule-dialog {
+			place-items: start center;
+			padding: calc(4.5rem + env(safe-area-inset-top, 0px)) 1rem 1rem;
+		}
+
+		.schedule-dialog__panel {
+			max-height: calc(100dvh - 5.5rem - env(safe-area-inset-top, 0px));
+		}
+	}
+
 	@media (max-width: 30rem) {
-		.schedule-board {
-			grid-template-columns: 2.75rem minmax(0, 1fr);
-			--schedule-header-row: 5.2rem;
-			--schedule-morning-row: 11.5rem;
-			--schedule-midday-row: 13.2rem;
-			--schedule-evening-row: 9.8rem;
+		.schedule-board:not(.schedule-board--scroll) .schedule-day__blocks {
+			padding: 0.9rem;
 		}
 
-		.schedule-days-track {
-			grid-template-columns: repeat(5, minmax(10.75rem, 11.5rem));
+		.schedule-board:not(.schedule-board--scroll) .schedule-block {
+			min-height: 0;
 		}
 
-		.schedule-time-rail__period {
+		.schedule-board:not(.schedule-board--scroll) .schedule-event {
+			min-height: 8.5rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__body {
+			padding: 0.95rem;
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-block--spanning .schedule-event {
+			min-height: calc(8.5rem * var(--schedule-block-span));
+		}
+
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__badge {
 			font-size: 0.8rem;
 		}
 
-		.schedule-block {
-			padding: 0.36rem;
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__name {
+			font-size: 1.12rem;
+			-webkit-line-clamp: 2;
 		}
 
-		.schedule-event--featured .schedule-event__content {
-			padding: 0.75rem 0.55rem;
-		}
-
-		.schedule-event__body {
-			padding: 0.62rem;
-		}
-
-		.schedule-event__badge {
-			padding: 0.3rem 0.62rem;
-			font-size: 0.72rem;
-		}
-
-		.schedule-event__name {
-			font-size: 0.98rem;
-		}
-
-		.schedule-event__summary {
-			font-size: 0.82rem;
+		.schedule-board:not(.schedule-board--scroll) .schedule-event__summary {
+			font-size: 0.94rem;
 			-webkit-line-clamp: 2;
 		}
 	}
