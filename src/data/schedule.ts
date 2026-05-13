@@ -9,7 +9,7 @@ export type ScheduleEventCategory = "啟程" | "主線課程" | "社群活動" |
 export interface ScheduleMeta {
 	title: string;
 	description: string;
-	note: string;
+	note?: string;
 }
 
 export interface ScheduleBlock {
@@ -41,8 +41,7 @@ export interface ScheduleEvent {
 
 export const scheduleMeta: ScheduleMeta = {
 	title: "活動課表",
-	description: "SITCON Camp 2026 將圍繞軟體工程、人工智慧與資訊安全三大主線展開，並穿插交流、實作與社群活動。",
-	note: "課程與活動可能依現場狀況微調，實際安排以營期公告為準。"
+	description: "SITCON Camp 2026 將圍繞軟體工程、人工智慧與資訊安全三大主線展開，並穿插交流、實作與社群活動。"
 };
 
 export const scheduleEvents: ScheduleEvent[] = [
@@ -120,7 +119,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 	},
 	{
 		id: "ml-main",
-		name: "ML 主線課程",
+		name: "人工智慧主線課程",
 		summary: "理解模型、資料與判斷之間的關係。",
 		description: "人工智慧與機器學習主題課程會帶學員理解模型不是魔法，而是和資料品質、問題定義與驗證方法緊密相關的工具。",
 		category: "主線課程",
@@ -144,7 +143,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 	},
 	{
 		id: "agentic-coding",
-		name: "Agentic Coding 使用經驗交流",
+		name: "AI Coding 交流",
 		summary: "Denny 分享如何把 AI agent 放進實際開發流程。",
 		description: "從使用經驗出發，交流如何讓 AI agent 協助開發、學習與實作，也討論工具帶來的效率、限制與判斷方式。",
 		category: "主線課程",
@@ -272,8 +271,8 @@ export const scheduleDays: ScheduleDay[] = [
 	},
 	{
 		id: "day-two",
-		title: "第二日",
-		subtitle: "軟工",
+		title: "軟體工程主題",
+		subtitle: "講師：Denny 黃一晉",
 		type: "software",
 		blocks: [
 			{ startSlot: "9:00", span: 3, eventId: "software-main" },
@@ -287,8 +286,8 @@ export const scheduleDays: ScheduleDay[] = [
 	},
 	{
 		id: "day-three",
-		title: "第三日",
-		subtitle: "ML",
+		title: "人工智慧主題",
+		subtitle: "講師：Ak 郭鎮天、Harry 張祺煒",
 		type: "artificial-intelligence",
 		blocks: [
 			{ startSlot: "9:00", span: 3, eventId: "ml-main" },
@@ -302,8 +301,8 @@ export const scheduleDays: ScheduleDay[] = [
 	},
 	{
 		id: "day-four",
-		title: "第四日",
-		subtitle: "資安",
+		title: "資訊安全主題",
+		subtitle: "講師：Jasper 尤理衡",
 		type: "security",
 		blocks: [
 			{ startSlot: "9:00", span: 3, eventId: "security-main" },

@@ -129,9 +129,13 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 				<p class="schedule-hero__lead">{scheduleMeta.description}</p>
 			</header>
 
-			<div class="schedule-notes" aria-label="課表公告">
-				<p class="schedule-note">{scheduleMeta.note}</p>
-			</div>
+			{
+				scheduleMeta.note && (
+					<div class="schedule-notes" aria-label="課表公告">
+						<p class="schedule-note">{scheduleMeta.note}</p>
+					</div>
+				)
+			}
 
 			<div class="schedule-board schedule-board--scroll" aria-label="五天活動日程輪廓">
 				<div class="schedule-time-rail" aria-hidden="true">
@@ -743,13 +747,13 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 	.schedule-event__name {
 		display: -webkit-box;
-		font-size: clamp(0.88rem, 0.9vw, 1.04rem);
+		font-size: clamp(1.05rem, 1.08vw, 1.22rem);
 		font-weight: 800;
-		line-height: 1.25;
+		line-height: 1.18;
 		overflow: hidden;
 		overflow-wrap: anywhere;
 		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
+		-webkit-line-clamp: 3;
 	}
 
 	.schedule-event__summary {
@@ -1131,9 +1135,9 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 
 		.schedule-board:not(.schedule-board--scroll) .schedule-event__name {
-			font-size: 1.25rem;
-			line-height: 1.25;
-			-webkit-line-clamp: 2;
+			font-size: clamp(1.32rem, 5.6vw, 1.56rem);
+			line-height: 1.18;
+			-webkit-line-clamp: 3;
 		}
 
 		.schedule-board:not(.schedule-board--scroll) .schedule-event__summary {
@@ -1248,8 +1252,8 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		}
 
 		.schedule-board:not(.schedule-board--scroll) .schedule-event__name {
-			font-size: 1.12rem;
-			-webkit-line-clamp: 2;
+			font-size: clamp(1.18rem, 6.2vw, 1.36rem);
+			-webkit-line-clamp: 3;
 		}
 
 		.schedule-board:not(.schedule-board--scroll) .schedule-event__summary {
