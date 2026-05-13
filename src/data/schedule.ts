@@ -62,8 +62,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		id: "icebreaking",
 		name: "破冰",
 		summary: "透過互動任務，認識一起學習與合作的夥伴。",
-		description:
-			"破冰不只是為了記住名字，而是讓大家有機會交換想法、發現彼此的好奇心。透過輕鬆的互動與任務，學員會認識小隊夥伴，熟悉營隊氣氛。",
+		description: "破冰不只是為了記住名字，而是讓大家有機會交換想法、發現彼此的好奇心。透過輕鬆的互動與任務，學員會認識小隊夥伴，熟悉營隊氣氛。",
 		category: "社群活動",
 		isInteractive: true,
 		image: {
@@ -111,8 +110,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		id: "software-main",
 		name: "軟工主線課程",
 		summary: "用軟體工程師的方法思考、協作與維護專案。",
-		description:
-			"軟體工程主題日的核心，是讓學員了解一個專案不只是把程式寫出來，而是要能被理解、被協作、被維護，並在需求變動時繼續前進。",
+		description: "軟體工程主題日的核心，是讓學員了解一個專案不只是把程式寫出來，而是要能被理解、被協作、被維護，並在需求變動時繼續前進。",
 		category: "主線課程",
 		isInteractive: true,
 		image: {
@@ -124,8 +122,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		id: "ml-main",
 		name: "ML 主線課程",
 		summary: "理解模型、資料與判斷之間的關係。",
-		description:
-			"人工智慧與機器學習主題課程會帶學員理解模型不是魔法，而是和資料品質、問題定義與驗證方法緊密相關的工具。",
+		description: "人工智慧與機器學習主題課程會帶學員理解模型不是魔法，而是和資料品質、問題定義與驗證方法緊密相關的工具。",
 		category: "主線課程",
 		isInteractive: true,
 		image: {
@@ -137,8 +134,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		id: "security-main",
 		name: "資安主線課程",
 		summary: "從攻防視角理解系統安全與資安思維。",
-		description:
-			"資訊安全主題日將帶學員靠近資安領域的思考方式。資安不只是找到漏洞或解出題目，更是在理解系統如何運作，以及攻擊者與防禦者會如何看待同一個問題。",
+		description: "資訊安全主題日將帶學員靠近資安領域的思考方式。資安不只是找到漏洞或解出題目，更是在理解系統如何運作，以及攻擊者與防禦者會如何看待同一個問題。",
 		category: "主線課程",
 		isInteractive: true,
 		image: {

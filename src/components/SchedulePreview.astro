@@ -170,32 +170,30 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 												<h3 class="schedule-block__period">{block.label}</h3>
 												{event ? (
 													<div class="schedule-block__events">
-														{
-															isInteractive ? (
-																<button
-																	type="button"
-																	class:list={["schedule-event", blockCategoryClassMap[event.category], { "schedule-event--spanning": block.span > 1 }]}
-																	data-schedule-event-trigger={event.id}
-																	aria-label={`查看${event.name}介紹`}
-																>
-																	<div class="schedule-event__body">
-																		<div class="schedule-event__content">
-																			<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
-																			<span class="schedule-event__name">{event.name}</span>
-																		</div>
-																	</div>
-																</button>
-															) : (
-																<div class:list={["schedule-event", "schedule-event--static", blockCategoryClassMap[event.category], { "schedule-event--spanning": block.span > 1 }]}>
-																	<div class="schedule-event__body">
-																		<div class="schedule-event__content">
-																			<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
-																			<span class="schedule-event__name">{event.name}</span>
-																		</div>
+														{isInteractive ? (
+															<button
+																type="button"
+																class:list={["schedule-event", blockCategoryClassMap[event.category], { "schedule-event--spanning": block.span > 1 }]}
+																data-schedule-event-trigger={event.id}
+																aria-label={`查看${event.name}介紹`}
+															>
+																<div class="schedule-event__body">
+																	<div class="schedule-event__content">
+																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
+																		<span class="schedule-event__name">{event.name}</span>
 																	</div>
 																</div>
-															)
-														}
+															</button>
+														) : (
+															<div class:list={["schedule-event", "schedule-event--static", blockCategoryClassMap[event.category], { "schedule-event--spanning": block.span > 1 }]}>
+																<div class="schedule-event__body">
+																	<div class="schedule-event__content">
+																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
+																		<span class="schedule-event__name">{event.name}</span>
+																	</div>
+																</div>
+															</div>
+														)}
 													</div>
 												) : (
 													<p class="schedule-block__empty-text"> </p>
