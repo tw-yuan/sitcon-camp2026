@@ -1,5 +1,6 @@
 ---
 import EventsHeld from "@/components/EventsHeld.astro";
+import AboutVideo from "@/components/AboutVideo.astro";
 import Team from "@/components/Team.astro";
 import OrganizerBrands from "@/components/OrganizerBrands.astro";
 import Layout from "@/layouts/Layout.astro";
@@ -55,6 +56,7 @@ const structuredData = [aboutPageSchema, breadcrumbSchema];
 
 <Layout title={pageMeta.title} description={pageMeta.description} additionalStructuredData={structuredData}>
 	<EventsHeld />
+	<AboutVideo />
 	<Team />
 	<OrganizerBrands />
 </Layout>

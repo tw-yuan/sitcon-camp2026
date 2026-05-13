@@ -1,0 +1,76 @@
+---
+import IcRoundPlayCircle from "~icons/ic/round-play-circle";
+
+import aboutData from "@/data/about.json";
+
+type AboutVideoContent = {
+	eyebrow: string;
+	title: string;
+	lead: string;
+	label: string;
+	thumbnailUrl: string;
+	embedUrl: string;
+};
+
+const video = aboutData.aboutVideo as AboutVideoContent;
+---
+
+<section class="bg-background py-[clamp(4rem,8vw,7rem)]">
+	<div class="site-container">
+		<div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center">
+			<header>
+				<p class="bg-green mb-5 w-fit px-3 py-2 text-[clamp(1rem,1.7vw,1.5rem)] leading-none font-extrabold text-black">{video.eyebrow}</p>
+				<h2 class="text-[clamp(2.35rem,5vw,4.75rem)] leading-[0.98] font-extrabold text-balance text-black">{video.title}</h2>
+				<p class="text-foreground/78 mt-6 text-[clamp(1.0625rem,1.45vw,1.25rem)] leading-[1.75] font-bold">{video.lead}</p>
+			</header>
+
+			<div class="bg-foreground overflow-hidden rounded-[2rem_0_2rem_0] p-2 shadow-[0.5rem_0.5rem_0_0_var(--color-soft-blue)]">
+				<div class="about-video-frame relative aspect-video overflow-hidden rounded-[1.5rem_0_1.5rem_0]" data-about-video data-embed-url={video.embedUrl} data-video-label={video.label}>
+					<button type="button" class="group absolute inset-0 block h-full w-full cursor-pointer" aria-label={`播放 ${video.label}`} data-about-video-play>
+						<img src={video.thumbnailUrl} alt="" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
+						<div class="from-foreground/85 absolute inset-0 flex items-center justify-center bg-linear-to-t from-0% via-transparent to-black/15">
+							<span class="bg-background/95 text-foreground grid size-18 place-items-center rounded-full shadow-lg transition-transform duration-300 group-hover:scale-110 sm:size-22">
+								<IcRoundPlayCircle class="text-6xl sm:text-7xl" />
+							</span>
+						</div>
+						<span class="text-background absolute right-4 bottom-4 left-4 text-left text-[clamp(1.25rem,3vw,2.25rem)] leading-tight font-extrabold text-balance drop-shadow-lg">{video.label}</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	document.addEventListener("astro:page-load", () => {
+		const ac = new AbortController();
+		const { signal } = ac;
+
+		document.addEventListener("astro:before-swap", () => ac.abort(), { once: true });
+
+		document.querySelectorAll("[data-about-video]").forEach(frame => {
+			const playButton = frame.querySelector("[data-about-video-play]");
+
+			playButton?.addEventListener(
+				"click",
+				() => {
+					const embedUrl = (frame as HTMLElement).dataset.embedUrl;
+					const label = (frame as HTMLElement).dataset.videoLabel ?? "YouTube video player";
+
+					if (!embedUrl) return;
+
+					const iframe = document.createElement("iframe");
+					iframe.className = "absolute inset-0 h-full w-full";
+					iframe.title = label;
+					iframe.src = embedUrl;
+					iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+					iframe.allowFullscreen = true;
+					iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+					frame.replaceChildren(iframe);
+				},
+				{ once: true, signal }
+			);
+		});
+	});
+</script>
