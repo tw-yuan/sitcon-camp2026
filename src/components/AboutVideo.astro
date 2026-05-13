@@ -17,10 +17,13 @@ const video = aboutData.aboutVideo as AboutVideoContent;
 
 <section class="bg-background py-[clamp(4rem,8vw,7rem)]">
 	<div class="site-container">
-		<div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center">
-			<header>
+		<div class="mx-auto grid max-w-6xl gap-8 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:items-center">
+			<header class="max-w-4xl xl:max-w-none">
 				<p class="bg-green mb-5 w-fit px-3 py-2 text-[clamp(1rem,1.7vw,1.5rem)] leading-none font-extrabold text-black">{video.eyebrow}</p>
-				<h2 class="text-[clamp(2.35rem,5vw,4.75rem)] leading-[0.98] font-extrabold text-balance text-black">{video.title}</h2>
+				<h2 class="text-[clamp(2.35rem,4.5vw,4.25rem)] leading-[1.02] font-extrabold text-black">
+					<span>從報導認識</span>
+					<span class="inline-block"> SITCON</span>
+				</h2>
 				<p class="text-foreground/78 mt-6 text-[clamp(1.0625rem,1.45vw,1.25rem)] leading-[1.75] font-bold">{video.lead}</p>
 			</header>
 
