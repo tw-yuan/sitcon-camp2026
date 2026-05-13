@@ -1,10 +1,10 @@
 export type ScheduleDayType = "opening" | "software" | "artificial-intelligence" | "security" | "closing";
 
-export const schedulePeriods = ["上午", "下午", "晚上"] as const;
+export const scheduleSlots = ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "睡覺"] as const;
 
-export type ScheduleBlockPeriod = (typeof schedulePeriods)[number];
+export type ScheduleSlot = (typeof scheduleSlots)[number];
 
-export type ScheduleEventCategory = "啟程" | "主線課程" | "社群活動" | "總結";
+export type ScheduleEventCategory = "啟程" | "主線課程" | "社群活動" | "生活" | "休息" | "總結";
 
 export interface ScheduleMeta {
 	title: string;
@@ -13,10 +13,9 @@ export interface ScheduleMeta {
 }
 
 export interface ScheduleBlock {
-	startPeriod: ScheduleBlockPeriod;
+	startSlot: ScheduleSlot;
 	span?: number;
-	hasDesign?: boolean;
-	eventIds: string[];
+	eventId: string;
 }
 
 export interface ScheduleDay {
@@ -31,75 +30,104 @@ export interface ScheduleEvent {
 	id: string;
 	name: string;
 	summary: string;
-	description: string;
 	category: ScheduleEventCategory;
-	image: {
+	isInteractive?: boolean;
+	description?: string;
+	image?: {
 		src: string;
 		alt: string;
 	};
 }
 
 export const scheduleMeta: ScheduleMeta = {
-	title: "活動日程搶先看",
+	title: "活動課表",
 	description: "SITCON Camp 2026 將圍繞軟體工程、人工智慧與資訊安全三大主線展開，並穿插交流、實作與社群活動。",
-	note: "三個主題日的實際順序與完整時段，將於正式課表公開時一併更新。"
+	note: "課程與活動可能依現場狀況微調，實際安排以營期公告為準。"
 };
 
 export const scheduleEvents: ScheduleEvent[] = [
 	{
-		id: "start-and-opening",
-		name: "報到與開幕",
-		summary: "帶著行李與好奇心，正式進入 SITCON Camp。",
-		description:
-			"從踏進營隊那一刻起，慢慢展開五天四夜的節奏。完成報到、認識環境、在開幕中了解接下來的課程與活動安排。這是 SITCON Camp 的起點，也會幫助學員理解營隊如何圍繞資訊技術、實作與學生社群展開。",
+		id: "opening",
+		name: "開幕",
+		summary: "認識營隊節奏與接下來五天的學習安排。",
+		description: "從開幕開始進入 SITCON Camp 的五天四夜。學員會理解營隊主軸、活動規則與接下來的課程安排，準備好和小隊夥伴一起展開學習與實作。",
 		category: "啟程",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/start-and-opening.jpg",
-			alt: "SITCON Camp 報到與開幕現場"
+			alt: "SITCON Camp 開幕現場"
 		}
 	},
 	{
 		id: "icebreaking",
-		name: "不一樣的破冰活動",
-		summary: "透過互動與任務，找到一起學習、合作與卡關的夥伴。",
+		name: "破冰",
+		summary: "透過互動任務，認識一起學習與合作的夥伴。",
 		description:
-			"破冰不只是為了記住名字，而是讓大家有機會交換想法、發現彼此的好奇心。透過輕鬆的互動與任務，學員會認識小隊夥伴，熟悉營隊氣氛。練習表達、合作與找到能一起學習、一起卡關的夥伴，與他們一起走進 SITCON Camp 。",
+			"破冰不只是為了記住名字，而是讓大家有機會交換想法、發現彼此的好奇心。透過輕鬆的互動與任務，學員會認識小隊夥伴，熟悉營隊氣氛。",
 		category: "社群活動",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/icebreaking.jpg",
 			alt: "學員在破冰活動中互動交流"
 		}
 	},
 	{
-		id: "night-special",
-		name: "夜間特別活動",
-		summary: "在課程之外交流放鬆，看見資訊社群中人與人的連結。",
-		description: "夜晚會保留給更自由、更有營隊感的活動。重點不在形式，而是讓你有機會和人、技術與想法靠得更近，看見資訊社群不只關於技術，更有充滿連結與溫度的一面。",
+		id: "quest",
+		name: "闖關",
+		summary: "以任務形式熟悉營隊環境與小隊合作。",
+		description: "透過闖關任務讓學員更快熟悉場地、隊友與營隊節奏，也在遊戲中練習溝通、分工與合作。",
 		category: "社群活動",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/night-special.jpg",
-			alt: "學員參與夜間特別活動"
+			alt: "學員參與營隊活動"
+		}
+	},
+	{
+		id: "agent-battle",
+		name: "Agent 對戰活動",
+		summary: "讓你的 agent 和其他人的成果一較高下。",
+		description: "把課程中的想法轉成可互動的 agent，並在活動中觀察不同策略如何面對同一個挑戰。",
+		category: "社群活動",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/night-special.jpg",
+			alt: "學員參與互動活動"
+		}
+	},
+	{
+		id: "lab-setup",
+		name: "電腦教室環境設定",
+		summary: "完成接下來課程需要的環境與工具準備。",
+		description: "協助學員完成電腦教室環境與工具設定，讓後續主線課程能順利進行。",
+		category: "啟程",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/start-and-opening.jpg",
+			alt: "課程環境設定"
 		}
 	},
 	{
 		id: "software-main",
-		name: "用軟體工程師的方法思考與協作",
-		summary: "學會從混亂走向可維護、可協作的專案思維。",
+		name: "軟工主線課程",
+		summary: "用軟體工程師的方法思考、協作與維護專案。",
 		description:
-			"軟體工程主題日的核心，是讓學員了解一個專案不只是把程式寫出來，而是要能被理解、被協作、被維護，並在需求變動時繼續前進。這一天會帶學員看見軟體工程師面對問題時的思考方式：如何整理混亂、拆解任務、溝通取捨，並讓團隊能一起把事情做下去。除了單純學某個工具或框架，也建立一種在資訊領域長期前進很重要的工程思維。對已經開始寫程式、但還不確定專案該怎麼變得更成熟的學員來說，這會是一個把「會寫」推向「會做」的重要入口。",
+			"軟體工程主題日的核心，是讓學員了解一個專案不只是把程式寫出來，而是要能被理解、被協作、被維護，並在需求變動時繼續前進。",
 		category: "主線課程",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/software-main.jpg",
 			alt: "軟體工程主題日課程現場"
 		}
 	},
 	{
-		id: "ai-main",
-		name: "AI 不是魔法，是垃圾進垃圾出",
-		summary: "理解 AI 背後的資料、判斷與限制。",
+		id: "ml-main",
+		name: "ML 主線課程",
+		summary: "理解模型、資料與判斷之間的關係。",
 		description:
-			"人工智慧主題日的核心，是讓學員理解 AI 不是神奇黑盒，也不只是把它當工具拿來用。AI 的表現背後，牽涉到資料品質、問題定義、判斷方式與人如何檢查結果；當前面輸入的東西不可靠，後面產出的結果也很難真正值得信任。這一天希望幫助學員建立面對 AI 時更清楚的直覺：知道它為什麼看起來聰明，也知道它可能在哪裡出錯。對正在大量接觸 AI 工具的學生來說，這門課想帶走的不是追逐最新名詞，而是學會用更理性、更有判斷力的方式理解 AI，學習如何使用 AI 協助學習與創作。",
+			"人工智慧與機器學習主題課程會帶學員理解模型不是魔法，而是和資料品質、問題定義與驗證方法緊密相關的工具。",
 		category: "主線課程",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/ai-main.jpg",
 			alt: "人工智慧主題日課程現場"
@@ -107,103 +135,202 @@ export const scheduleEvents: ScheduleEvent[] = [
 	},
 	{
 		id: "security-main",
-		name: "資安國手帶你進入攻防思維",
-		summary: "由資安國手尤理衡帶領，看見系統安全的思考方式。",
+		name: "資安主線課程",
+		summary: "從攻防視角理解系統安全與資安思維。",
 		description:
-			"資訊安全主題日將由資安國手尤理衡帶領，從真正站上競技場的經驗出發，帶學員靠近資安領域的思考方式。資安不只是找到漏洞或解出題目，更是在理解系統如何運作、哪裡可能失守，以及攻擊者與防禦者會如何看待同一個問題。這一天的重點，是讓學員看見安全思維為什麼是理解系統不可或缺的一部分，也讓對資安好奇的人有一個更具體、更有方向感的入口。透過國手的經驗與視角，學員能更直接感受到資安領域的深度、挑戰與吸引力。",
+			"資訊安全主題日將帶學員靠近資安領域的思考方式。資安不只是找到漏洞或解出題目，更是在理解系統如何運作，以及攻擊者與防禦者會如何看待同一個問題。",
 		category: "主線課程",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/security-main.jpg",
 			alt: "資訊安全主題日課程現場"
 		}
 	},
 	{
-		id: "learning-wrap",
-		name: "五天學習總結",
-		summary: "回顧五天的學習與實作，整理下一步想探索的方向。",
-		description:
-			"到了最後一天，我們會一起回頭整理這幾天學到的概念、完成的嘗試與還想繼續追的問題。透過整理與反思，學員可以更清楚自己學到了什麼，也看見未來還想深入探索哪些方向。收束不是結束，而是幫你把營隊經驗轉成下一段學習的起點。",
-		category: "總結",
+		id: "agentic-coding",
+		name: "Agentic Coding 使用經驗交流",
+		summary: "Denny 分享如何把 AI agent 放進實際開發流程。",
+		description: "從使用經驗出發，交流如何讓 AI agent 協助開發、學習與實作，也討論工具帶來的效率、限制與判斷方式。",
+		category: "主線課程",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/software-main.jpg",
+			alt: "Agentic Coding 經驗交流"
+		}
+	},
+	{
+		id: "heisenbug",
+		name: "海森堡 Bug",
+		summary: "倫敦鐵喬帶來的除錯與思考挑戰。",
+		description: "透過海森堡 Bug 主題活動，學員會在不穩定、難重現的情境中練習觀察、推理與除錯策略。",
+		category: "社群活動",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/night-special.jpg",
+			alt: "學員參與除錯挑戰"
+		}
+	},
+	{
+		id: "reality-puzzle",
+		name: "實境解謎",
+		summary: "把線索、觀察與合作串成解題流程。",
+		description: "實境解謎將學員帶進跨場景的任務挑戰，透過線索整理、團隊溝通與推理，一起完成解謎目標。",
+		category: "社群活動",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/night-special.jpg",
+			alt: "學員參與實境解謎"
+		}
+	},
+	{
+		id: "open-source-sharing",
+		name: "開源理念分享",
+		summary: "認識開源精神與學生社群的參與方式。",
+		description: "從開源理念出發，理解開放協作如何影響技術社群，也看見學生可以如何參與、貢獻與延續自己的學習。",
+		category: "社群活動",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/learning-wrap.jpg",
-			alt: "學員整理五天學習成果"
+			alt: "開源理念分享"
+		}
+	},
+	{
+		id: "community-cafe",
+		name: "社群交流與視界咖啡館",
+		summary: "和講者、隊輔與夥伴交流，把五天經驗整理成下一步。",
+		description: "最後一天保留時間讓學員交流、提問與整理經驗，在視界咖啡館中看見更多資訊社群的入口。",
+		category: "社群活動",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/learning-wrap.jpg",
+			alt: "學員交流與分享"
+		}
+	},
+	{
+		id: "sigs-ak",
+		name: "SIGs",
+		summary: "Ak 帶領的晚間主題交流。",
+		description: "SIGs 是晚間的小型主題交流時間，讓學員能針對有興趣的題目延伸討論，也認識更多不同背景的夥伴。",
+		category: "社群活動",
+		isInteractive: true,
+		image: {
+			src: "/2026/images/schedule/night-special.jpg",
+			alt: "晚間主題交流"
 		}
 	},
 	{
 		id: "closing",
-		name: "閉幕與未來入口",
+		name: "閉幕",
 		summary: "收起五天的故事，走向更大的資訊社群。",
-		description: "閉幕會把五天的故事收在一起，把視線帶向營隊之後，也把這段經驗連結到更大的資訊社群。你可以帶著問題、朋友與新的方向回到日常，繼續在資訊社群裡探索自己的位置。",
+		description: "閉幕會把五天的故事收在一起，把視線帶向營隊之後，也把這段經驗連結到更大的資訊社群。",
 		category: "總結",
+		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/closing.jpg",
 			alt: "閉幕活動與學員合影現場"
 		}
+	},
+	{
+		id: "return-home",
+		name: "賦歸",
+		summary: "整理行李，帶著五天的收穫回到日常。",
+		category: "總結"
+	},
+	{
+		id: "lunch",
+		name: "午餐",
+		summary: "補充能量，準備下午的課程與活動。",
+		category: "生活"
+	},
+	{
+		id: "dinner",
+		name: "晚餐",
+		summary: "晚餐與休息時間。",
+		category: "生活"
+	},
+	{
+		id: "sleep",
+		name: "睡覺",
+		summary: "休息，準備迎接隔天行程。",
+		category: "休息"
 	}
 ];
 
 export const scheduleDays: ScheduleDay[] = [
 	{
-		id: "camp-start",
-		title: "營隊啟程",
-		subtitle: "第一天",
+		id: "day-one",
+		title: "第一日",
+		subtitle: "報到／破冰",
 		type: "opening",
 		blocks: [
-			{ startPeriod: "上午", eventIds: ["start-and-opening"] },
-			{ startPeriod: "下午", eventIds: ["icebreaking"] },
-			{ startPeriod: "晚上", eventIds: ["night-special"] }
+			{ startSlot: "9:00", span: 2, eventId: "opening" },
+			{ startSlot: "11:00", eventId: "icebreaking" },
+			{ startSlot: "12:00", eventId: "lunch" },
+			{ startSlot: "13:00", span: 3, eventId: "quest" },
+			{ startSlot: "16:00", span: 2, eventId: "agent-battle" },
+			{ startSlot: "18:00", eventId: "dinner" },
+			{ startSlot: "19:00", span: 2, eventId: "lab-setup" },
+			{ startSlot: "21:00", eventId: "sigs-ak" },
+			{ startSlot: "睡覺", eventId: "sleep" }
 		]
 	},
 	{
-		id: "software-day",
-		title: "軟體工程主題日",
-		subtitle: "講師：Denny 黃一晉",
+		id: "day-two",
+		title: "第二日",
+		subtitle: "軟工",
 		type: "software",
 		blocks: [
-			{
-				startPeriod: "上午",
-				span: 3,
-				hasDesign: true,
-				eventIds: ["software-main"]
-			}
+			{ startSlot: "9:00", span: 3, eventId: "software-main" },
+			{ startSlot: "12:00", eventId: "lunch" },
+			{ startSlot: "13:00", span: 6, eventId: "software-main" },
+			{ startSlot: "19:00", eventId: "dinner" },
+			{ startSlot: "20:00", eventId: "agentic-coding" },
+			{ startSlot: "21:00", eventId: "sigs-ak" },
+			{ startSlot: "睡覺", eventId: "sleep" }
 		]
 	},
 	{
-		id: "security-day",
-		title: "資訊安全主題日",
-		subtitle: "講師：Jasper 尤理衡",
-		type: "security",
-		blocks: [
-			{
-				startPeriod: "上午",
-				span: 3,
-				hasDesign: true,
-				eventIds: ["security-main"]
-			}
-		]
-	},
-	{
-		id: "ai-day",
-		title: "人工智慧主題日",
-		subtitle: "講師：Ak 郭慕天、Harry 張祺煒",
+		id: "day-three",
+		title: "第三日",
+		subtitle: "ML",
 		type: "artificial-intelligence",
 		blocks: [
-			{
-				startPeriod: "上午",
-				span: 3,
-				hasDesign: true,
-				eventIds: ["ai-main"]
-			}
+			{ startSlot: "9:00", span: 3, eventId: "ml-main" },
+			{ startSlot: "12:00", eventId: "lunch" },
+			{ startSlot: "13:00", span: 3, eventId: "ml-main" },
+			{ startSlot: "16:00", span: 2, eventId: "heisenbug" },
+			{ startSlot: "18:00", eventId: "dinner" },
+			{ startSlot: "19:00", eventId: "ml-main" },
+			{ startSlot: "20:00", span: 3, eventId: "sleep" }
 		]
 	},
 	{
-		id: "camp-close",
-		title: "營隊成果總結",
-		subtitle: "第五天",
+		id: "day-four",
+		title: "第四日",
+		subtitle: "資安",
+		type: "security",
+		blocks: [
+			{ startSlot: "9:00", span: 3, eventId: "security-main" },
+			{ startSlot: "12:00", eventId: "lunch" },
+			{ startSlot: "13:00", span: 3, eventId: "security-main" },
+			{ startSlot: "16:00", span: 3, eventId: "reality-puzzle" },
+			{ startSlot: "19:00", eventId: "dinner" },
+			{ startSlot: "20:00", eventId: "security-main" },
+			{ startSlot: "21:00", eventId: "sigs-ak" },
+			{ startSlot: "睡覺", eventId: "sleep" }
+		]
+	},
+	{
+		id: "day-five",
+		title: "第五日",
+		subtitle: "收尾",
 		type: "closing",
 		blocks: [
-			{ startPeriod: "上午", eventIds: ["learning-wrap"] },
-			{ startPeriod: "下午", eventIds: ["closing"] }
+			{ startSlot: "9:00", eventId: "sleep" },
+			{ startSlot: "10:00", eventId: "open-source-sharing" },
+			{ startSlot: "11:00", span: 4, eventId: "community-cafe" },
+			{ startSlot: "15:00", span: 2, eventId: "closing" },
+			{ startSlot: "17:00", span: 6, eventId: "return-home" }
 		]
 	}
 ];
