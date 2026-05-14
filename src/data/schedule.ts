@@ -300,7 +300,7 @@ export const scheduleDays: ScheduleDay[] = [
 	{
 		id: "day-one",
 		title: ["第一日"],
-		subtitle: "報到／破冰",
+		subtitle: "主線課程先導",
 		type: "opening",
 		blocks: [
 			{ startSlot: "9:00", span: 2, eventId: "opening" },
@@ -360,7 +360,7 @@ export const scheduleDays: ScheduleDay[] = [
 	{
 		id: "day-five",
 		title: ["第五日"],
-		subtitle: "收尾",
+		subtitle: "開闢視野",
 		type: "closing",
 		blocks: [
 			{ startSlot: "10:00", eventId: "open-source-sharing" },
