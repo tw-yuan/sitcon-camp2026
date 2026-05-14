@@ -140,7 +140,14 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 							<article class:list={["schedule-day", dayAccentClassMap[day.type]]}>
 								<header class="schedule-day__header">
 									<div class="schedule-day__header-copy">
-										<h2 class="schedule-day__title">{day.title.map(line => <>{line}<br /></>)}</h2>
+										<h2 class="schedule-day__title">
+											{day.title.map((line, index) => (
+												<>
+													{line}
+													{index < day.title.length - 1 && <br />}
+												</>
+											))}
+										</h2>
 										<p class="schedule-day__subtitle">{day.subtitle}</p>
 									</div>
 								</header>
@@ -514,6 +521,10 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	.schedule-days-track::-webkit-scrollbar-thumb {
 		background: var(--color-foreground);
 		border-radius: 999rem;
+	}
+
+	.schedule-board--scroll {
+		--schedule-header-row: clamp(7.75rem, 9vw, 9rem);
 	}
 
 	.schedule-day {
@@ -1113,7 +1124,6 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			gap: 0.55rem;
 			overflow: hidden;
 			contain: inline-size layout paint;
-			--schedule-header-row: 7.6rem;
 			--schedule-slot-row: 5.35rem;
 		}
 
