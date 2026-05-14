@@ -88,7 +88,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 	},
 	{
 		id: "agent-battle",
-		name: "？？？",
+		name: "讓你的 agent 跟別人的戰鬥吧！",
 		summary: "神秘活動...",
 		description: ["即將揭曉..."],
 		category: "活動",
