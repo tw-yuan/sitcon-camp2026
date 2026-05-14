@@ -18,19 +18,10 @@ const dayAccentClassMap: Record<ScheduleDayType, string> = {
 const categoryClassMap: Record<ScheduleEventCategory, string> = {
 	啟程: "schedule-badge--green",
 	主線課程: "schedule-badge--blue",
-	社群活動: "schedule-badge--orange",
+	活動: "schedule-badge--orange",
 	生活: "schedule-badge--sky",
 	休息: "schedule-badge--lavender",
 	總結: "schedule-badge--dark"
-};
-
-const blockCategoryClassMap: Record<ScheduleEventCategory, string> = {
-	啟程: "schedule-event--green",
-	主線課程: "schedule-event--blue",
-	社群活動: "schedule-event--orange",
-	生活: "schedule-event--cream",
-	休息: "schedule-event--lavender",
-	總結: "schedule-event--dark"
 };
 
 const getEvent = (eventId: string): ScheduleEvent => {
@@ -177,7 +168,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 														{isInteractive ? (
 															<button
 																type="button"
-																class:list={["schedule-event", blockCategoryClassMap[event.category], { "schedule-event--spanning": block.span > 1 }]}
+																class:list={["schedule-event", { "schedule-event--spanning": block.span > 1 }]}
 																data-schedule-event-trigger={event.id}
 																aria-label={`查看${event.name}介紹`}
 															>
@@ -189,7 +180,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 																</div>
 															</button>
 														) : (
-															<div class:list={["schedule-event", "schedule-event--static", blockCategoryClassMap[event.category], { "schedule-event--spanning": block.span > 1 }]}>
+															<div class:list={["schedule-event", "schedule-event--static", { "schedule-event--spanning": block.span > 1 }]}>
 																<div class="schedule-event__body">
 																	<div class="schedule-event__content">
 																		<span class:list={["schedule-event__badge", categoryClassMap[event.category]]}>{event.category}</span>
@@ -663,7 +654,7 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 		color: var(--color-foreground);
 		text-align: left;
 		cursor: pointer;
-		background: var(--color-background);
+		background: var(--color-white);
 		border: 0;
 		border-radius: 0.72rem 0;
 		box-shadow: 0.16rem 0.16rem 0 0 var(--day-accent);
@@ -690,42 +681,13 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 
 	.schedule-event:not(.schedule-event--static):hover,
 	.schedule-event:focus-visible {
-		background: color-mix(in srgb, var(--color-background) 86%, white);
+		background: var(--color-white);
 		transform: translate(-0.08rem, -0.08rem);
 		box-shadow: 0.28rem 0.28rem 0 0 var(--day-accent);
 	}
 
 	.schedule-event--static {
 		cursor: default;
-	}
-
-	.schedule-event--green {
-		background: color-mix(in srgb, var(--color-green) 42%, var(--color-background));
-	}
-
-	.schedule-event--blue {
-		background: color-mix(in srgb, var(--color-soft-blue) 58%, var(--color-background));
-	}
-
-	.schedule-event--orange {
-		background: color-mix(in srgb, var(--color-orange) 42%, var(--color-background));
-	}
-
-	.schedule-event--cream {
-		background: rgb(255 244 202);
-	}
-
-	.schedule-event--lavender {
-		background: rgb(219 211 237);
-	}
-
-	.schedule-event--dark {
-		color: var(--color-foreground);
-		background: color-mix(in srgb, var(--color-green) 56%, var(--color-background));
-	}
-
-	.schedule-event--dark .schedule-event__summary {
-		color: color-mix(in srgb, var(--color-foreground) 68%, transparent);
 	}
 
 	.schedule-event:focus-visible,

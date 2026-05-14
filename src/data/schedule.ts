@@ -4,7 +4,7 @@ export const scheduleSlots = ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00
 
 export type ScheduleSlot = (typeof scheduleSlots)[number];
 
-export type ScheduleEventCategory = "啟程" | "主線課程" | "社群活動" | "生活" | "休息" | "總結";
+export type ScheduleEventCategory = "啟程" | "主線課程" | "活動" | "生活" | "休息" | "總結";
 
 export interface ScheduleMeta {
 	title: string;
@@ -41,7 +41,7 @@ export interface ScheduleEvent {
 
 export const scheduleMeta: ScheduleMeta = {
 	title: "活動課表",
-	description: "SITCON Camp 2026 將圍繞軟體工程、人工智慧與資訊安全三大主線展開，並穿插交流、實作與社群活動。"
+	description: "SITCON Camp 2026 將圍繞軟體工程、人工智慧與資訊安全三大主線展開，並穿插交流、實作與活動。"
 };
 
 export const scheduleEvents: ScheduleEvent[] = [
@@ -62,7 +62,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		name: "破冰",
 		summary: "透過互動任務，認識一起學習與合作的夥伴。",
 		description: "破冰不只是為了記住名字，而是讓大家有機會交換想法、發現彼此的好奇心。透過輕鬆的互動與任務，學員會認識小隊夥伴，熟悉營隊氣氛。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/icebreaking.jpg",
@@ -75,7 +75,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		summary: "結合觀察與分析，與隊友一同攻克隱藏在資訊背後的關卡",
 		description:
 			"當 AI 已經成為世界的一部分，那麼身處其中的我們，又該如何理解與運用科技？\n圍繞軟體工程、機器學習與資訊安全三大方向設計的挑戰內容，將結合觀察、分析與團隊合作等元素，讓大家在互動與探索的過程中，逐漸認識資訊科技背後的思考方式與應用場景。\n或許答案不只存在於程式之中，也藏在團隊合作與每一次推理的過程裡。\n準備好一起踏入這場科技探索了嗎？",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/night-special.jpg",
@@ -87,7 +87,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		name: "Agent 對戰活動",
 		summary: "讓你的 agent 和其他人的成果一較高下。",
 		description: "把課程中的想法轉成可互動的 agent，並在活動中觀察不同策略如何面對同一個挑戰。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/night-special.jpg",
@@ -162,7 +162,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 			"位元城自古流傳著一則都市傳說：「當交易的巔峰過後，喧嘩終歸於海，財富與浮名皆隨浪隱入塵煙。」而如今，政府觀察到這則都市傳說似乎應證的情形，身為收到政府指派的守衛隊，你們該如何解救這場危機？",
 		description:
 			"在 AI 發達的時代，人與人的溝通變的稀薄，除了和 AI 聊聊天，也有人會請 AI 幫忙分析怎麼回復他人的訊息，但即使人工智慧在發達，交流仍是必不可少的，在課程之後的休閒，讓我們一起活絡筋骨、和營隊的新朋友們一起了解著名的「海森堡 Bug」的故事吧！",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/night-special.jpg",
@@ -175,7 +175,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		summary: "在場地各處尋找線索，和隊友一起解開藏在營隊中的謎題。",
 		description:
 			"實境解謎會把線索藏進營隊場地的各個角落，學員需要走出教室、觀察環境，尋找散落在四周的提示與關鍵資訊。每一道謎題都不只是單純的問答，而是需要結合觀察、推理、討論與團隊分工，才能一步步靠近答案。\n\n在這個活動中，學員會和小隊夥伴一起探索場地、交換想法、驗證猜測，也可能在卡關時從別人的觀點中找到新的切入點。透過解謎的過程，讓大家在課程之外用另一種方式熟悉營隊空間，也在合作與推理中累積共同完成任務的經驗。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/night-special.jpg",
@@ -188,7 +188,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		summary: "認識開源精神與學生社群的參與方式。",
 		description:
 			"「為什麼我們要辦 SITCON？大概是為了吃宵夜時有人能揪一塊去」（Rifur，2013）\n\n對許多新接觸的參與者而言，資訊社群是個不可思議的地方：大家好像都有話直說、勇於表達、互相提攜，也很少有輩分或是上下關係的顧慮。在這場短講裡，我會盡量用簡單的方式帶過資訊社群文化發展的歷史、介紹社群成員彼此協作的方式，以及讓大家了解有哪些地方能找到學習資源、甚至進一步對你喜歡的專案做出有意義的貢獻。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/learning-wrap.jpg",
@@ -201,7 +201,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		summary: "群覽資訊社群，踏出啟程之路",
 		description:
 			"資訊世界廣袤無垠，「獨學而無友，則孤陋寡聞」既然如此來探索不同社群看看吧！除 SITCON 學生計算機年會外，其實還有許多不同資訊社群，這些社群有著不同的取向，但都有相同對資訊的熱愛，我們精選了數個社群，從開放文化到 Python 再到資訊安全，在這裡，你可以認識一群「友」，使得資訊探索之路更加精彩。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true
 	},
 	{
@@ -210,7 +210,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		summary: "透過輕鬆對談的形式，在與前輩近距離交流中獲得啟發。",
 		description:
 			"視界咖啡館參考自世界咖啡館（The World Café），在本次夏令營中，我們邀請到各領域及社群知名前輩，將傳統座談會形式改以聊天的樣貌呈現。學員可以與資訊界的名人們近距離互動，期望透過縮短講者與學員之間的距離，講者可以更針對學員給出建議，也鼓勵學員踴躍提問、參與，進而產生良好的雙向交流。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true
 	},
 	{
@@ -218,7 +218,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		name: "SIGs",
 		summary: "Ak 帶領的晚間主題交流。",
 		description: "SIGs 是晚間的小型主題交流時間，讓學員能針對有興趣的題目延伸討論，也認識更多不同背景的夥伴。",
-		category: "社群活動",
+		category: "活動",
 		isInteractive: true,
 		image: {
 			src: "/2026/images/schedule/night-special.jpg",
