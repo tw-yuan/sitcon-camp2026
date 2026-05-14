@@ -215,21 +215,34 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 	{
 		interactiveScheduleEvents.map(event => (
 			<div class="schedule-dialog" data-schedule-dialog={event.id} role="dialog" aria-modal="true" aria-labelledby={`schedule-dialog-title-${event.id}`} hidden>
-				<div class="schedule-dialog__panel">
-					<div class="schedule-dialog__image-wrap">
-						<img class="schedule-dialog__image" src={event.image?.src} alt={event.image?.alt} loading="lazy" decoding="async" />
-					</div>
-					<div class="schedule-dialog__content">
-						<span class:list={["schedule-dialog__badge", categoryClassMap[event.category]]}>{event.category}</span>
-						<h2 id={`schedule-dialog-title-${event.id}`} class="schedule-dialog__title" tabindex="-1">
-							{event.name}
-						</h2>
-						<p class="schedule-dialog__description">{event.description}</p>
-					</div>
-					<button type="button" class="schedule-dialog__close" data-schedule-dialog-close aria-label={`關閉${event.name}介紹`}>
-						<X width={24} height={24} stroke-width={3} />
-					</button>
-				</div>
+				{(() => {
+					const descriptionLines = event.description ?? [];
+
+					return (
+						<div class="schedule-dialog__panel">
+							<div class="schedule-dialog__image-wrap">
+								<img class="schedule-dialog__image" src={event.image?.src} alt={event.image?.alt} loading="lazy" decoding="async" />
+							</div>
+							<div class="schedule-dialog__content">
+								<span class:list={["schedule-dialog__badge", categoryClassMap[event.category]]}>{event.category}</span>
+								<h2 id={`schedule-dialog-title-${event.id}`} class="schedule-dialog__title" tabindex="-1">
+									{event.name}
+								</h2>
+								<p class="schedule-dialog__description">
+									{descriptionLines.map((line, index) => (
+										<>
+											{line}
+											{index < descriptionLines.length - 1 && <br />}
+										</>
+									))}
+								</p>
+							</div>
+							<button type="button" class="schedule-dialog__close" data-schedule-dialog-close aria-label={`關閉${event.name}介紹`}>
+								<X width={24} height={24} stroke-width={3} />
+							</button>
+						</div>
+					);
+				})()}
 			</div>
 		))
 	}
