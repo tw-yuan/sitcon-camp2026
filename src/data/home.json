@@ -213,7 +213,11 @@
 		"eyebrow": "主線課程",
 		"title": "三大實戰主題，由強者講師帶路",
 		"lead": "由具備國際大獎經歷的導師親自操刀，將業界真實的技術決策，濃縮成無可取代的實戰武器",
-		"deckAriaLabel": "Master Class 課程卡片"
+		"deckAriaLabel": "Master Class 課程卡片",
+		"scheduleLink": {
+			"label": "查看完整課表",
+			"href": "/2026/schedule/"
+		}
 	},
 	"masterClasses": [
 		{
