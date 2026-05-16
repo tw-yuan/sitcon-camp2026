@@ -1,0 +1,295 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+import aboutData from "@/data/about.json";
+import layoutData from "@/data/layout.json";
+import imgHackathon from "@/assets/events/hackathon.jpg";
+import imgHoc from "@/assets/events/hour-of-code.jpg";
+import imgCamp from "@/assets/events/sitcon-camp.jpg";
+import imgConference from "@/assets/events/sitcon-conference.jpg";
+import thumbnail from "@/assets/about/about-video-thumbnail.jpg";
+
+const { eventsHeld, team } = aboutData;
+type ActivityImageKey = "hoc" | "camp" | "conference" | "hackathon";
+const imageMap: Record<ActivityImageKey, ImageMetadata> = {
+	hoc: imgHoc,
+	camp: imgCamp,
+	conference: imgConference,
+	hackathon: imgHackathon
+};
+const visibleGroups = team.groups.slice(0, 8);
+---
+
+<section class="roc-about" aria-labelledby="roc-about-title">
+	<header class="roc-page-title">
+		<p>首頁 ＞ 關於我們 ＞ 組織介紹與歷年活動資訊</p>
+		<h1 id="roc-about-title">【SITCON 學生計算機年會服務資訊】</h1>
+		<span>{eventsHeld.lead}</span>
+	</header>
+
+	<div class="roc-alert">★ 本會持續推動資訊教育、開源協作與學生社群交流，歡迎各界先進蒞臨指導，誠摯為您服務！</div>
+
+	<section class="roc-about-grid">
+		<div class="roc-section">
+			<h2>【活動服務項目一覽】</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>項次</th>
+						<th>活動名稱</th>
+						<th>服務定位</th>
+						<th>說明</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						eventsHeld.activities.map((activity, index) => (
+							<tr>
+								<td>{index + 1}</td>
+								<td>
+									<strong>{activity.kicker}</strong>
+								</td>
+								<td>{activity.title}</td>
+								<td>{activity.description}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<aside class="roc-photo-box">
+			<h2>【活動照片公告欄】</h2>
+			<div>
+				{
+					eventsHeld.activities.map(activity => (
+						<figure>
+							<Image src={imageMap[activity.imageKey as ActivityImageKey]} alt={activity.title} loading="lazy" decoding="async" />
+							<figcaption>
+								{activity.kicker}｜{activity.title}
+							</figcaption>
+						</figure>
+					))
+				}
+			</div>
+		</aside>
+	</section>
+
+	<section class="roc-section">
+		<h2>【統計資料與影片附件】</h2>
+		<div class="roc-stats">
+			{
+				eventsHeld.stats.map(stat => (
+					<div>
+						<strong>{stat.value}</strong>
+						<span>{stat.label}</span>
+						<p>{stat.note}</p>
+					</div>
+				))
+			}
+			<figure>
+				<Image src={thumbnail} alt="SITCON 媒體報導縮圖" loading="lazy" decoding="async" />
+				<figcaption>媒體報導資料附件：開放文化基金會與 SITCON 社群介紹</figcaption>
+			</figure>
+		</div>
+	</section>
+
+	<section class="roc-section">
+		<h2>【籌備團隊行政職掌表】</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>組別</th>
+					<th>業務職掌</th>
+					<th>人員資料摘要</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					visibleGroups.map(group => (
+						<tr>
+							<td>
+								<strong>{group.name}</strong>
+							</td>
+							<td>{group.description}</td>
+							<td>{group.members.map(member => `${member.job}：${member.name}`).join("、")}</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</section>
+
+	<section class="roc-section roc-contact">
+		<h2>【聯絡資訊與服務窗口】</h2>
+		<p>本網站由 {layoutData.organization.name} 維護。若需洽詢活動、報名、合作或其他相關事項，請使用下列服務信箱，本會將依序辦理回覆。</p>
+		<a href="mailto:ask@sitcon.camp">ask@sitcon.camp</a>
+	</section>
+</section>
+
+<style>
+	.roc-about {
+		min-height: 100vh;
+		padding: 7rem max(0.55rem, calc((100% - 1180px) / 2)) 1.5rem;
+		color: #111;
+		background: linear-gradient(90deg, rgb(255 255 255 / 0.3) 1px, transparent 1px), linear-gradient(180deg, rgb(255 255 255 / 0.2) 1px, transparent 1px), #d7d4c8;
+		background-size: 16px 16px;
+		font-family: PMingLiU, MingLiU, "Microsoft JhengHei", Arial, sans-serif;
+	}
+
+	.roc-page-title,
+	.roc-alert,
+	.roc-section,
+	.roc-photo-box {
+		border: 2px solid #777;
+		background: #fffdf2;
+		box-shadow: 3px 3px 0 #8a8a8a;
+	}
+
+	.roc-page-title {
+		padding: 0.55rem;
+		background: linear-gradient(135deg, #c7ddff, #fff 45%, #fff6a9);
+		border: 3px double #000095;
+	}
+
+	.roc-page-title p {
+		margin: 0 0 0.35rem;
+		padding: 0.25rem 0.4rem;
+		background: #e8e8e8;
+		border: 1px solid #aaa;
+		font-size: 0.86rem;
+	}
+
+	.roc-page-title h1,
+	.roc-section h2,
+	.roc-photo-box h2 {
+		margin: 0 0 0.42rem;
+		padding: 0.35rem 0.5rem;
+		color: #fff;
+		background: linear-gradient(180deg, #1c55c7, #000095);
+		border: 1px solid #001c6b;
+		text-shadow: 1px 1px 0 #000;
+		font-size: clamp(1.35rem, 3vw, 2.1rem);
+	}
+
+	.roc-page-title span,
+	.roc-contact p {
+		display: block;
+		font-weight: 700;
+		line-height: 1.65;
+		white-space: pre-line;
+	}
+
+	.roc-alert {
+		margin: 0.55rem 0;
+		padding: 0.42rem 0.62rem;
+		background: hsl(52 96% 76%);
+		border-color: #d60000;
+		color: #9a0000;
+		font-weight: 900;
+	}
+
+	.roc-about-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.34fr);
+		gap: 0.55rem;
+	}
+
+	.roc-section,
+	.roc-photo-box {
+		margin-top: 0.62rem;
+		padding: 0.5rem;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		background: #fff;
+		font-size: 0.93rem;
+	}
+
+	th,
+	td {
+		padding: 0.36rem 0.42rem;
+		border: 1px solid #777;
+		text-align: left;
+		vertical-align: top;
+	}
+
+	thead th {
+		color: #fff;
+		background: linear-gradient(180deg, #565656, #222);
+		text-shadow: 1px 1px 0 #000;
+	}
+
+	tbody tr:nth-child(odd) {
+		background: #f3f6ff;
+	}
+
+	tbody tr:nth-child(even) {
+		background: #fffdee;
+	}
+
+	.roc-photo-box div,
+	.roc-stats {
+		display: grid;
+		gap: 0.42rem;
+	}
+
+	.roc-photo-box figure,
+	.roc-stats figure,
+	.roc-stats div {
+		margin: 0;
+		padding: 0.32rem;
+		background: #e8e8e8;
+		border: 1px solid #777;
+	}
+
+	.roc-photo-box img,
+	.roc-stats img {
+		display: block;
+		width: 100%;
+		height: 7rem;
+		object-fit: cover;
+		border: 2px ridge #fff;
+		filter: contrast(1.14) saturate(0.86);
+	}
+
+	figcaption,
+	.roc-stats p {
+		margin: 0.28rem 0 0;
+		font-size: 0.82rem;
+		font-weight: 700;
+		line-height: 1.45;
+	}
+
+	.roc-stats {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.roc-stats strong {
+		display: block;
+		color: #d60000;
+		font-size: 1.45rem;
+	}
+
+	.roc-stats span {
+		font-weight: 900;
+	}
+
+	.roc-contact a {
+		color: #005fd1;
+		font-weight: 900;
+	}
+
+	@media (max-width: 58rem) {
+		.roc-about {
+			padding-top: 5.8rem;
+		}
+
+		.roc-about-grid,
+		.roc-stats {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

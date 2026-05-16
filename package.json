@@ -5,9 +5,9 @@
 	"scripts": {
 		"astro": "astro",
 		"avatars:update": "node scripts/download-avatars.mjs",
-		"build": "astro build && node scripts/font-subset.mjs",
+		"build": "astro build && node scripts/font-subset.mjs && node scripts/mirror-base.mjs",
 		"build:subset": "node scripts/font-subset.mjs",
-		"dev": "astro dev",
+		"dev": "astro dev --host 23.146.248.2",
 		"preinstall": "npx only-allow pnpm",
 		"lint": "astro check",
 		"prepare": "sh -c 'command -v git >/dev/null 2>&1 && [ -d .git ] && git config core.hooksPath .githooks || exit 0'",

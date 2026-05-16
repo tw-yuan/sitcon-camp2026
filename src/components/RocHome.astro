@@ -1,0 +1,686 @@
+---
+import { Image } from "astro:assets";
+import MarkdownIt from "markdown-it";
+import homeData from "@/data/home.json";
+import layoutData from "@/data/layout.json";
+import campPhotoA from "@/assets/about-camp/about-sitcon-camp-1.webp";
+import campPhotoB from "@/assets/about-camp/about-sitcon-camp-3.webp";
+import registrationPhoto from "@/assets/registration/registration-photo.png";
+import dennyPhoto from "@/assets/master-class-speakers/denny-huang.webp";
+import jasperPhoto from "@/assets/master-class-speakers/jasper-yu.webp";
+import akPhoto from "@/assets/master-class-speakers/ak-kuo.webp";
+
+const { hero, masterClassSection, masterClasses, registration, faq } = homeData;
+const { header } = layoutData;
+const mdRenderer = new MarkdownIt({ html: false, linkify: true, breaks: true });
+const renderedNotice = mdRenderer.render(registration.noticeMarkdown);
+const speakerPhotos = [dennyPhoto, jasperPhoto, akPhoto];
+const featuredClasses = masterClasses.slice(0, 3);
+const attachmentLinks = [
+	registration.ctaBrochure,
+	{
+		label: "報名費用補助辦法",
+		href: "https://drive.google.com/file/d/1iITmqkfEe6PSXmqeqQMg8cnRg_cbVtgB/view?usp=sharing"
+	},
+	{
+		label: "退費說明文件",
+		href: "https://drive.google.com/file/d/1oNsvMLOAJzgJ8GaDm51vKtUIpWNq2poa/view?usp=sharing"
+	},
+	{
+		label: "重要時程 iCalendar 檔",
+		href: "/2026/SITCON_Camp_2026_重要時程.ics"
+	}
+];
+---
+
+<section class="roc-home" aria-labelledby="roc-home-title">
+	<div class="roc-top-notice" role="status">
+		<span>【最新公告事項】SITCON 夏令營 2026 報名資訊服務e化作業持續辦理中！</span>
+		<a href={registration.cta.href}>前往 e化線上報名系統 →</a>
+	</div>
+
+	<div class="roc-shell">
+		<aside class="roc-sidebar" aria-label="側欄導覽與重要連結">
+			<h2>本網站服務導覽</h2>
+			<nav class="roc-side-nav">
+				{header.navItems.map(item => <a href={item.href}>◆ {item.label}資訊專區</a>)}
+				<a href="#downloads">◆ 相關附件下載區</a>
+				<a href="#faq">◆ 常見問題服務台</a>
+			</nav>
+
+			<div class="roc-side-box">
+				<h3>營隊基本資料</h3>
+				<table>
+					<tbody>
+						<tr>
+							<th>活動日期</th>
+							<td>{registration.eventInfo.dateRange}</td>
+						</tr>
+						<tr>
+							<th>活動地點</th>
+							<td>{registration.eventInfo.venueName}</td>
+						</tr>
+						<tr>
+							<th>服務信箱</th>
+							<td><a href="mailto:ask@sitcon.camp">ask@sitcon.camp</a></td>
+						</tr>
+						<tr>
+							<th>預計名額</th>
+							<td>60 名高中職學員</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="roc-side-box roc-side-box--yellow">
+				<h3>報名狀態查詢</h3>
+				<p>請報名者務必留意電子郵件信箱及本網站公告資訊，以維護個人相關權益。</p>
+				<a class="roc-button roc-button--full" href={registration.cta.href}>e化申辦服務</a>
+			</div>
+		</aside>
+
+		<div class="roc-main">
+			<header class="roc-hero">
+				<p class="roc-breadcrumb">首頁 ＞ SITCON 夏令營 ＞ 2026 年度營隊資訊服務平台</p>
+				<div class="roc-hero__grid">
+					<div>
+						<p class="roc-hero__kicker">推動資訊教育 e化服務｜落實青年學習便民措施</p>
+						<h1 id="roc-home-title" class="roc-wordart" data-shadow="SITCON Camp 2026">
+							<span>SITCON</span><span>Camp</span><span>2026</span>
+						</h1>
+						<p class="roc-hero__lead">{hero.subtitle}，五天四夜資訊科技學習與學生社群交流活動，敬請踴躍報名參加，共同邁向數位新紀元。</p>
+						<div class="roc-hero__actions">
+							<a class="roc-button" href={registration.cta.href}>{registration.cta.label}服務e化</a>
+							<a class="roc-button roc-button--secondary" href={registration.ctaBrochure.href}>下載報名簡章</a>
+						</div>
+					</div>
+					<div class="roc-photo-stack" aria-label="營隊活動照片">
+						<Image src={campPhotoA} alt="SITCON Camp 學員活動現場" loading="eager" decoding="async" />
+						<Image src={registrationPhoto} alt={registration.photoAlt} loading="eager" decoding="async" />
+						<Image src={campPhotoB} alt="SITCON Camp 課程互動現場" loading="lazy" decoding="async" />
+					</div>
+				</div>
+			</header>
+
+			<div class="roc-marquee" aria-label="重要公告跑馬燈">
+				<span>★ 本活動採線上報名與資料審查作業，請詳閱簡章並依序完成填寫。 ★ 早鳥優惠及團報優惠請於期限內辦理。 ★ 如有疑義請洽服務信箱，工作人員將誠摯為您服務。</span>
+			</div>
+
+			<section class="roc-panel" id="registration-info" aria-labelledby="registration-title">
+				<h2 id="registration-title">【報名資訊與費用標準一覽表】</h2>
+				<div class="roc-table-wrap">
+					<table class="roc-data-table">
+						<thead>
+							<tr>
+								<th>項次</th>
+								<th>報名身分類別</th>
+								<th>收費標準</th>
+								<th>辦理狀態</th>
+								<th>備註說明</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								registration.pricingRows.map((row, index) => (
+									<tr>
+										<td>{String(index + 1).padStart(2, "0")}</td>
+										<td>{row.label}</td>
+										<td>
+											<strong>{row.price}</strong>
+										</td>
+										<td>
+											<span class="roc-stamp">受理中</span>
+										</td>
+										<td>{index === 0 ? "早鳥期限內完成資料送出者適用" : "依本系統公告規定辦理"}</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="roc-panel" id="master-class" aria-labelledby="class-title">
+				<h2 id="class-title">【主線課程內容資訊說明】</h2>
+				<p class="roc-panel__notice">{masterClassSection.lead}。本課程採實作導向，請學員於活動前詳閱相關通知事項。</p>
+				<div class="roc-class-grid">
+					{
+						featuredClasses.map((item, index) => (
+							<article class="roc-course">
+								<Image src={speakerPhotos[index]} alt={`${item.instructor} 講師照片`} loading="lazy" decoding="async" />
+								<table>
+									<tbody>
+										<tr>
+											<th>課程類別</th>
+											<td>{item.title}</td>
+										</tr>
+										<tr>
+											<th>授課人員</th>
+											<td>{item.instructor}</td>
+										</tr>
+										<tr>
+											<th>經歷摘要</th>
+											<td>{item.achievement}</td>
+										</tr>
+										<tr>
+											<th>學習目標</th>
+											<td>{item.summary.join(" ")}</td>
+										</tr>
+									</tbody>
+								</table>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="roc-panel roc-panel--split" id="downloads" aria-labelledby="download-title">
+				<div>
+					<h2 id="download-title">【e化表單與相關附件下載區】</h2>
+					<ul class="roc-downloads">
+						{
+							attachmentLinks.map((link, index) => (
+								<li>
+									<span>附件 {index + 1}</span>
+									<a href={link.href}>{link.label}</a>
+									<small>PDF / iCalendar / 線上文件</small>
+								</li>
+							))
+						}
+					</ul>
+				</div>
+				<div class="roc-notice-text" set:html={renderedNotice} />
+			</section>
+
+			<section class="roc-panel" id="faq" aria-labelledby="faq-title">
+				<h2 id="faq-title">【常見問題與服務窗口資訊】</h2>
+				<div class="roc-faq-list">
+					{
+						faq.items.map(item => (
+							<details>
+								<summary>
+									{faq.questionPrefix}
+									{item.question}
+								</summary>
+								<div set:html={mdRenderer.render(`${faq.answerPrefix}${item.answer}`)} />
+							</details>
+						))
+					}
+				</div>
+			</section>
+		</div>
+	</div>
+</section>
+
+<style>
+	.roc-home {
+		min-height: 100vh;
+		padding: 6.8rem 0 1.5rem;
+		color: #111;
+		background: linear-gradient(90deg, rgb(255 255 255 / 0.28) 1px, transparent 1px), linear-gradient(180deg, rgb(255 255 255 / 0.22) 1px, transparent 1px), #d9d7c9;
+		background-size: 16px 16px;
+		font-family: PMingLiU, MingLiU, "Microsoft JhengHei", Arial, sans-serif;
+	}
+
+	.roc-top-notice {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem 1rem;
+		align-items: center;
+		justify-content: center;
+		margin: 0 auto 0.55rem;
+		padding: 0.42rem 0.7rem;
+		width: min(1180px, calc(100% - 18px));
+		background: hsl(53 96% 72%);
+		border: 2px solid #d60000;
+		box-shadow: inset 0 0 0 1px #fff2a6;
+		font-size: 0.96rem;
+		font-weight: 700;
+	}
+
+	.roc-top-notice a,
+	.roc-home a {
+		color: #005fd1;
+		text-decoration: underline;
+	}
+
+	.roc-shell {
+		display: grid;
+		grid-template-columns: minmax(13.5rem, 0.28fr) minmax(0, 1fr);
+		gap: 0.55rem;
+		width: min(1180px, calc(100% - 18px));
+		margin: 0 auto;
+	}
+
+	.roc-sidebar,
+	.roc-main,
+	.roc-panel {
+		border: 2px solid #777;
+		background: #f4f4ee;
+		box-shadow: 3px 3px 0 #8a8a8a;
+	}
+
+	.roc-sidebar {
+		align-self: start;
+		padding: 0.45rem;
+		background: linear-gradient(180deg, #ececec, #c7c7c7 42%, #f9f9f9);
+	}
+
+	.roc-sidebar h2,
+	.roc-side-box h3,
+	.roc-panel h2 {
+		margin: 0 0 0.45rem;
+		padding: 0.32rem 0.45rem;
+		color: #fff;
+		background: linear-gradient(180deg, #1c55c7, #000095);
+		border: 1px solid #001c6b;
+		text-shadow: 1px 1px 0 #000;
+		font-family: "Microsoft JhengHei", PMingLiU, sans-serif;
+		font-size: 1rem;
+		line-height: 1.25;
+	}
+
+	.roc-side-nav {
+		display: grid;
+		gap: 0.18rem;
+		margin-bottom: 0.55rem;
+	}
+
+	.roc-side-nav a {
+		padding: 0.35rem 0.38rem;
+		color: #001f7d;
+		background: linear-gradient(180deg, #fff, #d8e5ff);
+		border: 1px solid #6c84b8;
+		font-size: 0.92rem;
+		font-weight: 700;
+	}
+
+	.roc-side-box {
+		margin-top: 0.48rem;
+		padding: 0.42rem;
+		background: hsl(211 100% 92%);
+		border: 1px solid #5e7fb4;
+	}
+
+	.roc-side-box--yellow {
+		background: hsl(52 96% 78%);
+	}
+
+	.roc-side-box p {
+		margin: 0.2rem 0 0.55rem;
+		font-size: 0.9rem;
+		line-height: 1.55;
+	}
+
+	.roc-side-box table,
+	.roc-course table {
+		width: 100%;
+		border-collapse: collapse;
+		background: #fff;
+		font-size: 0.86rem;
+	}
+
+	.roc-side-box th,
+	.roc-side-box td,
+	.roc-course th,
+	.roc-course td {
+		padding: 0.28rem 0.32rem;
+		border: 1px solid #8a8a8a;
+		vertical-align: top;
+	}
+
+	.roc-side-box th,
+	.roc-course th {
+		width: 5.5em;
+		background: #efefef;
+		color: #333;
+	}
+
+	.roc-main {
+		padding: 0.48rem;
+		background: #fffdf2;
+	}
+
+	.roc-hero {
+		padding: 0.55rem;
+		background: linear-gradient(135deg, #c7ddff 0%, #fff 44%, #fff6a9 100%);
+		border: 3px double #000095;
+	}
+
+	.roc-breadcrumb {
+		margin: 0 0 0.42rem;
+		padding: 0.24rem 0.4rem;
+		background: #e8e8e8;
+		border: 1px solid #aaa;
+		font-size: 0.82rem;
+	}
+
+	.roc-hero__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.43fr);
+		gap: 0.65rem;
+		align-items: stretch;
+	}
+
+	.roc-hero__kicker {
+		display: inline-block;
+		margin: 0 0 0.45rem;
+		padding: 0.22rem 0.5rem;
+		color: #8a0000;
+		background: hsl(52 96% 74%);
+		border: 1px solid #c59a00;
+		font-weight: 700;
+	}
+
+	.roc-wordart {
+		position: relative;
+		margin: 0.15rem 0 0.35rem;
+		font-size: clamp(2.1rem, 6vw, 4.6rem);
+		line-height: 0.95;
+		font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+		letter-spacing: 0;
+		color: #001a92;
+		text-shadow:
+			2px 2px 0 #ffd400,
+			4px 4px 0 #d60000;
+	}
+
+	.roc-wordart span {
+		display: inline-block;
+		background: linear-gradient(180deg, #ff1414 0%, #fff600 42%, #00e5ff 74%, #001a92 100%);
+		background-clip: text;
+		color: transparent;
+		-webkit-text-stroke: 1px #00105e;
+	}
+
+	.roc-wordart span:nth-child(1) {
+		transform: skewX(-8deg) scaleY(1.12);
+	}
+
+	.roc-wordart span:nth-child(2) {
+		transform: translateY(1px) scaleX(1.08);
+	}
+
+	.roc-wordart span:nth-child(3) {
+		transform: skewX(4deg) scaleY(1.04);
+	}
+
+	.roc-hero__lead {
+		max-width: 48rem;
+		margin: 0.55rem 0;
+		font-size: 1.04rem;
+		font-weight: 700;
+		line-height: 1.7;
+	}
+
+	.roc-hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.42rem;
+		margin-top: 0.65rem;
+	}
+
+	.roc-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.25rem;
+		padding: 0.34rem 0.78rem;
+		color: #fff !important;
+		background: linear-gradient(180deg, #55b9ff 0%, #0044c4 52%, #001f88 100%);
+		border: 2px outset #9ed6ff;
+		box-shadow:
+			inset 1px 1px 0 #fff,
+			2px 2px 0 #595959;
+		font-family: Tahoma, "Microsoft JhengHei", sans-serif;
+		font-size: 0.96rem;
+		font-weight: 800;
+		text-decoration: none !important;
+		text-shadow: 1px 1px 0 #001452;
+	}
+
+	.roc-button--secondary {
+		color: #111 !important;
+		background: linear-gradient(180deg, #fff8bd, #f1b000);
+		border-color: #ffdc55;
+		text-shadow: none;
+	}
+
+	.roc-button--full {
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.roc-photo-stack {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.3rem;
+		align-content: start;
+		padding: 0.25rem;
+		background: #d5d5d5;
+		border: 1px solid #777;
+	}
+
+	.roc-photo-stack img {
+		width: 100%;
+		height: 8.2rem;
+		object-fit: cover;
+		border: 2px ridge #fff;
+		filter: contrast(1.18) saturate(0.9);
+	}
+
+	.roc-photo-stack img:first-child {
+		grid-column: span 2;
+		height: 10.5rem;
+		object-position: 50% 32%;
+	}
+
+	.roc-marquee {
+		overflow: hidden;
+		margin: 0.52rem 0;
+		padding: 0.32rem 0;
+		color: #d60000;
+		background: #fff8a6;
+		border: 2px solid #d60000;
+		font-weight: 800;
+		white-space: nowrap;
+	}
+
+	.roc-marquee span {
+		display: inline-block;
+		min-width: 100%;
+		padding-left: 100%;
+		animation: roc-marquee 26s linear infinite;
+	}
+
+	.roc-panel {
+		margin-top: 0.58rem;
+		padding: 0.5rem;
+		background: #fdfdf8;
+	}
+
+	.roc-panel__notice {
+		margin: 0 0 0.52rem;
+		padding: 0.38rem 0.52rem;
+		background: hsl(52 94% 83%);
+		border: 1px dashed #9b7a00;
+		font-weight: 700;
+		line-height: 1.55;
+	}
+
+	.roc-table-wrap {
+		overflow-x: auto;
+	}
+
+	.roc-data-table {
+		width: 100%;
+		min-width: 680px;
+		border-collapse: collapse;
+		background: #fff;
+		font-size: 0.94rem;
+	}
+
+	.roc-data-table th,
+	.roc-data-table td {
+		padding: 0.36rem 0.42rem;
+		border: 1px solid #777;
+		text-align: left;
+		vertical-align: middle;
+	}
+
+	.roc-data-table thead th {
+		color: #fff;
+		background: linear-gradient(180deg, #565656, #222);
+		text-shadow: 1px 1px 0 #000;
+	}
+
+	.roc-data-table tbody tr:nth-child(odd) {
+		background: #f3f6ff;
+	}
+
+	.roc-data-table tbody tr:nth-child(even) {
+		background: #fffdee;
+	}
+
+	.roc-stamp {
+		display: inline-block;
+		padding: 0.08rem 0.32rem;
+		color: #d60000;
+		background: #fff;
+		border: 2px solid #d60000;
+		font-weight: 900;
+		transform: rotate(-1.2deg);
+	}
+
+	.roc-class-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.48rem;
+	}
+
+	.roc-course {
+		padding: 0.32rem;
+		background: #e8e8e8;
+		border: 1px solid #777;
+	}
+
+	.roc-course img {
+		display: block;
+		width: 100%;
+		height: 9rem;
+		object-fit: cover;
+		object-position: 50% 34%;
+		margin-bottom: 0.32rem;
+		border: 2px groove #fff;
+		filter: contrast(1.08) saturate(0.86);
+	}
+
+	.roc-panel--split {
+		display: grid;
+		grid-template-columns: minmax(16rem, 0.4fr) minmax(0, 1fr);
+		gap: 0.55rem;
+	}
+
+	.roc-downloads {
+		display: grid;
+		gap: 0.28rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.roc-downloads li {
+		display: grid;
+		grid-template-columns: 4.8rem 1fr;
+		gap: 0.12rem 0.42rem;
+		padding: 0.35rem;
+		background: #eef5ff;
+		border: 1px solid #7a91b9;
+	}
+
+	.roc-downloads span {
+		color: #fff;
+		background: #000095;
+		text-align: center;
+		font-size: 0.78rem;
+		font-weight: 700;
+	}
+
+	.roc-downloads small {
+		grid-column: 2;
+		color: #555;
+	}
+
+	.roc-notice-text {
+		padding: 0.45rem 0.72rem;
+		background: hsl(52 96% 77%);
+		border: 2px dotted #a68700;
+		font-size: 0.95rem;
+		font-weight: 700;
+		line-height: 1.62;
+	}
+
+	.roc-notice-text :global(ol) {
+		margin: 0;
+		padding-left: 1.3rem;
+	}
+
+	.roc-faq-list {
+		display: grid;
+		gap: 0.32rem;
+	}
+
+	.roc-faq-list details {
+		background: #f0f0f0;
+		border: 1px solid #777;
+	}
+
+	.roc-faq-list summary {
+		padding: 0.42rem 0.55rem;
+		color: #001f7d;
+		background: linear-gradient(180deg, #fff, #d7e4ff);
+		font-weight: 900;
+		cursor: pointer;
+	}
+
+	.roc-faq-list div {
+		padding: 0.42rem 0.65rem;
+		background: #fff;
+		border-top: 1px solid #999;
+		line-height: 1.65;
+	}
+
+	@keyframes roc-marquee {
+		to {
+			transform: translateX(-100%);
+		}
+	}
+
+	@media (max-width: 58rem) {
+		.roc-home {
+			padding-top: 5.8rem;
+		}
+
+		.roc-shell,
+		.roc-hero__grid,
+		.roc-panel--split {
+			grid-template-columns: 1fr;
+		}
+
+		.roc-sidebar {
+			order: 2;
+		}
+
+		.roc-class-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.roc-marquee span {
+			animation: none;
+			padding-left: 0;
+			white-space: normal;
+		}
+	}
+</style>

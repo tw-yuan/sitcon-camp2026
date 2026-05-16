@@ -140,4 +140,54 @@ type FooterIcon = keyof typeof iconMap;
 	.icon-link {
 		@apply h-6 w-6 transition-colors;
 	}
+
+	footer {
+		border-top: 3px double #000095;
+		font-family: PMingLiU, MingLiU, "Microsoft JhengHei", Arial, sans-serif;
+	}
+
+	.footer-bg {
+		background: linear-gradient(180deg, #174dbf 0%, #000095 58%, #00005f 100%);
+	}
+
+	footer :global(.aspect-25\/2) {
+		display: none;
+	}
+
+	footer > .footer-bg:nth-of-type(2) {
+		height: 0.55rem;
+		background: hsl(52 96% 76%);
+		border-top: 2px solid #d60000;
+		border-bottom: 2px solid #d60000;
+	}
+
+	footer > .footer-bg:nth-of-type(3) {
+		padding-top: 0.75rem;
+		padding-bottom: 1.2rem;
+	}
+
+	.label-base {
+		margin-bottom: 0.45rem;
+		padding: 0.28rem 0.45rem;
+		color: #fff;
+		background: linear-gradient(180deg, #565656, #222) !important;
+		border: 1px solid #fff;
+		font-size: 0.9rem;
+		text-shadow: 1px 1px 0 #000;
+	}
+
+	.link-base,
+	footer a {
+		color: #00e5ff;
+		text-decoration: underline;
+		text-shadow: 1px 1px 0 #000;
+	}
+
+	footer ul {
+		gap: 0.24rem;
+	}
+
+	footer .grid {
+		gap: 0.55rem;
+	}
 </style>

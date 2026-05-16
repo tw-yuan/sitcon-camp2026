@@ -1,0 +1,198 @@
+---
+import { scheduleDays, scheduleEvents, scheduleMeta, scheduleSlots } from "@/data/schedule";
+
+const eventById = new Map(scheduleEvents.map(event => [event.id, event]));
+
+const eventNameAt = (dayId: string, slot: string) => {
+	const day = scheduleDays.find(item => item.id === dayId);
+	const block = day?.blocks.find(item => item.startSlot === slot);
+	return block ? (eventById.get(block.eventId)?.name ?? "未公告") : "－";
+};
+---
+
+<section class="roc-schedule" aria-labelledby="roc-schedule-title">
+	<div class="roc-page-title">
+		<p>首頁 ＞ 活動資訊 ＞ 日程表公告專區</p>
+		<h1 id="roc-schedule-title">【{scheduleMeta.title}資訊公告】</h1>
+		<span>{scheduleMeta.description}</span>
+	</div>
+
+	<div class="roc-alert">※ 本表為營隊課程與生活作息服務e化查詢版本，實際時間仍以現場服務台公告為準，敬請配合辦理。</div>
+
+	<div class="roc-table-scroll" aria-label="五天活動日程表">
+		<table class="roc-schedule-table">
+			<thead>
+				<tr>
+					<th>時段</th>
+					{
+						scheduleDays.map(day => (
+							<th>
+								{day.subtitle}
+								<br />
+								{day.title.join("／")}
+							</th>
+						))
+					}
+				</tr>
+			</thead>
+			<tbody>
+				{
+					scheduleSlots.map(slot => (
+						<tr>
+							<th>{slot}</th>
+							{scheduleDays.map(day => (
+								<td>{eventNameAt(day.id, slot)}</td>
+							))}
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</div>
+
+	<section class="roc-section">
+		<h2>【活動項目摘要說明表】</h2>
+		<table class="roc-detail-table">
+			<thead>
+				<tr>
+					<th>類別</th>
+					<th>活動名稱</th>
+					<th>內容摘要</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					scheduleEvents
+						.filter(event => event.isInteractive)
+						.map(event => (
+							<tr>
+								<td>{event.category}</td>
+								<td>
+									<strong>{event.name}</strong>
+								</td>
+								<td>{event.summary}</td>
+							</tr>
+						))
+				}
+			</tbody>
+		</table>
+	</section>
+</section>
+
+<style>
+	.roc-schedule {
+		min-height: 100vh;
+		padding: 7rem max(0.55rem, calc((100% - 1180px) / 2)) 1.5rem;
+		color: #111;
+		background: linear-gradient(90deg, rgb(255 255 255 / 0.3) 1px, transparent 1px), linear-gradient(180deg, rgb(255 255 255 / 0.2) 1px, transparent 1px), #d7d4c8;
+		background-size: 16px 16px;
+		font-family: PMingLiU, MingLiU, "Microsoft JhengHei", Arial, sans-serif;
+	}
+
+	.roc-page-title,
+	.roc-alert,
+	.roc-section,
+	.roc-table-scroll {
+		border: 2px solid #777;
+		background: #fffdf2;
+		box-shadow: 3px 3px 0 #8a8a8a;
+	}
+
+	.roc-page-title {
+		padding: 0.55rem;
+		background: linear-gradient(135deg, #c7ddff, #fff 45%, #fff6a9);
+		border: 3px double #000095;
+	}
+
+	.roc-page-title p {
+		margin: 0 0 0.35rem;
+		padding: 0.25rem 0.4rem;
+		background: #e8e8e8;
+		border: 1px solid #aaa;
+		font-size: 0.86rem;
+	}
+
+	.roc-page-title h1,
+	.roc-section h2 {
+		margin: 0 0 0.42rem;
+		padding: 0.35rem 0.5rem;
+		color: #fff;
+		background: linear-gradient(180deg, #1c55c7, #000095);
+		border: 1px solid #001c6b;
+		text-shadow: 1px 1px 0 #000;
+		font-size: clamp(1.4rem, 3vw, 2.2rem);
+	}
+
+	.roc-page-title span {
+		display: block;
+		font-weight: 700;
+		line-height: 1.6;
+	}
+
+	.roc-alert {
+		margin: 0.55rem 0;
+		padding: 0.42rem 0.62rem;
+		background: hsl(52 96% 76%);
+		border-color: #d60000;
+		color: #9a0000;
+		font-weight: 900;
+	}
+
+	.roc-table-scroll {
+		overflow-x: auto;
+		padding: 0.45rem;
+	}
+
+	.roc-schedule-table,
+	.roc-detail-table {
+		width: 100%;
+		min-width: 760px;
+		border-collapse: collapse;
+		background: #fff;
+		font-size: 0.93rem;
+	}
+
+	.roc-schedule-table th,
+	.roc-schedule-table td,
+	.roc-detail-table th,
+	.roc-detail-table td {
+		padding: 0.36rem 0.42rem;
+		border: 1px solid #777;
+		text-align: left;
+		vertical-align: top;
+	}
+
+	.roc-schedule-table thead th,
+	.roc-detail-table thead th {
+		color: #fff;
+		background: linear-gradient(180deg, #565656, #222);
+		text-shadow: 1px 1px 0 #000;
+	}
+
+	.roc-schedule-table tbody th {
+		color: #001f7d;
+		background: #e1ebff;
+		white-space: nowrap;
+	}
+
+	.roc-schedule-table tbody tr:nth-child(odd) td,
+	.roc-detail-table tbody tr:nth-child(odd) {
+		background: #f3f6ff;
+	}
+
+	.roc-schedule-table tbody tr:nth-child(even) td,
+	.roc-detail-table tbody tr:nth-child(even) {
+		background: #fffdee;
+	}
+
+	.roc-section {
+		margin-top: 0.62rem;
+		padding: 0.5rem;
+	}
+
+	@media (max-width: 58rem) {
+		.roc-schedule {
+			padding-top: 5.8rem;
+		}
+	}
+</style>
