@@ -35,21 +35,27 @@ const attachmentLinks = [
 
 <section class="roc-home" aria-labelledby="roc-home-title">
 	<div class="roc-top-notice" role="status">
-		<span>【最新公告事項】SITCON 夏令營 2026 報名資訊服務e化作業持續辦理中！</span>
-		<a href={registration.cta.href}>前往 e化線上報名系統 →</a>
+		<span>【強力公告】SITCON 夏令營 2026 金光閃閃報名服務e化熱烈開鍋中！名額有限，手腳要快！</span>
+		<a href={registration.cta.href}>立刻前往 ㄅㄧㄤˋ 亮報名系統 →</a>
+	</div>
+	<div class="roc-condiment-strip" aria-label="系統環境與訪客資訊">
+		<span>本站最佳瀏覽解析度：1024×768 黃金比例</span>
+		<span>建議使用 IE 10.0 以上或 Netscape 豪華瀏覽器</span>
+		<span>今日人氣強強滾：000886</span>
+		<span>Power By ㄅㄧㄤˋ亮學生資訊服務系統</span>
 	</div>
 
 	<div class="roc-shell">
 		<aside class="roc-sidebar" aria-label="側欄導覽與重要連結">
-			<h2>本網站服務導覽</h2>
+			<h2>本網站豪華服務導覽</h2>
 			<nav class="roc-side-nav">
-				{header.navItems.map(item => <a href={item.href}>◆ {item.label}資訊專區</a>)}
-				<a href="#downloads">◆ 相關附件下載區</a>
-				<a href="#faq">◆ 常見問題服務台</a>
+				{header.navItems.map(item => <a href={item.href}>◆ {item.label}金牌資訊專區</a>)}
+				<a href="#downloads">◆ 相關附件豪華下載區</a>
+				<a href="#faq">◆ 常見問題熱心服務台</a>
 			</nav>
 
 			<div class="roc-side-box">
-				<h3>營隊基本資料</h3>
+				<h3>營隊基本資料大公開</h3>
 				<table>
 					<tbody>
 						<tr>
@@ -66,16 +72,43 @@ const attachmentLinks = [
 						</tr>
 						<tr>
 							<th>預計名額</th>
-							<td>60 名高中職學員</td>
+							<td>60 名黃金高中職學員</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
 			<div class="roc-side-box roc-side-box--yellow">
-				<h3>報名狀態查詢</h3>
-				<p>請報名者務必留意電子郵件信箱及本網站公告資訊，以維護個人相關權益。</p>
-				<a class="roc-button roc-button--full" href={registration.cta.href}>e化申辦服務</a>
+				<h3>報名狀態強力查詢</h3>
+				<p>請報名者務必日日查看電子郵件信箱及本網站公告資訊，保障權益，開心上桌，請大家作伙來配合！</p>
+				<a class="roc-button roc-button--full" href={registration.cta.href}>ㄅㄧㄤˋ亮 e化申辦服務</a>
+			</div>
+
+			<div class="roc-side-box roc-side-box--noodle">
+				<h3>本日湯頭金榜資訊</h3>
+				<table>
+					<tbody>
+						<tr>
+							<th>紅燒</th>
+							<td>軟體工程濃厚爆香湯底</td>
+						</tr>
+						<tr>
+							<th>清燉</th>
+							<td>人工智慧資料清湯金牌款</td>
+						</tr>
+						<tr>
+							<th>加辣</th>
+							<td>資訊安全攻防特製大辣</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="roc-link-badges" aria-label="網站徽章">
+				<span>IE OK</span>
+				<span>無障礙AA</span>
+				<span>OPEN DATA</span>
+				<span>HOT!</span>
 			</div>
 		</aside>
 
@@ -88,10 +121,14 @@ const attachmentLinks = [
 						<h1 id="roc-home-title" class="roc-wordart" data-shadow="SITCON Camp 2026">
 							<span>SITCON</span><span>Camp</span><span>2026</span>
 						</h1>
-						<p class="roc-hero__lead">{hero.subtitle}，五天四夜資訊科技學習與學生社群交流活動，敬請踴躍報名參加，共同邁向數位新紀元。</p>
+						<div class="roc-shop-board" aria-label="牛肉麵店式營隊公告招牌">
+							<strong>老字號紅燒資訊營隊 ㄅㄧㄤˋ亮登場</strong>
+							<span>本店嚴選高中職新鮮好奇心，現場大火熬煮五天四夜，香氣直達雲端。</span>
+						</div>
+						<p class="roc-hero__lead">{hero.subtitle}，五天四夜資訊科技學習、社群交流、熱血實作一次豪華上桌，敬請踴躍報名參加，作伙邁向金光閃閃數位新紀元。</p>
 						<div class="roc-hero__actions">
-							<a class="roc-button" href={registration.cta.href}>{registration.cta.label}服務e化</a>
-							<a class="roc-button roc-button--secondary" href={registration.ctaBrochure.href}>下載報名簡章</a>
+							<a class="roc-button" href={registration.cta.href}>{registration.cta.label}｜ㄅㄧㄤˋ亮服務e化</a>
+							<a class="roc-button roc-button--secondary" href={registration.ctaBrochure.href}>下載金牌報名簡章</a>
 						</div>
 					</div>
 					<div class="roc-photo-stack" aria-label="營隊活動照片">
@@ -103,20 +140,28 @@ const attachmentLinks = [
 			</header>
 
 			<div class="roc-marquee" aria-label="重要公告跑馬燈">
-				<span>★ 本活動採線上報名與資料審查作業，請詳閱簡章並依序完成填寫。 ★ 早鳥優惠及團報優惠請於期限內辦理。 ★ 如有疑義請洽服務信箱，工作人員將誠摯為您服務。</span>
+				<span>
+					★ 金光閃閃大公告：本活動採線上報名與資料審查作業，請詳閱簡章並依序完成填寫！ ★ 早鳥優惠、團報優惠強力開放，請於期限內辦理，逾期只好含淚加湯！ ★
+					如有疑義請洽服務信箱，工作人員將以熱湯般的誠意為您服務！
+				</span>
 			</div>
 
 			<section class="roc-panel" id="registration-info" aria-labelledby="registration-title">
-				<h2 id="registration-title">【報名資訊與費用標準一覽表】</h2>
+				<h2 id="registration-title">【報名資訊與豪華費用標準一覽表】</h2>
+				<div class="roc-menu-board" aria-label="台式麵店價目牌">
+					<span>紅燒課程開運套餐 $8900 起</span>
+					<span>清燉資料處理金牌款 $9900</span>
+					<span>加麵團報優惠 強力推薦</span>
+				</div>
 				<div class="roc-table-wrap">
 					<table class="roc-data-table">
 						<thead>
 							<tr>
-								<th>項次</th>
+								<th>開運項次</th>
 								<th>報名身分類別</th>
-								<th>收費標準</th>
+								<th>金牌收費標準</th>
 								<th>辦理狀態</th>
-								<th>備註說明</th>
+								<th>貼心備註說明</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -129,9 +174,9 @@ const attachmentLinks = [
 											<strong>{row.price}</strong>
 										</td>
 										<td>
-											<span class="roc-stamp">受理中</span>
+											<span class="roc-stamp">熱烈受理中</span>
 										</td>
-										<td>{index === 0 ? "早鳥期限內完成資料送出者適用" : "依本系統公告規定辦理"}</td>
+										<td>{index === 0 ? "早鳥期限內完成資料送出者，享金光優惠" : "依本系統公告規定辦理，請安心加湯"}</td>
 									</tr>
 								))
 							}
@@ -141,8 +186,8 @@ const attachmentLinks = [
 			</section>
 
 			<section class="roc-panel" id="master-class" aria-labelledby="class-title">
-				<h2 id="class-title">【主線課程內容資訊說明】</h2>
-				<p class="roc-panel__notice">{masterClassSection.lead}。本課程採實作導向，請學員於活動前詳閱相關通知事項。</p>
+				<h2 id="class-title">【主線課程內容金牌資訊說明】</h2>
+				<p class="roc-panel__notice">{masterClassSection.lead}。本課程採實作導向，三大主線豪華上桌，請學員於活動前詳閱相關通知事項，準備好一起把技能煮到入味。</p>
 				<div class="roc-class-grid">
 					{
 						featuredClasses.map((item, index) => (
@@ -151,19 +196,19 @@ const attachmentLinks = [
 								<table>
 									<tbody>
 										<tr>
-											<th>課程類別</th>
+											<th>課程口味</th>
 											<td>{item.title}</td>
 										</tr>
 										<tr>
-											<th>授課人員</th>
+											<th>掌杓講師</th>
 											<td>{item.instructor}</td>
 										</tr>
 										<tr>
-											<th>經歷摘要</th>
+											<th>金牌經歷</th>
 											<td>{item.achievement}</td>
 										</tr>
 										<tr>
-											<th>學習目標</th>
+											<th>ㄅㄧㄤˋ亮目標</th>
 											<td>{item.summary.join(" ")}</td>
 										</tr>
 									</tbody>
@@ -176,14 +221,14 @@ const attachmentLinks = [
 
 			<section class="roc-panel roc-panel--split" id="downloads" aria-labelledby="download-title">
 				<div>
-					<h2 id="download-title">【e化表單與相關附件下載區】</h2>
+					<h2 id="download-title">【e化表單與金光附件下載區】</h2>
 					<ul class="roc-downloads">
 						{
 							attachmentLinks.map((link, index) => (
 								<li>
 									<span>附件 {index + 1}</span>
 									<a href={link.href}>{link.label}</a>
-									<small>PDF / iCalendar / 線上文件</small>
+									<small>PDF / iCalendar / 線上文件｜請安心下載</small>
 								</li>
 							))
 						}
@@ -193,7 +238,7 @@ const attachmentLinks = [
 			</section>
 
 			<section class="roc-panel" id="faq" aria-labelledby="faq-title">
-				<h2 id="faq-title">【常見問題與服務窗口資訊】</h2>
+				<h2 id="faq-title">【常見問題與熱心服務窗口資訊】</h2>
 				<div class="roc-faq-list">
 					{
 						faq.items.map(item => (
@@ -217,9 +262,21 @@ const attachmentLinks = [
 		min-height: 100vh;
 		padding: 6.8rem 0 1.5rem;
 		color: #111;
-		background: linear-gradient(90deg, rgb(255 255 255 / 0.28) 1px, transparent 1px), linear-gradient(180deg, rgb(255 255 255 / 0.22) 1px, transparent 1px), #d9d7c9;
-		background-size: 16px 16px;
-		font-family: PMingLiU, MingLiU, "Microsoft JhengHei", Arial, sans-serif;
+		background:
+			linear-gradient(45deg, rgb(170 0 0 / 0.16) 25%, transparent 25% 75%, rgb(170 0 0 / 0.16) 75%),
+			linear-gradient(45deg, rgb(255 236 120 / 0.42) 25%, transparent 25% 75%, rgb(255 236 120 / 0.42) 75%), linear-gradient(90deg, rgb(255 255 255 / 0.28) 1px, transparent 1px),
+			linear-gradient(180deg, rgb(255 255 255 / 0.22) 1px, transparent 1px), #d9d7c9;
+		background-position:
+			0 0,
+			8px 8px,
+			0 0,
+			0 0;
+		background-size:
+			16px 16px,
+			16px 16px,
+			16px 16px,
+			16px 16px;
+		font-family: BiauKai, "標楷體", DFKai-SB, PMingLiU, MingLiU, "Microsoft JhengHei", Arial, sans-serif;
 	}
 
 	.roc-top-notice {
@@ -242,6 +299,30 @@ const attachmentLinks = [
 	.roc-home a {
 		color: #005fd1;
 		text-decoration: underline;
+	}
+
+	.roc-condiment-strip {
+		display: grid;
+		grid-template-columns: repeat(4, max-content);
+		gap: 0.22rem;
+		justify-content: center;
+		width: min(1180px, calc(100% - 18px));
+		margin: -0.28rem auto 0.42rem;
+		padding: 0.22rem 0.3rem;
+		color: #fff;
+		background: #8b0000;
+		border: 2px groove #ffd400;
+		box-shadow:
+			inset 0 0 0 1px #d60000,
+			2px 2px 0 #333;
+		font-family: "Courier New", DFKai-SB, monospace;
+		font-size: 0.78rem;
+	}
+
+	.roc-condiment-strip span {
+		padding: 0.08rem 0.35rem;
+		background: #111;
+		border: 1px inset #ffef89;
 	}
 
 	.roc-shell {
@@ -306,6 +387,19 @@ const attachmentLinks = [
 		background: hsl(52 96% 78%);
 	}
 
+	.roc-side-box--noodle {
+		background: linear-gradient(90deg, rgb(255 255 255 / 0.72) 50%, transparent 50%), #b40000;
+		background-size: 10px 10px;
+		border: 2px ridge #ffd400;
+	}
+
+	.roc-side-box--noodle h3 {
+		color: #fff600;
+		background: linear-gradient(180deg, #bd0000, #6f0000);
+		border-color: #ffd400;
+		font-family: BiauKai, "標楷體", DFKai-SB, serif;
+	}
+
 	.roc-side-box p {
 		margin: 0.2rem 0 0.55rem;
 		font-size: 0.9rem;
@@ -336,6 +430,25 @@ const attachmentLinks = [
 		color: #333;
 	}
 
+	.roc-link-badges {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.24rem;
+		margin-top: 0.48rem;
+	}
+
+	.roc-link-badges span {
+		display: grid;
+		place-items: center;
+		min-height: 1.6rem;
+		color: #fff;
+		background: linear-gradient(180deg, #00a8ff, #000095 52%, #bd0000);
+		border: 2px outset #fff;
+		font-family: "Arial Black", Tahoma, sans-serif;
+		font-size: 0.68rem;
+		text-shadow: 1px 1px 0 #000;
+	}
+
 	.roc-main {
 		padding: 0.48rem;
 		background: #fffdf2;
@@ -343,8 +456,14 @@ const attachmentLinks = [
 
 	.roc-hero {
 		padding: 0.55rem;
-		background: linear-gradient(135deg, #c7ddff 0%, #fff 44%, #fff6a9 100%);
-		border: 3px double #000095;
+		background: linear-gradient(90deg, rgb(255 255 255 / 0.68) 50%, transparent 50%), linear-gradient(135deg, #fff1b6 0%, #fff 44%, #ffd2a4 100%);
+		background-size:
+			18px 18px,
+			auto;
+		border: 5px double #8b0000;
+		box-shadow:
+			inset 0 0 0 3px #ffd400,
+			4px 4px 0 #555;
 	}
 
 	.roc-breadcrumb {
@@ -376,14 +495,18 @@ const attachmentLinks = [
 		position: relative;
 		display: inline-block;
 		margin: 0.15rem 0 0.35rem;
-		font-size: clamp(2.1rem, 6vw, 4.6rem);
+		padding: 0.12rem 0.32rem 0.22rem;
+		font-size: clamp(2.2rem, 6vw, 4.8rem);
 		line-height: 0.95;
-		font-family: Impact, "Arial Black", "Microsoft JhengHei", sans-serif;
+		font-family: BiauKai, "標楷體", DFKai-SB, "Arial Black", serif;
 		letter-spacing: 0;
 		color: #001a92;
+		background: linear-gradient(180deg, #bd0000, #6f0000);
+		border: 4px ridge #ffd400;
 		text-shadow:
-			2px 2px 0 #ffd400,
-			4px 4px 0 #d60000;
+			1px 1px 0 #fff,
+			3px 3px 0 #ffd400,
+			5px 5px 0 #111;
 		transform-origin: 50% 54%;
 		transform-style: preserve-3d;
 		animation: roc-wordart-spin 5.8s steps(22, end) infinite;
@@ -405,10 +528,10 @@ const attachmentLinks = [
 
 	.roc-wordart span {
 		display: inline-block;
-		background: linear-gradient(180deg, #ff1414 0%, #fff600 42%, #00e5ff 74%, #001a92 100%);
+		background: linear-gradient(180deg, #fffad2 0%, #fff600 38%, #ffb000 58%, #00e5ff 78%, #fff 100%);
 		background-clip: text;
 		color: transparent;
-		-webkit-text-stroke: 1px #00105e;
+		-webkit-text-stroke: 1px #4a0000;
 	}
 
 	.roc-wordart span:nth-child(1) {
@@ -421,6 +544,33 @@ const attachmentLinks = [
 
 	.roc-wordart span:nth-child(3) {
 		transform: skewX(4deg) scaleY(1.04);
+	}
+
+	.roc-shop-board {
+		display: grid;
+		width: fit-content;
+		max-width: 100%;
+		margin: 0.48rem 0 0.35rem;
+		padding: 0.32rem 0.58rem 0.38rem;
+		color: #fff600;
+		background: radial-gradient(circle at 8px 8px, #ffd400 0 2px, transparent 2.2px), linear-gradient(180deg, #d60000, #7b0000);
+		background-size:
+			18px 18px,
+			auto;
+		border: 3px ridge #ffdc55;
+		box-shadow: 3px 3px 0 #222;
+		font-family: BiauKai, "標楷體", DFKai-SB, serif;
+		text-shadow: 2px 2px 0 #000;
+		transform: rotate(-0.6deg);
+	}
+
+	.roc-shop-board strong {
+		font-size: clamp(1.25rem, 2.5vw, 1.9rem);
+	}
+
+	.roc-shop-board span {
+		color: #fff;
+		font-size: 0.92rem;
 	}
 
 	.roc-hero__lead {
@@ -524,6 +674,28 @@ const attachmentLinks = [
 		border: 1px dashed #9b7a00;
 		font-weight: 700;
 		line-height: 1.55;
+	}
+
+	.roc-menu-board {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.32rem;
+		margin: 0 0 0.45rem;
+		padding: 0.38rem;
+		background: #8b0000;
+		border: 3px ridge #ffd400;
+	}
+
+	.roc-menu-board span {
+		padding: 0.28rem 0.34rem;
+		color: #fff600;
+		background: #111;
+		border: 1px dashed #ffef89;
+		font-family: BiauKai, "標楷體", DFKai-SB, serif;
+		font-size: clamp(0.88rem, 1.5vw, 1.12rem);
+		font-weight: 900;
+		text-align: center;
+		text-shadow: 1px 1px 0 #d60000;
 	}
 
 	.roc-table-wrap {
@@ -709,6 +881,11 @@ const attachmentLinks = [
 	@media (max-width: 58rem) {
 		.roc-home {
 			padding-top: 5.8rem;
+		}
+
+		.roc-condiment-strip,
+		.roc-menu-board {
+			grid-template-columns: 1fr;
 		}
 
 		.roc-shell,
