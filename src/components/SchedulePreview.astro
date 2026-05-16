@@ -1,7 +1,18 @@
 ---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
 import X from "~icons/lucide/x";
 import type { ScheduleBlock, ScheduleDay, ScheduleDayType, ScheduleEvent, ScheduleEventCategory } from "@/data/schedule";
 import { scheduleDays, scheduleEvents, scheduleMeta, scheduleSlots } from "@/data/schedule";
+
+const scheduleImageModules = import.meta.glob<{ default: ImageMetadata }>("../assets/schedule/*.{jpg,jpeg,png,webp}", { eager: true });
+const scheduleImages = new Map(
+	Object.entries(scheduleImageModules).map(([path, mod]) => {
+		const filename = path.split("/").pop() ?? path;
+		const key = filename.replace(/\.(jpe?g|png|webp)$/i, "");
+		return [key, mod.default];
+	})
+);
 
 const eventsById = new Map(scheduleEvents.map(event => [event.id, event]));
 const scheduleSlotIndexMap = new Map(scheduleSlots.map((slot, index) => [slot, index]));
@@ -33,6 +44,22 @@ const getEvent = (eventId: string): ScheduleEvent => {
 	}
 
 	return event;
+};
+
+const getScheduleImage = (event: ScheduleEvent): ImageMetadata => {
+	const imageKey = event.image?.key;
+
+	if (!imageKey) {
+		throw new Error(`Missing schedule image key: ${event.id}`);
+	}
+
+	const image = scheduleImages.get(imageKey);
+
+	if (!image) {
+		throw new Error(`Missing schedule image asset: ${imageKey}`);
+	}
+
+	return image;
 };
 
 const getBlockSpan = (block: ScheduleBlock): number => {
@@ -215,11 +242,22 @@ const getRenderableBlocks = (day: ScheduleDay) => {
 			<div class="schedule-dialog" data-schedule-dialog={event.id} role="dialog" aria-modal="true" aria-labelledby={`schedule-dialog-title-${event.id}`} hidden>
 				{(() => {
 					const descriptionLines = event.description ?? [];
+					const image = getScheduleImage(event);
+					const imageAlt = event.image?.alt ?? "";
 
 					return (
 						<div class="schedule-dialog__panel">
 							<div class="schedule-dialog__image-wrap">
-								<img class="schedule-dialog__image" src={event.image?.src} alt={event.image?.alt} loading="lazy" decoding="async" />
+								<Image
+									class="schedule-dialog__image"
+									src={image}
+									alt={imageAlt}
+									loading="lazy"
+									decoding="async"
+									format="webp"
+									widths={[640, 960, 1280, 1600]}
+									sizes="(max-width: 72rem) 100vw, 52vw"
+								/>
 							</div>
 							<div class="schedule-dialog__content">
 								<span class:list={["schedule-dialog__badge", categoryClassMap[event.category]]}>{event.category}</span>

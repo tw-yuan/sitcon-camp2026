@@ -34,7 +34,7 @@ export interface ScheduleEvent {
 	isInteractive?: boolean;
 	description?: string[];
 	image?: {
-		src: string;
+		key: string;
 		alt: string;
 	};
 }
@@ -53,7 +53,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "啟程",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/start-and-opening.jpg",
+			key: "start-and-opening",
 			alt: "SITCON Camp 開幕現場"
 		}
 	},
@@ -65,7 +65,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/icebreaking.jpg",
+			key: "icebreaking",
 			alt: "學員在破冰活動中互動交流"
 		}
 	},
@@ -82,7 +82,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/quest.jpg",
+			key: "quest",
 			alt: "學員參與闖關活動"
 		}
 	},
@@ -94,7 +94,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/agent-battle.jpg",
+			key: "agent-battle",
 			alt: "學員操作著電腦"
 		}
 	},
@@ -108,7 +108,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "啟程",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/lab-setup.jpg",
+			key: "lab-setup",
 			alt: "課程環境設定"
 		}
 	},
@@ -120,7 +120,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "主線課程",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/software-main.jpg",
+			key: "software-main",
 			alt: "軟體工程主題日課程現場"
 		}
 	},
@@ -132,7 +132,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "主線課程",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/ai-main.jpg",
+			key: "ai-main",
 			alt: "人工智慧主題日課程現場"
 		}
 	},
@@ -144,7 +144,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "主線課程",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/security-main.jpg",
+			key: "security-main",
 			alt: "資訊安全主題日課程現場"
 		}
 	},
@@ -160,7 +160,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "主線課程",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/software-main.jpg",
+			key: "software-main",
 			alt: "AI 寫程式經驗交流"
 		}
 	},
@@ -177,7 +177,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/heisenbug.jpg",
+			key: "heisenbug",
 			alt: "學員參與海森堡 Bug 活動"
 		}
 	},
@@ -193,7 +193,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/reality-puzzle.jpg",
+			key: "reality-puzzle",
 			alt: "學員參與實境解謎"
 		}
 	},
@@ -209,7 +209,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/learning-wrap.jpg",
+			key: "learning-wrap",
 			alt: "開源理念分享"
 		}
 	},
@@ -224,7 +224,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/community-fair.jpg",
+			key: "community-fair",
 			alt: "社群博覽會攤位交流現場"
 		}
 	},
@@ -240,7 +240,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/vision-cafe.jpg",
+			key: "vision-cafe",
 			alt: "視界咖啡館交流現場"
 		}
 	},
@@ -254,7 +254,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "活動",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/roundtable-discussion.jpg",
+			key: "roundtable-discussion",
 			alt: "學員在專題圓桌討論會中交流討論"
 		}
 	},
@@ -266,7 +266,7 @@ export const scheduleEvents: ScheduleEvent[] = [
 		category: "總結",
 		isInteractive: true,
 		image: {
-			src: "/2026/images/schedule/closing.jpg",
+			key: "closing",
 			alt: "閉幕活動與學員合影現場"
 		}
 	},

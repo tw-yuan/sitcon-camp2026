@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import IcRoundPlayCircle from "~icons/ic/round-play-circle";
+import thumbnail from "@/assets/about/about-video-thumbnail.jpg";
 
 import aboutData from "@/data/about.json";
 
@@ -8,7 +10,6 @@ type AboutVideoContent = {
 	title: string;
 	lead: string;
 	label: string;
-	thumbnailUrl: string;
 	embedUrl: string;
 };
 
@@ -30,7 +31,16 @@ const video = aboutData.aboutVideo as AboutVideoContent;
 			<div class="bg-foreground overflow-hidden rounded-[2rem_0_2rem_0] p-2 shadow-[0.5rem_0.5rem_0_0_var(--color-soft-blue)]">
 				<div class="about-video-frame relative aspect-video overflow-hidden rounded-[1.5rem_0_1.5rem_0]" data-about-video data-embed-url={video.embedUrl} data-video-label={video.label}>
 					<button type="button" class="group absolute inset-0 block h-full w-full cursor-pointer" aria-label={`播放 ${video.label}`} data-about-video-play>
-						<img src={video.thumbnailUrl} alt="" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
+						<Image
+							src={thumbnail}
+							alt=""
+							class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+							loading="lazy"
+							decoding="async"
+							format="webp"
+							widths={[640, 960, 1280]}
+							sizes="(max-width: 80rem) 100vw, 42rem"
+						/>
 						<div class="from-foreground/85 absolute inset-0 flex items-center justify-center bg-linear-to-t from-0% via-transparent to-black/15">
 							<span class="bg-background/95 text-foreground grid size-18 place-items-center rounded-full shadow-lg transition-transform duration-300 group-hover:scale-110 sm:size-22">
 								<IcRoundPlayCircle class="text-6xl sm:text-7xl" />
