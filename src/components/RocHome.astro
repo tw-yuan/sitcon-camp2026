@@ -374,6 +374,7 @@ const attachmentLinks = [
 
 	.roc-wordart {
 		position: relative;
+		display: inline-block;
 		margin: 0.15rem 0 0.35rem;
 		font-size: clamp(2.1rem, 6vw, 4.6rem);
 		line-height: 0.95;
@@ -383,6 +384,23 @@ const attachmentLinks = [
 		text-shadow:
 			2px 2px 0 #ffd400,
 			4px 4px 0 #d60000;
+		transform-origin: 50% 54%;
+		transform-style: preserve-3d;
+		animation: roc-wordart-spin 5.8s steps(22, end) infinite;
+		will-change: transform, filter;
+	}
+
+	.roc-wordart::after {
+		content: attr(data-shadow);
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		color: rgb(0 0 0 / 0.18);
+		text-shadow:
+			7px 9px 0 rgb(0 0 0 / 0.18),
+			-2px 3px 0 rgb(0 149 255 / 0.36);
+		transform: translate(9px, 10px) skewX(-18deg) scaleY(1.24);
+		pointer-events: none;
 	}
 
 	.roc-wordart span {
@@ -656,6 +674,38 @@ const attachmentLinks = [
 		}
 	}
 
+	@keyframes roc-wordart-spin {
+		0% {
+			transform: perspective(420px) rotateY(0deg) rotateX(0deg) skewX(-1deg);
+			filter: brightness(1) contrast(1.08);
+		}
+
+		18% {
+			transform: perspective(420px) rotateY(74deg) rotateX(7deg) skewX(-5deg);
+			filter: brightness(1.22) contrast(1.18);
+		}
+
+		36% {
+			transform: perspective(420px) rotateY(158deg) rotateX(-4deg) skewX(2deg);
+			filter: brightness(0.88) contrast(1.35);
+		}
+
+		54% {
+			transform: perspective(420px) rotateY(226deg) rotateX(8deg) skewX(-3deg);
+			filter: brightness(1.16) contrast(1.16);
+		}
+
+		72% {
+			transform: perspective(420px) rotateY(306deg) rotateX(-6deg) skewX(4deg);
+			filter: brightness(0.98) contrast(1.28);
+		}
+
+		100% {
+			transform: perspective(420px) rotateY(360deg) rotateX(0deg) skewX(-1deg);
+			filter: brightness(1) contrast(1.08);
+		}
+	}
+
 	@media (max-width: 58rem) {
 		.roc-home {
 			padding-top: 5.8rem;
@@ -677,6 +727,12 @@ const attachmentLinks = [
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.roc-wordart {
+			animation: none;
+			transform: none;
+			filter: none;
+		}
+
 		.roc-marquee span {
 			animation: none;
 			padding-left: 0;
