@@ -192,7 +192,111 @@ const eventNameAt = (dayId: string, slot: string) => {
 
 	@media (max-width: 58rem) {
 		.roc-schedule {
-			padding-top: 5.8rem;
+			padding: 5.4rem 0.32rem 0.75rem;
+			overflow-x: hidden;
+		}
+
+		.roc-page-title,
+		.roc-alert,
+		.roc-section,
+		.roc-table-scroll {
+			box-shadow: 1px 1px 0 #8a8a8a;
+		}
+
+		.roc-table-scroll {
+			overflow: visible;
+		}
+
+		.roc-schedule-table,
+		.roc-detail-table,
+		.roc-schedule-table thead,
+		.roc-detail-table thead,
+		.roc-schedule-table tbody,
+		.roc-detail-table tbody,
+		.roc-schedule-table tr,
+		.roc-detail-table tr,
+		.roc-schedule-table th,
+		.roc-detail-table th,
+		.roc-schedule-table td,
+		.roc-detail-table td {
+			display: block;
+			min-width: 0;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.roc-schedule-table thead,
+		.roc-detail-table thead {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip: rect(0 0 0 0);
+		}
+
+		.roc-schedule-table tr,
+		.roc-detail-table tr {
+			margin-bottom: 0.45rem;
+			border: 2px solid #777;
+		}
+
+		.roc-schedule-table tbody th {
+			border-width: 0 0 1px;
+		}
+
+		.roc-schedule-table td,
+		.roc-detail-table td {
+			display: grid;
+			grid-template-columns: 5.8rem minmax(0, 1fr);
+			gap: 0.35rem;
+			border-width: 0 0 1px;
+		}
+
+		.roc-schedule-table td:nth-child(2)::before {
+			content: "Day 1";
+			font-weight: 900;
+		}
+
+		.roc-schedule-table td:nth-child(3)::before {
+			content: "Day 2";
+			font-weight: 900;
+		}
+
+		.roc-schedule-table td:nth-child(4)::before {
+			content: "Day 3";
+			font-weight: 900;
+		}
+
+		.roc-schedule-table td:nth-child(5)::before {
+			content: "Day 4";
+			font-weight: 900;
+		}
+
+		.roc-schedule-table td:nth-child(6)::before {
+			content: "Day 5";
+			font-weight: 900;
+		}
+
+		.roc-detail-table td:nth-child(1)::before {
+			content: "類別";
+			font-weight: 900;
+		}
+
+		.roc-detail-table td:nth-child(2)::before {
+			content: "活動名稱";
+			font-weight: 900;
+		}
+
+		.roc-detail-table td:nth-child(3)::before {
+			content: "內容摘要";
+			font-weight: 900;
+		}
+	}
+
+	@media (max-width: 28rem) {
+		.roc-schedule-table td,
+		.roc-detail-table td {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

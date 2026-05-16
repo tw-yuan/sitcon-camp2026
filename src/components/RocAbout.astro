@@ -284,11 +284,91 @@ const visibleGroups = team.groups.slice(0, 8);
 
 	@media (max-width: 58rem) {
 		.roc-about {
-			padding-top: 5.8rem;
+			padding: 5.4rem 0.32rem 0.75rem;
+			overflow-x: hidden;
 		}
 
 		.roc-about-grid,
 		.roc-stats {
+			grid-template-columns: 1fr;
+		}
+
+		.roc-page-title,
+		.roc-alert,
+		.roc-section,
+		.roc-photo-box {
+			box-shadow: 1px 1px 0 #8a8a8a;
+		}
+
+		table,
+		thead,
+		tbody,
+		tr,
+		th,
+		td {
+			display: block;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		thead {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip: rect(0 0 0 0);
+		}
+
+		tr {
+			margin-bottom: 0.45rem;
+			border: 2px solid #777;
+		}
+
+		td {
+			display: grid;
+			grid-template-columns: 5.8rem minmax(0, 1fr);
+			gap: 0.35rem;
+			border-width: 0 0 1px;
+		}
+
+		.roc-section:first-child td:nth-child(1)::before {
+			content: "項次";
+			font-weight: 900;
+		}
+
+		.roc-section:first-child td:nth-child(2)::before {
+			content: "活動名稱";
+			font-weight: 900;
+		}
+
+		.roc-section:first-child td:nth-child(3)::before {
+			content: "服務定位";
+			font-weight: 900;
+		}
+
+		.roc-section:first-child td:nth-child(4)::before {
+			content: "說明";
+			font-weight: 900;
+		}
+
+		.roc-section:nth-of-type(3) td:nth-child(1)::before {
+			content: "組別";
+			font-weight: 900;
+		}
+
+		.roc-section:nth-of-type(3) td:nth-child(2)::before {
+			content: "業務職掌";
+			font-weight: 900;
+		}
+
+		.roc-section:nth-of-type(3) td:nth-child(3)::before {
+			content: "人員資料";
+			font-weight: 900;
+		}
+	}
+
+	@media (max-width: 28rem) {
+		td {
 			grid-template-columns: 1fr;
 		}
 	}
