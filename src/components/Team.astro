@@ -152,7 +152,7 @@ const avatarImages = import.meta.glob<{ default: ImageMetadata }>("../assets/tea
 					id="layout-avatar"
 				/>
 				<div class="flex h-full w-full min-w-0 flex-col justify-between">
-					<h1 class="mx-auto text-3xl font-bold md:mx-0 md:text-6xl" id="layout-name">{modal.namePlaceholder}</h1>
+					<h2 class="mx-auto text-3xl font-bold md:mx-0 md:text-6xl" id="layout-name">{modal.namePlaceholder}</h2>
 					<p class="text-foreground my-4 text-lg font-bold" id="layout-des">{modal.descriptionPlaceholder}</p>
 					<a class="text-blue mt-auto block truncate text-lg font-bold underline underline-offset-3" id="layout-link" target="_blank" rel="noopener noreferrer" hidden>
 						{modal.linkPlaceholder}
@@ -169,7 +169,7 @@ const avatarImages = import.meta.glob<{ default: ImageMetadata }>("../assets/tea
 	</div>
 
 	<section class="site-container">
-		<h1 class="bg-green h-fit w-fit p-3 text-5xl font-bold text-black">{teamContent.title}</h1>
+		<h2 class="bg-green h-fit w-fit p-3 text-5xl font-bold text-black">{teamContent.title}</h2>
 		{
 			teamGroups.map(group => (
 				<section class="my-4 mt-12 lg:mt-16">

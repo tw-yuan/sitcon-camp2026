@@ -42,7 +42,7 @@ const sections = aboutData.organizerBrands.sections
 		{
 			sections.map(([tag, items]) => (
 				<section class="mt-12 first:mt-0 md:mt-24 lg:mt-32">
-					<h1 class="mb-4 text-center text-3xl font-bold md:text-left md:text-4xl lg:text-[3rem]">{tag}</h1>
+					<h2 class="mb-4 text-center text-3xl font-bold md:text-left md:text-4xl lg:text-[3rem]">{tag}</h2>
 					<div class="flex flex-wrap items-center justify-center gap-8 gap-y-10 sm:gap-10 md:justify-start lg:gap-12">
 						{items.map(org => {
 							const logoClass = "h-full w-auto max-w-full object-contain";
